@@ -1,25 +1,37 @@
 <div align="center">
 <h1 align="center">Maple</h1>
-<img align="center" width="256" height="256" src="https://femboylamkas.please-fuck.me/BjB79T.png" />
+<br />
+<img align="center" width="256" height="256" src="https://femboylamkas.please-fuck.me/yJTKni.png" />
+<br />
 </div>
 
 <div align="center">
-<h3>A shitpost programming language</h3>
+<h3><i>A shitpost programming language based on C++</i></h3>
+<p>Extension (.maple)</p>
+</div>
+
+<div align="center">
+<h4>Quick Start</h4>
+<p>Read <a href="https://github.com/LamkasDev/maple/wiki">here</a> (soon)</p>
+  
+<h4>Contributing</h4>
+<p>That's great! Make a <a href="https://github.com/LamkasDev/maple/pullse">pull request</a>~</p>
 </div>
 <hr />
 
 <div align="center">
-<h3>Why?</h3>
+<h3>❓ Why?</h3>
 <p>
-I'm bored lol
+I'm bored lol, also want to practice C++
 </p>
 
-<h3>Features</h3>
+<h3>🔥 Features</h3>
 <p>
-✅ Can count numbers together sometimes
+1️⃣ Can count numbers together sometimes~<br />
+👻 Also floats, cool stuff~
 </p>
 
-<h3>Is that all?</h3>
+<h3>🥺 Is that all?</h3>
 <p>
 yep
 </p>
@@ -29,7 +41,8 @@ yep
 <div align="center">
 <h3>Compiling the runner (Windows)</h3>
 <p>
-You're gonna need <code>gcc</code> (any version is fine i think) and compile the <code>shell.cpp</code> file
+You're gonna need <code>gcc</code> (any version is fine i think) and compile the <code>shell.cpp</code> file<br />
+<i>(don't ask for a make install, i'm too lazy)</i>
 </p>
 
 <h3>Commands</h3>
