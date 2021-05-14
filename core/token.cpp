@@ -1,0 +1,72 @@
+#pragma once
+#include <string>
+#include <list>
+#include "error.cpp"
+using namespace std;
+
+const string DIGITS = "0123456789";
+const string TT_INT = "TT_INT";
+const string TT_FLOAT = "TT_FLOAT";
+const string TT_PLUS = "PLUS";
+const string TT_MINUS = "MINUS";
+const string TT_MUL = "MUL";
+const string TT_DIV = "DIV";
+const string TT_LPAREN = "LPAREN";
+const string TT_RPAREN = "RPAREN";
+const string TT_EOF = "EOF";
+
+class Token {
+    public:
+        Position start;
+        Position end;
+        string type;
+        int value_int;
+        float value_float;
+
+        void init(string _type) {
+            type = _type;
+        }
+
+        void set_start(Position _start) {
+            start = _start.copy();
+            end = _start.copy();
+            end.advance();
+        }
+
+        void set_end(Position _end) {
+            end = _end;
+        }
+
+        string repr() {
+            if(type == TT_INT) {
+                return type + ":" + to_string(value_int);
+            } else if(type == TT_FLOAT) {
+                return type + ":" + to_string(value_float);
+            }
+
+            return type;
+        }
+};
+
+class TokenInt : public Token {
+    public:
+        void init(string _type, int _value) {
+            type = _type;
+            value_int = _value;
+        }
+};
+
+class TokenFloat : public Token {
+    public:
+        void init(string _type, float _value) {
+            type = _type;
+            value_float = _value;
+        }
+};
+
+class MakeTokensResult {
+    public:
+        int state = 0;
+        Error e;
+        list<Token> tokens;
+};
