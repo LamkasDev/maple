@@ -46,6 +46,30 @@ class Interpreter {
             return n;
         }
 
+        InterpreterResult visit_unary_node(UnaryOperationNode node) {
+            //printf("Found unary node-\n");
+
+            InterpreterResult res;
+            if(node.op.type == TT_PLUS) {
+                if(node.node.type == NODE_INT) {
+                    IntNumber n = visit_int_node(node.node); /*n.set_pos(node.start, node.end);*/ res.init(n);
+                } else {
+                    FloatNumber n = visit_float_node(node.node); /*n.set_pos(node.start, node.end);*/ res.init(n);
+                }
+            } else if(node.op.type == TT_MINUS) {
+                IntNumber n_m;
+                n_m.init(-1);
+            
+                if(node.node.type == NODE_INT) {
+                    IntNumber n = n_m.multiplied_by(visit_int_node(node.node)); /*n.set_pos(node.start, node.end);*/ res.init(n);
+                } else {
+                    FloatNumber n = n_m.multiplied_by(visit_float_node(node.node)); /*n.set_pos(node.start, node.end);*/ res.init(n);
+                }
+            }
+
+            return res;
+        }
+
         InterpreterResult visit_binary_node(BinaryOperationNode* node) {
             //printf("Found binary node-\n");
             string left_type = (*node).left_type;
@@ -62,6 +86,9 @@ class Interpreter {
                 left_int = visit_int_node((*node).left);
             } else if(left_type == NODE_FLOAT) {
                 left_float = visit_float_node((*node).left);
+            } else if(left_type == NODE_UNARY) {
+                InterpreterResult res = visit_unary_node((*node).left_unary);
+                if(res.type == NODE_INT) { left_int = res.res_int; left_type = NODE_INT; } else { left_float = res.res_float; left_type = NODE_FLOAT; }
             } else if(left_type == NODE_BINARY) {
                 InterpreterResult res = visit_binary_node((*node).left_binary);
                 if(res.type == NODE_INT) { left_int = res.res_int; left_type = NODE_INT; } else { left_float = res.res_float; left_type = NODE_FLOAT; }
@@ -71,6 +98,9 @@ class Interpreter {
                 right_int = visit_int_node((*node).right);
             } else if(right_type == NODE_FLOAT) {
                 right_float = visit_float_node((*node).right);
+            } else if(right_type == NODE_UNARY) {
+                InterpreterResult res = visit_unary_node((*node).right_unary);
+                if(res.type == NODE_INT) { right_int = res.res_int; right_type = NODE_INT; } else { right_float = res.res_float; right_type = NODE_FLOAT; }
             } else if(right_type == NODE_BINARY) {
                 InterpreterResult res = visit_binary_node((*node).right_binary);
                 if(res.type == NODE_INT) { right_int = res.res_int; right_type = NODE_INT; } else { right_float = res.res_float; right_type = NODE_FLOAT; }
@@ -120,30 +150,6 @@ class Interpreter {
             }
             
             //printf("returning: %s\n", (res.type == NODE_INT ? to_string(res.res_int.value).c_str() : to_string(res.res_float.value).c_str()));
-            return res;
-        }
-
-        InterpreterResult visit_unary_node(UnaryOperationNode node) {
-            //printf("Found unary node-\n");
-
-            InterpreterResult res;
-            if(node.op.type == TT_PLUS) {
-                if(node.node.type == NODE_INT) {
-                    IntNumber n = visit_int_node(node.node); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                } else {
-                    FloatNumber n = visit_float_node(node.node); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                }
-            } else if(node.op.type == TT_MINUS) {
-                IntNumber n_m;
-                n_m.init(-1);
-            
-                if(node.node.type == NODE_INT) {
-                    IntNumber n = n_m.multiplied_by(visit_int_node(node.node)); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                } else {
-                    FloatNumber n = n_m.multiplied_by(visit_float_node(node.node)); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                }
-            }
-
             return res;
         }
 
