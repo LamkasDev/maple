@@ -33,21 +33,12 @@ class Parser {
             return res;
         }
 
-        ParserResult factor() {
+        ParserResult atom() {
             ParserResult result;
             result.init();
 
             Token t = current_t;
-            if(t.type == TT_PLUS || t.type == TT_MINUS) {
-                advance();
-                ParserResult n_0 = factor();
-                if(n_0.state == -1) { return result.failure(n_0.e); }
-                UnaryOperationNode n; n.init(t, n_0.node_number);
-
-                result.node_type = n.type;
-                result.node_unary = n;
-                return result.success();
-            } else if(t.type == TT_INT) {
+            if(t.type == TT_INT) {
                 advance();
                 IntNode n; n.init(t);
 
@@ -79,8 +70,59 @@ class Parser {
             }
 
             InvalidSyntaxError e;
-            e.init(t.start, t.end, "Expected int or float");
+            e.init(t.start, t.end, "Expected int or float, '+', '-' or '('");
             return result.failure(e);
+        }
+
+        ParserResult power() {
+            ParserResult result;
+            result.init();
+
+            ParserResult left = result.registerResult(atom());
+            if(result.state == -1) { return result; }
+
+            BinaryOperationNode* op = new BinaryOperationNode();
+            left.set_to_left(op);
+
+            while(current_t.type == TT_POW) {
+                Token op_token = current_t;
+                (*op).init(op_token);
+                advance();
+
+                ParserResult right = result.registerResult(factor());
+                if(result.state == -1) {
+                    break;
+                }
+
+                if((*op).right_type != NODE_UNKNOWN) {
+                    BinaryOperationNode* copy = op->copy();
+                    (*op).set_left(copy);
+                }
+                right.set_to_right(op);
+            }
+            if(result.state == -1) { return result; }
+            result.set_from(op);
+
+            return result.success();
+        }
+
+        ParserResult factor() {
+            ParserResult result;
+            result.init();
+
+            Token t = current_t;
+            if(t.type == TT_PLUS || t.type == TT_MINUS) {
+                advance();
+                ParserResult n_0 = factor();
+                if(n_0.state == -1) { return result.failure(n_0.e); }
+                UnaryOperationNode n; n.init(t, n_0.node_number);
+
+                result.node_type = n.type;
+                result.node_unary = n;
+                return result.success();
+            }
+
+            return power();
         }
 
         ParserResult term() {
@@ -105,7 +147,6 @@ class Parser {
 
                 if((*op).right_type != NODE_UNKNOWN) {
                     BinaryOperationNode* copy = op->copy();
-
                     (*op).set_left(copy);
                 }
                 right.set_to_right(op);
@@ -113,7 +154,6 @@ class Parser {
             if(result.state == -1) { return result; }
             result.set_from(op);
 
-            //printf("term: %s\n", result.node_type.c_str());
             return result.success();
         }
 
@@ -139,7 +179,6 @@ class Parser {
 
                 if((*op).right_type != NODE_UNKNOWN) {
                     BinaryOperationNode* copy = op->copy();
-                    
                     (*op).set_left(copy);
                 }
                 right.set_to_right(op);
@@ -147,7 +186,6 @@ class Parser {
             if(result.state == -1) { return result; }
             result.set_from(op);
 
-            //printf("expr: %s\n", result.node_type.c_str());
             return result.success();
         }
 };

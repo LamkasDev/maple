@@ -66,6 +66,14 @@ class Lexer {
                         break;
                     }
 
+                    case '^': {
+                        Token t;
+                        t.init(TT_POW);
+                        t.set_start(pos);
+                        result.tokens.push_back(t); advance();
+                        break;
+                    }
+
                     case '(': {
                         Token t;
                         t.init(TT_LPAREN);

@@ -1,8 +1,11 @@
 #include <stdio.h>
+#include <math.h>
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
+
 #include "runner/runner.cpp"
 #include "tests/tests.cpp"
 using namespace std;
