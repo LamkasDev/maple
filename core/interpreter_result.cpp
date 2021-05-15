@@ -75,15 +75,19 @@ class InterpreterResult {
             FloatNumber n_float;
             if(type == NODE_INT && _right.type == NODE_INT) {
                 n_int.init(res_int.value + _right.res_int.value);
+                n_int.set_context(res_int.context);
                 res.set_from(n_int);
             } else if(type == NODE_INT && _right.type == NODE_FLOAT) {
                 n_float.init(res_int.value + _right.res_float.value);
+                n_float.set_context(res_int.context);
                 res.set_from(n_float);
             } else if(type == NODE_FLOAT && _right.type == NODE_INT) {
                 n_float.init(res_float.value + _right.res_int.value);
+                n_float.set_context(res_float.context);
                 res.set_from(n_float);
             } else {
                 n_float.init(res_float.value + _right.res_float.value);
+                n_float.set_context(res_float.context);
                 res.set_from(n_float);
             }
 
@@ -96,15 +100,19 @@ class InterpreterResult {
             FloatNumber n_float;
             if(type == NODE_INT && _right.type == NODE_INT) {
                 n_int.init(res_int.value - _right.res_int.value);
+                n_int.set_context(res_int.context);
                 res.set_from(n_int);
             } else if(type == NODE_INT && _right.type == NODE_FLOAT) {
                 n_float.init(res_int.value - _right.res_float.value);
+                n_float.set_context(res_int.context);
                 res.set_from(n_float);
             } else if(type == NODE_FLOAT && _right.type == NODE_INT) {
                 n_float.init(res_float.value - _right.res_int.value);
+                n_float.set_context(res_float.context);
                 res.set_from(n_float);
             } else {
                 n_float.init(res_float.value - _right.res_float.value);
+                n_float.set_context(res_float.context);
                 res.set_from(n_float);
             }
 
@@ -117,15 +125,19 @@ class InterpreterResult {
             FloatNumber n_float;
             if(type == NODE_INT && _right.type == NODE_INT) {
                 n_int.init(res_int.value * _right.res_int.value);
+                n_int.set_context(res_int.context);
                 res.set_from(n_int);
             } else if(type == NODE_INT && _right.type == NODE_FLOAT) {
                 n_float.init(res_int.value * _right.res_float.value);
+                n_float.set_context(res_int.context);
                 res.set_from(n_float);
             } else if(type == NODE_FLOAT && _right.type == NODE_INT) {
                 n_float.init(res_float.value * _right.res_int.value);
+                n_float.set_context(res_float.context);
                 res.set_from(n_float);
             } else {
                 n_float.init(res_float.value * _right.res_float.value);
+                n_float.set_context(res_float.context);
                 res.set_from(n_float);
             }
 
@@ -134,9 +146,13 @@ class InterpreterResult {
 
         InterpreterResult divided_by(InterpreterResult _right) {
             InterpreterResult res;
-            if((_right.type == NODE_INT && _right.res_int.value == 0) || (_right.type == NODE_FLOAT && _right.res_float.value == 0)) {
+            if(_right.type == NODE_INT && _right.res_int.value == 0) {
                 RuntimeError e;
-                e.init(_right.start, _right.end, "Division by zero");
+                e.init(_right.start, _right.end, "Division by zero", res_int.context);
+                return res.failure(e);
+            } else if(_right.type == NODE_FLOAT && _right.res_float.value == 0) {
+                RuntimeError e;
+                e.init(_right.start, _right.end, "Division by zero", res_float.context);
                 return res.failure(e);
             }
 
@@ -144,15 +160,19 @@ class InterpreterResult {
             FloatNumber n_float;
             if(type == NODE_INT && _right.type == NODE_INT) {
                 n_int.init(res_int.value / _right.res_int.value);
+                n_int.set_context(res_int.context);
                 res.set_from(n_int);
             } else if(type == NODE_INT && _right.type == NODE_FLOAT) {
                 n_float.init(res_int.value / _right.res_float.value);
+                n_float.set_context(res_int.context);
                 res.set_from(n_float);
             } else if(type == NODE_FLOAT && _right.type == NODE_INT) {
                 n_float.init(res_float.value / _right.res_int.value);
+                n_float.set_context(res_float.context);
                 res.set_from(n_float);
             } else {
                 n_float.init(res_float.value / _right.res_float.value);
+                n_float.set_context(res_float.context);
                 res.set_from(n_float);
             }
 

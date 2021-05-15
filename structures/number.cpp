@@ -9,10 +9,15 @@ class Number {
     public:
         Position start;
         Position end;
+        Context* context = nullptr;
 
         void set_pos(Position _start, Position _end) {
             start = _start;
             end = _end;
+        }
+
+        void set_context(Context* _context) {
+            context = _context;
         }
 };
 

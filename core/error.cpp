@@ -3,10 +3,17 @@
 #include "position.cpp"
 using namespace std;
 
+const string ERROR_UNKNOWN = "UNKNOWN";
+const string ERROR_DEFAULT = "DEFAULT";
+const string ERROR_RUNTIME = "RUNTIME";
+
 class Error {
     public:
         Position start;
         Position end;
+        Context* context = nullptr;
+
+        string type = ERROR_UNKNOWN;
         string name;
         string details;
 
@@ -27,6 +34,8 @@ class IllegalCharacterError : public Error {
         void init(Position _start, Position _end, string _details) {
             start = _start;
             end = _end;
+
+            type = ERROR_DEFAULT;
             name = "IllegalCharacterError";
             details = _details;
         }
@@ -37,6 +46,8 @@ class InvalidSyntaxError : public Error {
         void init(Position _start, Position _end, string _details) {
             start = _start;
             end = _end;
+
+            type = ERROR_DEFAULT;
             name = "InvalidSyntaxError";
             details = _details;
         }
@@ -44,10 +55,13 @@ class InvalidSyntaxError : public Error {
 
 class RuntimeError : public Error {
     public:
-        void init(Position _start, Position _end, string _details) {
+        void init(Position _start, Position _end, string _details, Context* _context) {
             start = _start;
             end = _end;
+
+            type = ERROR_RUNTIME;
             name = "RuntimeError";
             details = _details;
+            context = _context;
         }
 };

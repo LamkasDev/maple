@@ -3,6 +3,7 @@
 #include <iostream>
 #include <list>
 
+#include "core/context.cpp"
 #include "core/error.cpp"
 #include "core/node.cpp"
 #include "core/position.cpp"
@@ -211,18 +212,20 @@ RunResult run(string _fileName, string _text) {
 
     Interpreter interpreter;
     interpreter.init();
+    Context* context = new Context();
+    context->init(_fileName);
 
     InterpreterResult interpreterResult;
     string node_type = parserResult.node_type;
     //printf("Root Node: %s\n", node_type.c_str());
     if(node_type == NODE_INT) {
-        interpreterResult = interpreter.visit_int_node(parserResult.node_number);
+        interpreterResult = interpreter.visit_int_node(parserResult.node_number, context);
     } else if(node_type == NODE_FLOAT) {
-        interpreterResult = interpreter.visit_float_node(parserResult.node_number);
+        interpreterResult = interpreter.visit_float_node(parserResult.node_number, context);
     } else if(node_type == NODE_BINARY) {
-        interpreterResult = interpreter.visit_binary_node(parserResult.node_binary);
+        interpreterResult = interpreter.visit_binary_node(parserResult.node_binary, context);
     } else if(node_type == NODE_UNARY) {
-        interpreterResult = interpreter.visit_unary_node(parserResult.node_unary);
+        interpreterResult = interpreter.visit_unary_node(parserResult.node_unary, context);
     } else {
         interpreter.no_visit_method(node_type);
     }
