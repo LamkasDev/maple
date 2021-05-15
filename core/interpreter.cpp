@@ -46,38 +46,38 @@ class Interpreter {
             return n;
         }
 
-        InterpreterResult visit_binary_node(BinaryOperationNode node) {
+        InterpreterResult visit_binary_node(BinaryOperationNode* node) {
             //printf("Found binary node-\n");
-            string left_type = node.left_type;
+            string left_type = (*node).left_type;
             IntNumber left_int;
             FloatNumber left_float;
 
-            string right_type = node.right_type;
+            string right_type = (*node).right_type;
             IntNumber right_int;
             FloatNumber right_float;
 
             //printf("%s\n", (left_type + "<>" + right_type).c_str());
 
             if(left_type == NODE_INT) {
-                left_int = visit_int_node(node.left);
+                left_int = visit_int_node((*node).left);
             } else if(left_type == NODE_FLOAT) {
-                left_float = visit_float_node(node.left);
+                left_float = visit_float_node((*node).left);
             } else if(left_type == NODE_BINARY) {
-                InterpreterResult res = visit_binary_node(*node.left_binary);
+                InterpreterResult res = visit_binary_node((*node).left_binary);
                 if(res.type == NODE_INT) { left_int = res.res_int; left_type = NODE_INT; } else { left_float = res.res_float; left_type = NODE_FLOAT; }
             }
 
             if(right_type == NODE_INT) {
-                right_int = visit_int_node(node.right);
+                right_int = visit_int_node((*node).right);
             } else if(right_type == NODE_FLOAT) {
-                right_float = visit_float_node(node.right);
+                right_float = visit_float_node((*node).right);
             } else if(right_type == NODE_BINARY) {
-                InterpreterResult res = visit_binary_node(*node.right_binary);
+                InterpreterResult res = visit_binary_node((*node).right_binary);
                 if(res.type == NODE_INT) { right_int = res.res_int; right_type = NODE_INT; } else { right_float = res.res_float; right_type = NODE_FLOAT; }
             }
 
             InterpreterResult res;
-            if(node.op.type == TT_PLUS) {
+            if((*node).op.type == TT_PLUS) {
                 if(left_type == NODE_INT && right_type == NODE_INT) {
                     IntNumber n = left_int.added_to(right_int); /*n.set_pos(node.start, node.end);*/ res.init(n);
                 } else if(right_type == NODE_INT && left_type == NODE_FLOAT) {
@@ -87,7 +87,7 @@ class Interpreter {
                 } else {
                     FloatNumber n = left_float.added_to(right_float); /*n.set_pos(node.start, node.end);*/ res.init(n);
                 }
-            } else if(node.op.type == TT_MINUS) {
+            } else if((*node).op.type == TT_MINUS) {
                 if(left_type == NODE_INT && right_type == NODE_INT) {
                     IntNumber n = left_int.substracted_by(right_int); /*n.set_pos(node.start, node.end);*/ res.init(n);
                 } else if(right_type == NODE_INT && left_type == NODE_FLOAT) {
@@ -97,7 +97,7 @@ class Interpreter {
                 } else {
                     FloatNumber n = left_float.substracted_by(right_float); /*n.set_pos(node.start, node.end);*/ res.init(n);
                 }
-            } else if(node.op.type == TT_MUL) {
+            } else if((*node).op.type == TT_MUL) {
                 if(left_type == NODE_INT && right_type == NODE_INT) {
                     IntNumber n = left_int.multiplied_by(right_int); /*n.set_pos(node.start, node.end);*/ res.init(n);
                 } else if(right_type == NODE_INT && left_type == NODE_FLOAT) {
@@ -107,7 +107,7 @@ class Interpreter {
                 } else {
                     FloatNumber n = left_float.multiplied_by(right_float); /*n.set_pos(node.start, node.end);*/ res.init(n);
                 }
-            } else if(node.op.type == TT_DIV) {
+            } else if((*node).op.type == TT_DIV) {
                 if(left_type == NODE_INT && right_type == NODE_INT) {
                     IntNumber n = left_int.divided_by(right_int); /*n.set_pos(node.start, node.end);*/ res.init(n);
                 } else if(right_type == NODE_INT && left_type == NODE_FLOAT) {
