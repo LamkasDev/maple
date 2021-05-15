@@ -52,5 +52,12 @@ void runTests() {
     totalTests += 4;
 
     printf("----------\n");
+    passed += runIntegerTest("Extra Math 1 (2^4)", "16", 16);
+    passed += runIntegerTest("Extra Math 2 ((5*2)^2)", "(5*2)^2", 100);
+    passed += runIntegerTest("Extra Math 3 (5%2)", "5%2", 1);
+    passed += runIntegerTest("Extra Math 4 ((5*2)%3)", "(5*2)%3", 1);
+    totalTests += 4;
+
+    printf("----------\n");
     printf("%i PASSED, %i FAILED", passed, (totalTests - passed));
 }
