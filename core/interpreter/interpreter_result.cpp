@@ -161,9 +161,9 @@ class InterpreterResult {
             IntNumber n_int;
             FloatNumber n_float;
             if(type == NODE_INT && _right.type == NODE_INT) {
-                n_int.init(res_int.value / _right.res_int.value);
-                n_int.set_context(res_int.context);
-                res.set_from(n_int);
+                n_float.init(res_int.value / _right.res_int.value);
+                n_float.set_context(res_int.context);
+                res.set_from(n_float);
             } else if(type == NODE_INT && _right.type == NODE_FLOAT) {
                 n_float.init(res_int.value / _right.res_float.value);
                 n_float.set_context(res_int.context);
