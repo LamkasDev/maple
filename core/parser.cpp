@@ -93,16 +93,9 @@ class Parser {
 
             ParserResult left = result.registerResult(factor());
             if(result.state == -1) { return result; }
-            string node_type = left.node_type;
 
             BinaryOperationNode* op = new BinaryOperationNode();
-            if(left.node_type == NODE_BINARY) {
-                (*op).set_left(&left.node_binary);
-            } else if(left.node_type == NODE_UNARY) {
-                (*op).set_left(left.node_unary);
-            } else {
-                (*op).set_left(left.node_number);
-            }
+            left.set_to_left(op);
 
             while(current_t.type == TT_MUL || current_t.type == TT_DIV) {
                 Token op_token = current_t;
@@ -119,32 +112,10 @@ class Parser {
                     (*op_1).set_left(op);
                     *op = (*op_1);*/
                 }
-                if(right.node_type == NODE_BINARY) {
-                    (*op).set_right(&right.node_binary);
-                } else if(right.node_type == NODE_UNARY) {
-                    (*op).set_right(right.node_unary);
-                } else {
-                    (*op).set_right(right.node_number);
-                }
-                node_type = (*op).type;
+                right.set_to_right(op);
             }
             if(result.state == -1) { return result; }
-
-            if(node_type == NODE_BINARY) {
-                if((*op).right_type == NODE_UNKNOWN) {
-                    result.node_type = (*op).left_type;
-                    result.node_binary = *((*op).left_binary);
-                } else {
-                    result.node_type = (*op).type;
-                    result.node_binary = (*op);
-                }
-            } else if(node_type == NODE_UNARY) {
-                result.node_type = left.node_unary.type;
-                result.node_unary = left.node_unary;
-            } else {
-                result.node_type = left.node_number.type;
-                result.node_number = left.node_number;
-            }
+            result.set_from(op);
 
             //printf("term: %s\n", result.node_type.c_str());
             return result.success();
@@ -156,16 +127,9 @@ class Parser {
 
             ParserResult left = result.registerResult(term());
             if(result.state == -1) { return result; }
-            string node_type = left.node_type;
 
             BinaryOperationNode* op = new BinaryOperationNode();
-            if(left.node_type == NODE_BINARY) {
-                (*op).set_left(&left.node_binary);
-            } else if(left.node_type == NODE_UNARY) {
-                (*op).set_left(left.node_unary);
-            } else {
-                (*op).set_left(left.node_number);
-            }
+            left.set_to_left(op);
             
             while(current_t.type == TT_PLUS || current_t.type == TT_MINUS) {
                 Token op_token = current_t;
@@ -178,34 +142,14 @@ class Parser {
                 }
 
                 if((*op).right_type != NODE_UNKNOWN) {
-                    /*BinaryOperationNode* op_1 = new BinaryOperationNode();
+                    BinaryOperationNode* op_1 = new BinaryOperationNode();
                     (*op_1).set_left(op);
-                    *op = (*op_1);*/
+                    *op = (*op_1);
                 }
-                if(right.node_type == NODE_BINARY) {
-                    (*op).set_right(&right.node_binary);
-                } else if(left.node_type == NODE_UNARY) {
-                    (*op).set_right(right.node_unary);
-                } else {
-                    (*op).set_right(right.node_number);
-                }
-                node_type = (*op).type;
+                right.set_to_right(op);
             }
             if(result.state == -1) { return result; }
-
-            if(((*op).left_type == NODE_INT || (*op).left_type == NODE_FLOAT) && (*op).right_type == NODE_UNKNOWN) {
-                result.node_type = left.node_number.type;
-                result.node_number = left.node_number;
-            } else if((*op).left_type == NODE_BINARY && (*op).right_type == NODE_UNKNOWN) {
-                result.node_type = left.node_binary.type;
-                result.node_binary = left.node_binary;
-            } else if((*op).left_type == NODE_UNARY && (*op).right_type == NODE_UNKNOWN) {
-                result.node_type = left.node_unary.type;
-                result.node_unary = left.node_unary;
-            } else {
-                result.node_type = (*op).type;
-                result.node_binary = (*op);
-            }
+            result.set_from(op);
 
             //printf("expr: %s\n", result.node_type.c_str());
             return result.success();
