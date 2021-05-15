@@ -58,5 +58,14 @@ void runTests(Runner* runner) {
     totalTests += 4;
 
     printf("----------\n");
+    passed += runIntegerTest(runner, "Variables 1 (NULL)", "NULL", 0);
+    passed += runIntegerTest(runner, "Variables 2 (VAR a = 5)", "VAR a = 5", 5);
+    passed += runIntegerTest(runner, "Variables 3 (VAR b = 10)", "VAR b = 10", 10);
+    passed += runIntegerTest(runner, "Variables 4 (a + b)", "a + b", 15);
+    passed += runIntegerTest(runner, "Variables 5 (a * b)", "a * b", 50);
+    passed += runIntegerTest(runner, "Variables 6 (VAR c = a + b * 10)", "VAR c = a + b * 10", 105);
+    totalTests += 6;
+
+    printf("----------\n");
     printf("%i PASSED, %i FAILED", passed, (totalTests - passed));
 }
