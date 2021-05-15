@@ -64,9 +64,11 @@ class InterpreterResult {
                 return _left.multiplied_by(_right);
             } else if(_op.type == TT_DIV) {
                 return _left.divided_by(_right);
-            } else {
+            } else if(_op.type == TT_POW) {
                 return _left.power_on(_right);
-            }
+            } else {
+                return _left.modulo_of(_right);
+            } 
         }
 
         InterpreterResult added_to(InterpreterResult _right) {
@@ -197,6 +199,31 @@ class InterpreterResult {
                 res.set_from(n_float);
             } else {
                 n_float.init(pow(res_float.value, _right.res_float.value));
+                n_float.set_context(res_float.context);
+                res.set_from(n_float);
+            }
+
+            return res;
+        }
+
+        InterpreterResult modulo_of(InterpreterResult _right) {
+            InterpreterResult res;
+            IntNumber n_int;
+            FloatNumber n_float;
+            if(type == NODE_INT && _right.type == NODE_INT) {
+                n_int.init(res_int.value % _right.res_int.value);
+                n_int.set_context(res_int.context);
+                res.set_from(n_int);
+            } else if(type == NODE_INT && _right.type == NODE_FLOAT) {
+                n_float.init(fmod(res_int.value, _right.res_float.value));
+                n_float.set_context(res_int.context);
+                res.set_from(n_float);
+            } else if(type == NODE_FLOAT && _right.type == NODE_INT) {
+                n_float.init(fmod(res_float.value, _right.res_int.value));
+                n_float.set_context(res_float.context);
+                res.set_from(n_float);
+            } else {
+                n_float.init(fmod(res_float.value, _right.res_float.value));
                 n_float.set_context(res_float.context);
                 res.set_from(n_float);
             }

@@ -135,7 +135,7 @@ class Parser {
             BinaryOperationNode* op = new BinaryOperationNode();
             left.set_to_left(op);
 
-            while(current_t.type == TT_MUL || current_t.type == TT_DIV) {
+            while(current_t.type == TT_MUL || current_t.type == TT_DIV || current_t.type == TT_MOD) {
                 Token op_token = current_t;
                 (*op).init(op_token);
                 advance();
