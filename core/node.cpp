@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include "token.cpp"
 using namespace std;
 
 const string NODE_UNKNOWN = "UNKNOWN";

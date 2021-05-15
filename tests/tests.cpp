@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
-#include "../maple.cpp"
+#include "../runner/runner.cpp"
 using namespace std;
 
 int runIntegerTest(string name, string code, int value) {

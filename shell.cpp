@@ -3,7 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include "maple.cpp"
+#include "runner/runner.cpp"
 #include "tests/tests.cpp"
 using namespace std;
 

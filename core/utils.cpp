@@ -1,8 +1,6 @@
 #pragma once
 #include <string>
-#include <vector>
-#include "token.cpp"
-#include "parser_result.cpp"
+#include "parser/parser_result.cpp"
 using namespace std;
 
 string print_tree(list<Token> tokens) {

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "../node.cpp"
 using namespace std;
 
 class ParserResult {

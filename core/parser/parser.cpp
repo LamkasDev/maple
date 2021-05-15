@@ -1,9 +1,5 @@
 #pragma once
 #include <string>
-#include <vector>
-#include "token.cpp"
-#include "node.cpp"
-#include "parser_result.cpp"
 using namespace std;
 
 class Parser {

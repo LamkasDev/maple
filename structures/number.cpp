@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "../core/interpreter_result.cpp"
+#include "../core/interpreter/interpreter_result.cpp"
 #include "../core/position.cpp"
 using namespace std;
 

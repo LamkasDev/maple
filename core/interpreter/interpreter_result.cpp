@@ -1,8 +1,6 @@
 #pragma once
 #include <string>
-#include <stdexcept>
-#include "node.cpp"
-#include "../structures/number.cpp"
+#include "../../structures/number.cpp"
 using namespace std;
 
 class InterpreterResult {
