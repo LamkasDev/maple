@@ -4,7 +4,6 @@
 #include <sstream>
 #include <string>
 #include "maple.cpp"
-#include "core/utils.cpp"
 #include "tests/tests.cpp"
 using namespace std;
 
@@ -64,6 +63,8 @@ int main(int argc, char** argv) {
             printf("Token Error - %s \n\n", result.makeTokensResult.e.as_string().c_str());
         } else if(result.parserResult.state == -1) {
             printf("Parse Error - %s \n\n", result.parserResult.e.as_string().c_str());
+        } else if(result.interpreterResult.state == -1) {
+            printf("Interpreter Error - %s \n\n", result.interpreterResult.e.as_string().c_str());
         } else {
             printf("Tokens - %s \n", print_tree(result.makeTokensResult.tokens).c_str());
             printf("Nodes - %s \n", ("(" + print_node(result.parserResult) + ")").c_str());

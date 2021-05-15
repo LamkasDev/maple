@@ -2,25 +2,9 @@
 #include <string>
 #include <stdexcept>
 #include "node.cpp"
+#include "interpreter_result.cpp"
 #include "../structures/number.cpp"
 using namespace std;
-
-class InterpreterResult {
-    public:
-        string type = NODE_UNKNOWN;
-        IntNumber res_int;
-        FloatNumber res_float;
-
-        void init(IntNumber _res_int) {
-            res_int = _res_int;
-            type = NODE_INT;
-        }
-
-        void init(FloatNumber _res_float) {
-            res_float = _res_float;
-            type = NODE_FLOAT;
-        }
-};
 
 class Interpreter {
     public:
@@ -28,129 +12,105 @@ class Interpreter {
             
         }
 
-        IntNumber visit_int_node(NumberNode node) {
+        InterpreterResult visit_int_node(NumberNode node) {
             //printf("Found int node-\n");
             IntNumber n;
             n.init(node.token_int);
             n.set_pos(node.start, node.end);
 
-            return n;
+            InterpreterResult res;
+            res.init(n.start, n.end);
+            res.set_from(n);
+
+            return res.success();
         }
 
-        FloatNumber visit_float_node(NumberNode node) {
+        InterpreterResult visit_float_node(NumberNode node) {
             //printf("Found float node-\n");
             FloatNumber n;
             n.init(node.token_float);
             n.set_pos(node.start, node.end);
 
-            return n;
+            InterpreterResult res;
+            res.init(n.start, n.end);
+            res.set_from(n);
+
+            return res.success();
         }
 
         InterpreterResult visit_unary_node(UnaryOperationNode node) {
             //printf("Found unary node-\n");
 
             InterpreterResult res;
+            res.init(node.start, node.end);
+
             if(node.op.type == TT_PLUS) {
                 if(node.node.type == NODE_INT) {
-                    IntNumber n = visit_int_node(node.node); /*n.set_pos(node.start, node.end);*/ res.init(n);
+                    res.set_from(visit_int_node(node.node));
                 } else {
-                    FloatNumber n = visit_float_node(node.node); /*n.set_pos(node.start, node.end);*/ res.init(n);
+                    res.set_from(visit_float_node(node.node));
                 }
             } else if(node.op.type == TT_MINUS) {
+                Token n_t;
+                n_t.init(TT_MUL);
                 IntNumber n_m;
                 n_m.init(-1);
-            
+                InterpreterResult n_m_i;
+                n_m_i.set_from(n_m);
+                
                 if(node.node.type == NODE_INT) {
-                    IntNumber n = n_m.multiplied_by(visit_int_node(node.node)); /*n.set_pos(node.start, node.end);*/ res.init(n);
+                    res = res.processNumber(visit_int_node(node.node), n_t, n_m_i);
                 } else {
-                    FloatNumber n = n_m.multiplied_by(visit_float_node(node.node)); /*n.set_pos(node.start, node.end);*/ res.init(n);
+                    res = res.processNumber(visit_float_node(node.node), n_t, n_m_i);
                 }
             }
 
-            return res;
+            return res.success();
         }
 
         InterpreterResult visit_binary_node(BinaryOperationNode* node) {
             //printf("Found binary node-\n");
+
+            InterpreterResult res;
+            res.init((*node).start, (*node).end);
+
             string left_type = (*node).left_type;
-            IntNumber left_int;
-            FloatNumber left_float;
+            InterpreterResult left_res;
 
             string right_type = (*node).right_type;
-            IntNumber right_int;
-            FloatNumber right_float;
+            InterpreterResult right_res;
 
             //printf("%s\n", (left_type + "<>" + right_type).c_str());
 
             if(left_type == NODE_INT) {
-                left_int = visit_int_node((*node).left);
+                left_res = visit_int_node((*node).left);
             } else if(left_type == NODE_FLOAT) {
-                left_float = visit_float_node((*node).left);
+                left_res = visit_float_node((*node).left);
             } else if(left_type == NODE_UNARY) {
-                InterpreterResult res = visit_unary_node((*node).left_unary);
-                if(res.type == NODE_INT) { left_int = res.res_int; left_type = NODE_INT; } else { left_float = res.res_float; left_type = NODE_FLOAT; }
+                left_res = visit_unary_node((*node).left_unary);
             } else if(left_type == NODE_BINARY) {
-                InterpreterResult res = visit_binary_node((*node).left_binary);
-                if(res.type == NODE_INT) { left_int = res.res_int; left_type = NODE_INT; } else { left_float = res.res_float; left_type = NODE_FLOAT; }
+                left_res = visit_binary_node((*node).left_binary);
             }
+            res.registerResult(left_res);
+            if(res.state == -1) { return res; }
 
             if(right_type == NODE_INT) {
-                right_int = visit_int_node((*node).right);
+                right_res = visit_int_node((*node).right);
             } else if(right_type == NODE_FLOAT) {
-                right_float = visit_float_node((*node).right);
+                right_res = visit_float_node((*node).right);
             } else if(right_type == NODE_UNARY) {
-                InterpreterResult res = visit_unary_node((*node).right_unary);
-                if(res.type == NODE_INT) { right_int = res.res_int; right_type = NODE_INT; } else { right_float = res.res_float; right_type = NODE_FLOAT; }
+                right_res = visit_unary_node((*node).right_unary);
             } else if(right_type == NODE_BINARY) {
-                InterpreterResult res = visit_binary_node((*node).right_binary);
-                if(res.type == NODE_INT) { right_int = res.res_int; right_type = NODE_INT; } else { right_float = res.res_float; right_type = NODE_FLOAT; }
+                right_res = visit_binary_node((*node).right_binary);
             }
+            res.registerResult(right_res);
+            if(res.state == -1) { return res; }
 
-            InterpreterResult res;
-            if((*node).op.type == TT_PLUS) {
-                if(left_type == NODE_INT && right_type == NODE_INT) {
-                    IntNumber n = left_int.added_to(right_int); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                } else if(right_type == NODE_INT && left_type == NODE_FLOAT) {
-                    FloatNumber n_0; n_0.init(right_int.value); FloatNumber n = left_float.added_to(n_0); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                } else if(right_type == NODE_FLOAT && left_type == NODE_INT) {
-                    FloatNumber n = left_int.added_to(right_float); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                } else {
-                    FloatNumber n = left_float.added_to(right_float); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                }
-            } else if((*node).op.type == TT_MINUS) {
-                if(left_type == NODE_INT && right_type == NODE_INT) {
-                    IntNumber n = left_int.substracted_by(right_int); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                } else if(right_type == NODE_INT && left_type == NODE_FLOAT) {
-                    FloatNumber n_0; n_0.init(right_int.value); FloatNumber n = left_float.substracted_by(n_0); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                } else if(right_type == NODE_FLOAT && left_type == NODE_INT) {
-                    FloatNumber n = left_int.substracted_by(right_float); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                } else {
-                    FloatNumber n = left_float.substracted_by(right_float); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                }
-            } else if((*node).op.type == TT_MUL) {
-                if(left_type == NODE_INT && right_type == NODE_INT) {
-                    IntNumber n = left_int.multiplied_by(right_int); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                } else if(right_type == NODE_INT && left_type == NODE_FLOAT) {
-                    FloatNumber n_0; n_0.init(right_int.value); FloatNumber n = left_float.multiplied_by(n_0); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                } else if(right_type == NODE_FLOAT && left_type == NODE_INT) {
-                    FloatNumber n = left_int.multiplied_by(right_float); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                } else {
-                    FloatNumber n = left_float.multiplied_by(right_float); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                }
-            } else if((*node).op.type == TT_DIV) {
-                if(left_type == NODE_INT && right_type == NODE_INT) {
-                    IntNumber n = left_int.divided_by(right_int); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                } else if(right_type == NODE_INT && left_type == NODE_FLOAT) {
-                    FloatNumber n_0; n_0.init(right_int.value); FloatNumber n = left_float.divided_by(n_0); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                } else if(right_type == NODE_FLOAT && left_type == NODE_INT) {
-                    FloatNumber n = left_int.divided_by(right_float); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                } else {
-                    FloatNumber n = left_float.divided_by(right_float); /*n.set_pos(node.start, node.end);*/ res.init(n);
-                }
-            }
+            res = res.processNumber(left_res, (*node).op, right_res);
+            if(res.state == -1) { return res; }
             
             //printf("returning: %s\n", (res.type == NODE_INT ? to_string(res.res_int.value).c_str() : to_string(res.res_float.value).c_str()));
-            return res;
+            return res.success();
         }
 
         void no_visit_method(string type) {

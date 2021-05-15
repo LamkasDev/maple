@@ -2,13 +2,19 @@
 #include <string>
 #include <iostream>
 #include <list>
-#include "core/node.cpp"
-#include "core/token.cpp"
+
 #include "core/error.cpp"
+#include "core/node.cpp"
 #include "core/position.cpp"
+#include "core/token.cpp"
+#include "core/utils.cpp"
+
 #include "core/parser.cpp"
 #include "core/parser_result.cpp"
 #include "core/interpreter.cpp"
+#include "core/interpreter_result.cpp"
+
+#include "structures/number.cpp"
 
 using namespace std;
 
@@ -210,9 +216,9 @@ RunResult run(string _fileName, string _text) {
     string node_type = parserResult.node_type;
     //printf("Root Node: %s\n", node_type.c_str());
     if(node_type == NODE_INT) {
-        interpreterResult.init(interpreter.visit_int_node(parserResult.node_number));
+        interpreterResult = interpreter.visit_int_node(parserResult.node_number);
     } else if(node_type == NODE_FLOAT) {
-        interpreterResult.init(interpreter.visit_float_node(parserResult.node_number));
+        interpreterResult = interpreter.visit_float_node(parserResult.node_number);
     } else if(node_type == NODE_BINARY) {
         interpreterResult = interpreter.visit_binary_node(parserResult.node_binary);
     } else if(node_type == NODE_UNARY) {

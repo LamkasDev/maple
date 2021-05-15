@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "../core/interpreter_result.cpp"
 #include "../core/position.cpp"
 using namespace std;
 
@@ -24,22 +25,6 @@ class FloatNumber : public Number {
             value = _value;
         }
 
-        FloatNumber added_to(FloatNumber _number) {
-            FloatNumber n; n.init(value + _number.value); return n;
-        }
-
-        FloatNumber substracted_by(FloatNumber _number) {
-            FloatNumber n; n.init(value - _number.value); return n;
-        }
-
-        FloatNumber multiplied_by(FloatNumber _number) {
-            FloatNumber n; n.init(value * _number.value); return n;
-        }
-
-        FloatNumber divided_by(FloatNumber _number) {
-            FloatNumber n; n.init(value / _number.value); return n;
-        }
-
         string repr() {
             return to_string(value);
         }
@@ -51,38 +36,6 @@ class IntNumber : public Number {
 
         void init(int _value) {
             value = _value;
-        }
-
-        IntNumber added_to(IntNumber _number) {
-            IntNumber n; n.init(value + _number.value); return n;
-        }
-
-        FloatNumber added_to(FloatNumber _number) {
-            FloatNumber n; n.init(value + _number.value); return n;
-        }
-
-        IntNumber substracted_by(IntNumber _number) {
-            IntNumber n; n.init(value - _number.value); return n;
-        }
-
-        FloatNumber substracted_by(FloatNumber _number) {
-            FloatNumber n; n.init(value - _number.value); return n;
-        }
-
-        IntNumber multiplied_by(IntNumber _number) {
-            IntNumber n; n.init(value * _number.value); return n;
-        }
-
-        FloatNumber multiplied_by(FloatNumber _number) {
-            FloatNumber n; n.init(value * _number.value); return n;
-        }
-
-        IntNumber divided_by(IntNumber _number) {
-            IntNumber n; n.init(value / _number.value); return n;
-        }
-
-        FloatNumber divided_by(FloatNumber _number) {
-            FloatNumber n; n.init(value / _number.value); return n;
         }
 
         string repr() {
