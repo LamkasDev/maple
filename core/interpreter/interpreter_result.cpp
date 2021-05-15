@@ -50,8 +50,10 @@ class InterpreterResult {
         void set_from(InterpreterResult _res) {
             if(_res.type == NODE_INT) {
                 res_int = _res.res_int;
+                type = NODE_INT;
             } else {
                 res_float = _res.res_float;
+                type = NODE_FLOAT;
             }
         }
 

@@ -1,8 +1,6 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "../core/interpreter/interpreter_result.cpp"
-#include "../core/position.cpp"
 using namespace std;
 
 class Number {

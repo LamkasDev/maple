@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include "context.cpp"
-#include "position.cpp"
 using namespace std;
 
 const string ERROR_UNKNOWN = "UNKNOWN";

@@ -1,7 +1,13 @@
 #pragma once
+#include <algorithm>
 #include <string>
+#include <vector>
 #include "parser/parser_result.cpp"
 using namespace std;
+
+bool in_array(const string &value, const vector<string> &array){
+    return find(array.begin(), array.end(), value) != array.end();
+}
 
 string print_tree(list<Token> tokens) {
     string s = "(";
@@ -20,6 +26,10 @@ string print_node(ParserResult root) {
         return root.node_binary->repr();
     } else if(root.node_type == NODE_UNARY) {
         return root.node_unary.repr();
+    } else if(root.node_type == NODE_ACCESS) {
+        return root.node_access.repr();
+    } else if(root.node_type == NODE_ASSIGNMENT) {
+        return root.node_assignment.repr();
     } else {
         return root.node_type;
     }

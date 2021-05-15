@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "../utils.cpp"
 using namespace std;
 
 class Lexer {
@@ -98,9 +99,19 @@ class Lexer {
                         break;
                     }
 
+                    case '=': {
+                        Token t;
+                        t.init(TT_EQ);
+                        t.set_start(pos);
+                        result.tokens.push_back(t); advance();
+                        break;
+                    }
+
                     default: {
                         if (DIGITS.find(current_c) != string::npos) {
                             result.tokens.push_back(make_number());
+                        } else if (LETTERS.find(current_c) != string::npos) {
+                            result.tokens.push_back(make_identifier());
                         } else {
                             char c = current_c;
                             Position start = pos.copy();
@@ -142,14 +153,40 @@ class Lexer {
             
             if(dot == 0) {
                 TokenInt t;
-                t.init(TT_INT, stoi(str));
+                t.init(stoi(str));
                 t.set_start(start);
                 t.set_end(pos);
 
                 return t;
             } else {
                 TokenFloat t;
-                t.init(TT_FLOAT, atof(str.c_str()));
+                t.init(atof(str.c_str()));
+                t.set_start(start);
+                t.set_end(pos);
+
+                return t;
+            }
+        }
+
+        Token make_identifier() {
+            string str;
+            Position start = pos.copy();
+
+            while(pos.index < text.length() && (LETTERS_DIGITS + '_').find(current_c) != string::npos) {
+                str += current_c;
+                advance();
+            }
+
+            if(in_array(str, KEYWORDS)) {
+                TokenKeyword t;
+                t.init(str);
+                t.set_start(start);
+                t.set_end(pos);
+
+                return t;
+            } else {
+                TokenIdentifier t;
+                t.init(str);
                 t.set_start(start);
                 t.set_end(pos);
 

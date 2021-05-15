@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include "interpreter_result.cpp"
 using namespace std;
 
 class Interpreter {
@@ -89,6 +88,8 @@ class Interpreter {
                 left_res = visit_unary_node((*node).left_unary, context);
             } else if(left_type == NODE_BINARY) {
                 left_res = visit_binary_node((*node).left_binary, context);
+            } else if(left_type == NODE_ACCESS) {
+                left_res = visit_variable_access((*node).left_access, context);
             }
             res.registerResult(left_res);
             if(res.state == -1) { return res; }
@@ -101,6 +102,8 @@ class Interpreter {
                 right_res = visit_unary_node((*node).right_unary, context);
             } else if(right_type == NODE_BINARY) {
                 right_res = visit_binary_node((*node).right_binary, context);
+            } else if(right_type == NODE_ACCESS) {
+                right_res = visit_variable_access((*node).right_access, context);
             }
             res.registerResult(right_res);
             if(res.state == -1) { return res; }
@@ -109,6 +112,62 @@ class Interpreter {
             if(res.state == -1) { return res; }
             
             //printf("returning: %s\n", (res.type == NODE_INT ? to_string(res.res_int.value).c_str() : to_string(res.res_float.value).c_str()));
+            return res.success();
+        }
+
+        InterpreterResult visit_variable_access(VariableAccessNode node, Context* context) {
+            InterpreterResult res;
+            res.init(node.start, node.end);
+
+            SymbolContainer value = context->symbol_table->get(node.name.value_string);
+            if(value.state == -1) {
+                RuntimeError e;
+                e.init(node.start, node.end, node.name.value_string + " is not defined", context);
+                return res.failure(e);
+            } else {
+                if(value.type == SYMBOL_INT) {
+                    IntNumber n;
+                    n.init(value.value_int);
+                    res.set_from(n);
+                } else  if(value.type == SYMBOL_FLOAT) {
+                    FloatNumber n;
+                    n.init(value.value_float);
+                    res.set_from(n);
+                }
+            }
+
+            return res.success();
+        }
+
+        InterpreterResult visit_variable_assign(VariableAssignmentNode node, Context* context) {
+            InterpreterResult res;
+            res.init(node.start, node.end);
+            
+            InterpreterResult value_res;
+            if(node.value_type == NODE_INT) {
+                value_res = res.registerResult(visit_int_node(node.value_number, context));
+            } else if(node.value_type == NODE_FLOAT) {
+                value_res = res.registerResult(visit_float_node(node.value_number, context));
+            } else if(node.value_type == NODE_UNARY) {
+                value_res = res.registerResult(visit_unary_node(node.value_unary, context));
+            } else if(node.value_type == NODE_BINARY) {
+                value_res = res.registerResult(visit_binary_node(node.value_binary, context));
+            } else if(node.value_type == NODE_ACCESS) {
+                value_res = res.registerResult(visit_variable_access(node.value_access, context));
+            }
+            if(res.state == -1) { return res; }
+            res.set_from(value_res);
+
+            if(res.type == NODE_INT) {
+                SymbolContainer* value = new SymbolContainer();
+                value->init(res.res_int.value);
+                context->symbol_table->set(node.name.value_string, value);
+            } else if(res.type == NODE_FLOAT) {
+                SymbolContainer* value = new SymbolContainer();
+                value->init(res.res_float.value);
+                context->symbol_table->set(node.name.value_string, value);
+            }
+            
             return res.success();
         }
 

@@ -16,6 +16,9 @@ void printResult(RunResult result) {
 }
 
 int main(int argc, char** argv) {
+    Runner* runner = new Runner();
+    runner->initialize_global_symbol_table();
+
     if(argc >= 2) {
         if(argc >= 3) {
             if(string(argv[1]) == "-run") {
@@ -29,7 +32,7 @@ int main(int argc, char** argv) {
                     stream << file.rdbuf();
                     string contents = stream.str();
 
-                    RunResult result = run("<file>", contents);
+                    RunResult result = runner->run("<file>", contents);
                     printResult(result);
 
                     return 1;
@@ -38,7 +41,7 @@ int main(int argc, char** argv) {
         }
 
         if(string(argv[1]) == "-tests") {
-            runTests();
+            runTests(runner);
             return 1;
         }
     }
@@ -57,11 +60,11 @@ int main(int argc, char** argv) {
             printf("Bye bye~");
             break;
         } else if(_s == "tests()") {
-            runTests();
+            runTests(runner);
             break;
         }
         
-        RunResult result = run("<stdin>", _s);
+        RunResult result = runner->run("<stdin>", _s);
         if(result.makeTokensResult.state == -1) {
             printf("%s \n\n", result.makeTokensResult.e.as_string().c_str());
         } else if(result.parserResult.state == -1) {

@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "../node.cpp"
+#include "../nodes/node_variable.cpp"
 using namespace std;
 
 class ParserResult {
@@ -10,6 +10,8 @@ class ParserResult {
         NumberNode node_number;
         BinaryOperationNode* node_binary;
         UnaryOperationNode node_unary;
+        VariableAssignmentNode node_assignment;
+        VariableAccessNode node_access;
         Error e;
 
         void init() {
@@ -39,6 +41,8 @@ class ParserResult {
                 _node->set_left(node_binary);
             } else if(node_type == NODE_UNARY) {
                 _node->set_left(node_unary);
+            } else if(node_type == NODE_ACCESS) {
+                _node->set_left(node_access);
             } else {
                 _node->set_left(node_number);
             }
@@ -49,6 +53,8 @@ class ParserResult {
                 _node->set_right(node_binary);
             } else if(node_type == NODE_UNARY) {
                 _node->set_right(node_unary);
+            } else if(node_type == NODE_ACCESS) {
+                _node->set_right(node_access);
             } else {
                 _node->set_right(node_number);
             }
@@ -64,9 +70,26 @@ class ParserResult {
             } else if((*_node).left_type == NODE_UNARY && (*_node).right_type == NODE_UNKNOWN) {
                 node_type = (*_node).left_unary.type;
                 node_unary = (*_node).left_unary;
+            } else if((*_node).left_type == NODE_ACCESS && (*_node).right_type == NODE_UNKNOWN) {
+                node_type = (*_node).left_access.type;
+                node_access = (*_node).left_access;
             } else {
                 node_type = (*_node).type;
                 node_binary = _node;
             }
+        }
+
+        VariableAssignmentNode set_to_assignment(VariableAssignmentNode _node) {
+            if(node_type == NODE_BINARY) {
+                _node.set_value(node_binary);
+            } else if(node_type == NODE_UNARY) {
+                _node.set_value(node_unary);
+            } else if(node_type == NODE_ACCESS) {
+                _node.set_value(node_access);
+            } else {
+                _node.set_value(node_number);
+            }
+
+            return _node;
         }
 };

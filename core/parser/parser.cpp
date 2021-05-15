@@ -52,6 +52,13 @@ class Parser {
                 result.node_type = n.type;
                 result.node_number = n;
                 return result.success();
+            } else if(t.type == TT_IDENFIFIER) {
+                advance();
+                VariableAccessNode n; n.init(t);
+
+                result.node_type = n.type;
+                result.node_access = n;
+                return result.success();
             } else if(t.type == TT_LPAREN) {
                 advance();
                 ParserResult n_0 = expression();
@@ -160,6 +167,34 @@ class Parser {
         ParserResult expression() {
             ParserResult result;
             result.init();
+
+            if(current_t.matches(TT_KEYWORD, KEYWORD_VAR)) {
+                advance();
+                if(current_t.type != TT_IDENFIFIER) {
+                    InvalidSyntaxError e;
+                    e.init(current_t.start, current_t.end, "Expected identifier");
+                    return result.failure(e);
+                }
+
+                Token identifier = current_t;
+                advance();
+
+                if(current_t.type != TT_EQ) {
+                    InvalidSyntaxError e;
+                    e.init(current_t.start, current_t.end, "Expected '='");
+                    return result.failure(e);
+                }
+
+                advance();
+                ParserResult expr = result.registerResult(expression());
+                if(result.state == -1) { return result; }
+
+                VariableAssignmentNode n; n.init(identifier); n = expr.set_to_assignment(n);
+                result.node_type = n.type;
+                result.node_assignment = n;
+                
+                return result.success();
+            }
 
             ParserResult left = result.registerResult(term());
             if(result.state == -1) { return result; }

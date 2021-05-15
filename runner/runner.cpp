@@ -7,65 +7,93 @@
 
 #include "../core/context.cpp"
 #include "../core/error.cpp"
-#include "../core/node.cpp"
 #include "../core/position.cpp"
 #include "../core/token.cpp"
 #include "../core/utils.cpp"
 
-#include "../core/parser/parser.cpp"
-#include "../core/parser/parser_result.cpp"
 #include "../core/interpreter/interpreter.cpp"
 #include "../core/interpreter/interpreter_result.cpp"
+
 #include "../core/lexer/lexer.cpp"
+
+#include "../core/nodes/node.cpp"
+#include "../core/nodes/node_number.cpp"
+#include "../core/nodes/node_variable.cpp"
+#include "../core/nodes/node_variable_access.cpp"
+#include "../core/nodes/node_binary.cpp"
+
+#include "../core/parser/parser.cpp"
+#include "../core/parser/parser_result.cpp"
+
+#include "../core/symbols/symbol_table.cpp"
+#include "../core/symbols/symbol_container.cpp"
 
 #include "../structures/number.cpp"
 
 using namespace std;
 
-RunResult run(string _fileName, string _text) {
-    RunResult result;
-    result.init();
+class Runner {
+    public:
+        SymbolTable* global_symbol_table;
 
-    Lexer lexer;
-    lexer.init(_fileName, _text);
-    result.set_lexer(lexer);
+        void initialize_global_symbol_table() {
+            SymbolContainer* sc_null = new SymbolContainer();
+            sc_null->init(0);
 
-    MakeTokensResult makeTokensResult = lexer.make_tokens();
-    result.set_make_tokens_result(makeTokensResult);
-    if(makeTokensResult.state == -1) {
-        return result;
-    }
+            global_symbol_table = new SymbolTable();
+            global_symbol_table->set("NULL", sc_null);
+        }
 
-    Parser parser;
-    parser.init(makeTokensResult.tokens);
+        RunResult run(string _fileName, string _text) {
+            RunResult result;
+            result.init();
 
-    ParserResult parserResult = parser.parse();
-    result.set_parser_result(parserResult);
-    if(parserResult.state == -1) {
-        return result;
-    }
+            Lexer lexer;
+            lexer.init(_fileName, _text);
+            result.set_lexer(lexer);
 
-    Interpreter interpreter;
-    interpreter.init();
-    Context* context = new Context();
-    context->init(_fileName);
+            MakeTokensResult makeTokensResult = lexer.make_tokens();
+            result.set_make_tokens_result(makeTokensResult);
+            if(makeTokensResult.state == -1) {
+                return result;
+            }
 
-    InterpreterResult interpreterResult;
-    string node_type = parserResult.node_type;
-    //printf("Root Node: %s\n", node_type.c_str());
-    if(node_type == NODE_INT) {
-        interpreterResult = interpreter.visit_int_node(parserResult.node_number, context);
-    } else if(node_type == NODE_FLOAT) {
-        interpreterResult = interpreter.visit_float_node(parserResult.node_number, context);
-    } else if(node_type == NODE_BINARY) {
-        interpreterResult = interpreter.visit_binary_node(parserResult.node_binary, context);
-    } else if(node_type == NODE_UNARY) {
-        interpreterResult = interpreter.visit_unary_node(parserResult.node_unary, context);
-    } else {
-        interpreter.no_visit_method(node_type);
-    }
+            Parser parser;
+            parser.init(makeTokensResult.tokens);
 
-    result.set_interpreter_result(interpreterResult);
-    
-    return result;
-}
+            ParserResult parserResult = parser.parse();
+            result.set_parser_result(parserResult);
+            if(parserResult.state == -1) {
+                return result;
+            }
+            
+            Interpreter interpreter;
+            interpreter.init();
+            Context* context = new Context();
+            context->init(_fileName);
+            context->set_symbol_table(global_symbol_table);
+
+            InterpreterResult interpreterResult;
+            string node_type = parserResult.node_type;
+            //printf("Root Node: %s\n", node_type.c_str());
+            if(node_type == NODE_INT) {
+                interpreterResult = interpreter.visit_int_node(parserResult.node_number, context);
+            } else if(node_type == NODE_FLOAT) {
+                interpreterResult = interpreter.visit_float_node(parserResult.node_number, context);
+            } else if(node_type == NODE_BINARY) {
+                interpreterResult = interpreter.visit_binary_node(parserResult.node_binary, context);
+            } else if(node_type == NODE_UNARY) {
+                interpreterResult = interpreter.visit_unary_node(parserResult.node_unary, context);
+            } else if(node_type == NODE_ACCESS) {
+                interpreterResult = interpreter.visit_variable_access(parserResult.node_access, context);
+            } else if(node_type == NODE_ASSIGNMENT) {
+                interpreterResult = interpreter.visit_variable_assign(parserResult.node_assignment, context);
+            } else {
+                interpreter.no_visit_method(node_type);
+            }
+
+            result.set_interpreter_result(interpreterResult);
+            
+            return result;
+        }
+};
