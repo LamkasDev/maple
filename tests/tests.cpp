@@ -32,7 +32,7 @@ void runTests() {
     printf("----------\n");
     passed += runIntegerTest("Integer Math 1 (1+1)", "1+1", 2);
     passed += runIntegerTest("Integer Math 2 (1*2)", "1*2", 2);
-    passed += runFloatTest("Integer Math 3 (2/1)", "2/1", 1);
+    passed += runFloatTest("Integer Math 3 (2/1)", "2/1", 2);
     passed += runIntegerTest("Integer Math 4 (2-1)", "2-1", 1);
     passed += runIntegerTest("Integer Math 5 (10+10+10)", "10+10+10", 30);
     passed += runIntegerTest("Integer Math 6 (10+(10+10))", "10+(10+10)", 30);
