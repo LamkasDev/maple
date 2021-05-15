@@ -18,7 +18,7 @@ class Number {
 
 class FloatNumber : public Number {
     public:
-        float value;
+        float value = 0;
 
         void init(float _value) {
             value = _value;
@@ -47,7 +47,7 @@ class FloatNumber : public Number {
 
 class IntNumber : public Number {
     public:
-        int value;
+        int value = 0;
 
         void init(int _value) {
             value = _value;

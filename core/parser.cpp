@@ -9,7 +9,7 @@ using namespace std;
 class Parser {
     public:
         list<Token> tokens;
-        int index;
+        int index = 0;
         Token current_t;
 
         void init(list<Token> _tokens) {

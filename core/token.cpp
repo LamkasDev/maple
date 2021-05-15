@@ -20,8 +20,8 @@ class Token {
         Position start;
         Position end;
         string type;
-        int value_int;
-        float value_float;
+        int value_int = 0;
+        float value_float = 0;
 
         void init(string _type) {
             type = _type;

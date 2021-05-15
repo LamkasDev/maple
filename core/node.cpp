@@ -26,8 +26,8 @@ class Node {
 
 class NumberNode : public Node {
     public:
-        int token_int;
-        float token_float;
+        int token_int = 0;
+        float token_float = 0;
 
         void init(string _type) {
             type = _type;
