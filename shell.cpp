@@ -60,11 +60,11 @@ int main(int argc, char** argv) {
         
         RunResult result = run("<stdin>", _s);
         if(result.makeTokensResult.state == -1) {
-            printf("Token Error - %s \n\n", result.makeTokensResult.e.as_string().c_str());
+            printf("%s \n\n", result.makeTokensResult.e.as_string().c_str());
         } else if(result.parserResult.state == -1) {
-            printf("Parse Error - %s \n\n", result.parserResult.e.as_string().c_str());
+            printf("%s \n\n", result.parserResult.e.as_string().c_str());
         } else if(result.interpreterResult.state == -1) {
-            printf("Interpreter Error - %s \n\n", result.interpreterResult.e.as_string().c_str());
+            printf("%s \n", result.interpreterResult.e.as_string().c_str());
         } else {
             printf("Tokens - %s \n", print_tree(result.makeTokensResult.tokens).c_str());
             printf("Nodes - %s \n", ("(" + print_node(result.parserResult) + ")").c_str());

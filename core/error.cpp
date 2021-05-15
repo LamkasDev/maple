@@ -25,7 +25,28 @@ class Error {
         }
 
         string as_string() {
-            return (name + ": " + details + "\nFile " + start.fileName + ", line " + to_string(start.line + 1));
+            if(type != ERROR_RUNTIME) {
+                string s = name + ": " + details + "\n";
+                s += "File " + start.fileName + ", line " + to_string(start.line + 1);
+                return s;
+            } else {
+                string s = generate_traceback();
+                s += name + ": " + details + "\n";
+                return s;
+            }
+        }
+
+        string generate_traceback() {
+            string res = "";
+            Position _start = start;
+            Context* _context = context;
+            while(_context != nullptr) {
+                res = "  File " + start.fileName + ", line " + to_string(start.line + 1) + ", in " + _context->display_name + "\n" + res;
+                _start = _context->parent_entry_pos;
+                _context = _context->parent;
+            }
+
+            return "Traceback (most recent call last):\n" + res;
         }
 };
 
