@@ -214,7 +214,7 @@ RunResult run(string _fileName, string _text) {
     } else if(node_type == NODE_FLOAT) {
         interpreterResult.init(interpreter.visit_float_node(parserResult.node_number));
     } else if(node_type == NODE_BINARY) {
-        interpreterResult = interpreter.visit_binary_node(&parserResult.node_binary);
+        interpreterResult = interpreter.visit_binary_node(parserResult.node_binary);
     } else if(node_type == NODE_UNARY) {
         interpreterResult = interpreter.visit_unary_node(parserResult.node_unary);
     } else {

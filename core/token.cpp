@@ -37,6 +37,17 @@ class Token {
             end = _end;
         }
 
+        Token copy() {
+            Token* copy = new Token();
+            copy->init(type);
+            copy->set_start(start);
+            copy->set_end(end);
+            copy->value_int = value_int;
+            copy->value_float = value_float;
+
+            return (*copy);
+        }
+
         string repr() {
             if(type == TT_INT) {
                 return type + ":" + to_string(value_int);

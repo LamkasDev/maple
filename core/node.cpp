@@ -33,6 +33,20 @@ class NumberNode : public Node {
             type = _type;
         }
 
+        NumberNode copy() {
+            NumberNode* node = new NumberNode();
+            node->init(type);
+            if(type == NODE_INT) {
+                node->token_int = token_int;
+            } else {
+                node->token_float = token_float;
+            }
+
+            node->start = start.copy();
+            node->end = end.copy();
+            return (*node);
+        }
+
         string repr() {
             return type;
         }
@@ -81,6 +95,13 @@ class UnaryOperationNode : public Node {
 
             start = _op.start;
             end = _node.end;
+        }
+
+        UnaryOperationNode copy() {
+            UnaryOperationNode* copy = new UnaryOperationNode();
+            copy->init(op.copy(), node.copy());
+
+            return (*copy);
         }
 
         string repr() {
@@ -141,6 +162,27 @@ class BinaryOperationNode : public Node {
             right_unary = _right;
             right_type = _right.type;
             end = _right.end.copy();
+        }
+
+        BinaryOperationNode* copy() {
+            BinaryOperationNode* copy = new BinaryOperationNode();
+            copy->init(op.copy());
+            if(left_type == NODE_BINARY) {
+                copy->set_left(left_binary->copy());
+            } else if(left_type == NODE_UNARY) {
+                copy->set_left(left_unary.copy());
+            } else {
+                copy->set_left(left.copy());
+            }
+            if(right_type == NODE_BINARY) {
+                copy->set_right(right_binary->copy());
+            } else if(right_type == NODE_UNARY) {
+                copy->set_right(right_unary.copy());
+            } else {
+                copy->set_right(right.copy());
+            }
+
+            return copy;
         }
 
         string repr() {

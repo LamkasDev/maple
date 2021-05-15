@@ -108,9 +108,9 @@ class Parser {
                 }
 
                 if((*op).right_type != NODE_UNKNOWN) {
-                    /*BinaryOperationNode* op_1 = new BinaryOperationNode();
-                    (*op_1).set_left(op);
-                    *op = (*op_1);*/
+                    BinaryOperationNode* copy = op->copy();
+
+                    (*op).set_left(copy);
                 }
                 right.set_to_right(op);
             }
@@ -142,9 +142,9 @@ class Parser {
                 }
 
                 if((*op).right_type != NODE_UNKNOWN) {
-                    BinaryOperationNode* op_1 = new BinaryOperationNode();
-                    (*op_1).set_left(op);
-                    *op = (*op_1);
+                    BinaryOperationNode* copy = op->copy();
+                    
+                    (*op).set_left(copy);
                 }
                 right.set_to_right(op);
             }

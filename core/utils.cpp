@@ -19,7 +19,7 @@ string print_node(ParserResult root) {
     if(root.node_type == NODE_INT || root.node_type == NODE_FLOAT) {
         return root.node_number.repr();
     } else if(root.node_type == NODE_BINARY) {
-        return root.node_binary.repr();
+        return root.node_binary->repr();
     } else if(root.node_type == NODE_UNARY) {
         return root.node_unary.repr();
     } else {
