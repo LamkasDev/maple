@@ -6,7 +6,7 @@
 </div>
 
 <div align="center">
-<h3><i>A shitpost programming language based on C++</i></h3>
+<h3>A programming language based on C++</h3>
 <p>Extension (.maple)</p>
 </div>
 
@@ -20,26 +20,22 @@
 <hr />
 
 <div align="center">
-<h3>❓ Why?</h3>
-<p>
-I'm bored lol, also want to practice C++
-</p>
-
 <h3>🔥 Features</h3>
 <p>
-1️⃣ Can count numbers together sometimes~<br />
-👻 Also floats, cool stuff~
+Basic math operations (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>^</code>)<br />
+Support for integers and floats<br />
+Variables (<code>VAR</code>)
 </p>
 
-<h3>🥺 Is that all?</h3>
+<h3>Is that all?</h3>
 <p>
-yep
+For now, yes-
 </p>
 </div>
 <hr />
 
 <div align="center">
-<h3>Compiling the runner (Windows)</h3>
+<h3>Compiling the runner</h3>
 <p>
 You're gonna need <code>gcc</code> (any version is fine i think) and compile the <code>shell.cpp</code> file<br />
 <i>(don't ask for a make install, i'm too lazy)</i>
