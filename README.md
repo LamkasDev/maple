@@ -27,7 +27,6 @@
         Support for integers and floats<br />
         Variables (<code>VAR</code>)
     </p>
-
     <h3>Is that all?</h3>
     <p>
         For now, yes-
@@ -42,7 +41,6 @@
         You're gonna need <code>gcc (version 5>=, supports C++ 17 features)</code>, <code>make (version 3.81>=)</code><br />
         Once you have that, you can just run <code>make</code> :)
     </p>
-
     <h3>Commands</h3>
     <p>
         <code>.\maple-shell</code> - Starts the standard shell to execute Maple code<br />
