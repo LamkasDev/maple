@@ -2,4 +2,5 @@
 .VSCodeCounter/
 
 samples/
-shell.exe
+maple-shell.exe
+maple-shell.o
