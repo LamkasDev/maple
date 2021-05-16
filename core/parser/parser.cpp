@@ -79,7 +79,7 @@ class Parser {
             }
 
             InvalidSyntaxError e;
-            e.init(t.start, t.end, "Expected int or float, '+', '-' or '('");
+            e.init(t.start, t.end, "Expected int/float, identifier, '+', '-' or '('");
             return result.failure(e);
         }
 
@@ -190,6 +190,11 @@ class Parser {
                 result.register_advance(advance());
                 ParserResult expr = result.register_result(expression());
                 if(result.state == -1) { return result; }
+                if(expr.node_type == NODE_UNKNOWN) {
+                    InvalidSyntaxError e;
+                    e.init(current_t.start, current_t.end, "Expected int/float, identifier, '+', '-' or '('");
+                    return result.failure(e);
+                }
 
                 VariableAssignmentNode n; n.init(identifier); n = expr.set_to_assignment(n);
                 result.node_type = n.type;
@@ -199,7 +204,11 @@ class Parser {
             }
 
             ParserResult left = result.register_result(term());
-            if(result.state == -1) { return result; }
+            if(result.state == -1) {
+                InvalidSyntaxError e;
+                e.init(current_t.start, current_t.end, "Expected 'VAR', int/float, identifier, '+', '-' or '('");
+                return result.failure(e);
+            }
 
             BinaryOperationNode* op = new BinaryOperationNode();
             left.set_to_left(op);

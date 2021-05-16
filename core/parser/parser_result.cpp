@@ -6,6 +6,8 @@ using namespace std;
 class ParserResult {
     public:
         int state = 0;
+        int advance_count = 0;
+
         string node_type = NODE_UNKNOWN;
         NumberNode node_number;
         BinaryOperationNode* node_binary;
@@ -19,10 +21,11 @@ class ParserResult {
         }
 
         void register_advance(int _result) {
-            return;
+            advance_count += _result;
         }
 
         ParserResult register_result(ParserResult _result) {
+            advance_count += _result.advance_count;
             state = _result.state;
             e = _result.e;
 
@@ -35,8 +38,11 @@ class ParserResult {
         }
 
         ParserResult failure(Error _e) {
-            state = -1;
-            e = _e;
+            if(state == 0 || advance_count == 0) {
+                state = -1;
+                e = _e;
+            }
+            
             return *this;
         }
 
