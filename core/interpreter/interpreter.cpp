@@ -70,45 +70,45 @@ class Interpreter {
             //printf("Found binary node-\n");
 
             InterpreterResult res;
-            res.init((*node).start, (*node).end);
+            res.init(node->start, node->end);
 
-            string left_type = (*node).left_type;
+            string left_type = node->left_type;
             InterpreterResult left_res;
 
-            string right_type = (*node).right_type;
+            string right_type = node->right_type;
             InterpreterResult right_res;
 
             //printf("%s\n", (left_type + "<>" + right_type).c_str());
 
             if(left_type == NODE_INT) {
-                left_res = visit_int_node((*node).left, context);
+                left_res = visit_int_node(node->left, context);
             } else if(left_type == NODE_FLOAT) {
-                left_res = visit_float_node((*node).left, context);
+                left_res = visit_float_node(node->left, context);
             } else if(left_type == NODE_UNARY) {
-                left_res = visit_unary_node((*node).left_unary, context);
+                left_res = visit_unary_node(node->left_unary, context);
             } else if(left_type == NODE_BINARY) {
-                left_res = visit_binary_node((*node).left_binary, context);
+                left_res = visit_binary_node(node->left_binary, context);
             } else if(left_type == NODE_ACCESS) {
-                left_res = visit_variable_access((*node).left_access, context);
+                left_res = visit_variable_access(node->left_access, context);
             }
             res.registerResult(left_res);
             if(res.state == -1) { return res; }
 
             if(right_type == NODE_INT) {
-                right_res = visit_int_node((*node).right, context);
+                right_res = visit_int_node(node->right, context);
             } else if(right_type == NODE_FLOAT) {
-                right_res = visit_float_node((*node).right, context);
+                right_res = visit_float_node(node->right, context);
             } else if(right_type == NODE_UNARY) {
-                right_res = visit_unary_node((*node).right_unary, context);
+                right_res = visit_unary_node(node->right_unary, context);
             } else if(right_type == NODE_BINARY) {
-                right_res = visit_binary_node((*node).right_binary, context);
+                right_res = visit_binary_node(node->right_binary, context);
             } else if(right_type == NODE_ACCESS) {
-                right_res = visit_variable_access((*node).right_access, context);
+                right_res = visit_variable_access(node->right_access, context);
             }
             res.registerResult(right_res);
             if(res.state == -1) { return res; }
 
-            res = res.processNumber(left_res, (*node).op, right_res);
+            res = res.processNumber(left_res, node->op, right_res);
             if(res.state == -1) { return res; }
             
             //printf("returning: %s\n", (res.type == NODE_INT ? to_string(res.res_int.value).c_str() : to_string(res.res_float.value).c_str()));
@@ -119,7 +119,7 @@ class Interpreter {
             InterpreterResult res;
             res.init(node.start, node.end);
 
-            SymbolContainer value = context->symbol_table->get(node.name.value_string);
+            SymbolContainer value = (*context->symbol_table->get(node.name.value_string));
             if(value.state == -1) {
                 RuntimeError e;
                 e.init(node.start, node.end, node.name.value_string + " is not defined", context);

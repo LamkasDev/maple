@@ -14,12 +14,14 @@ class Parser {
             advance();
         }
 
-        void advance() {
+        int advance() {
             index++;
             if(tokens.size() > 0) {
                 current_t = tokens.front();
                 tokens.pop_front();
             }
+
+            return 1;
         }
 
         ParserResult parse() {
@@ -39,32 +41,32 @@ class Parser {
 
             Token t = current_t;
             if(t.type == TT_INT) {
-                advance();
+                result.register_advance(advance());
                 IntNode n; n.init(t);
 
                 result.node_type = n.type;
                 result.node_number = n;
                 return result.success();
             } else if(t.type == TT_FLOAT) {
-                advance();
+                result.register_advance(advance());
                 FloatNode n; n.init(t);
 
                 result.node_type = n.type;
                 result.node_number = n;
                 return result.success();
             } else if(t.type == TT_IDENFIFIER) {
-                advance();
+                result.register_advance(advance());
                 VariableAccessNode n; n.init(t);
 
                 result.node_type = n.type;
                 result.node_access = n;
                 return result.success();
             } else if(t.type == TT_LPAREN) {
-                advance();
+                result.register_advance(advance());
                 ParserResult n_0 = expression();
                 if(n_0.state == -1) { return result.failure(n_0.e); }
                 if(current_t.type == TT_RPAREN) {
-                    advance();
+                    result.register_advance(advance());
                     
                     result.node_type = n_0.node_type;
                     result.node_binary = n_0.node_binary;
@@ -85,7 +87,7 @@ class Parser {
             ParserResult result;
             result.init();
 
-            ParserResult left = result.registerResult(atom());
+            ParserResult left = result.register_result(atom());
             if(result.state == -1) { return result; }
 
             BinaryOperationNode* op = new BinaryOperationNode();
@@ -93,17 +95,17 @@ class Parser {
 
             while(current_t.type == TT_POW) {
                 Token op_token = current_t;
-                (*op).init(op_token);
-                advance();
+                op->init(op_token);
+                result.register_advance(advance());
 
-                ParserResult right = result.registerResult(factor());
+                ParserResult right = result.register_result(factor());
                 if(result.state == -1) {
                     break;
                 }
 
-                if((*op).right_type != NODE_UNKNOWN) {
+                if(op->right_type != NODE_UNKNOWN) {
                     BinaryOperationNode* copy = op->copy();
-                    (*op).set_left(copy);
+                    op->set_left(copy);
                 }
                 right.set_to_right(op);
             }
@@ -119,7 +121,7 @@ class Parser {
 
             Token t = current_t;
             if(t.type == TT_PLUS || t.type == TT_MINUS) {
-                advance();
+                result.register_advance(advance());
                 ParserResult n_0 = factor();
                 if(n_0.state == -1) { return result.failure(n_0.e); }
                 UnaryOperationNode n; n.init(t, n_0.node_number);
@@ -136,7 +138,7 @@ class Parser {
             ParserResult result;
             result.init();
 
-            ParserResult left = result.registerResult(factor());
+            ParserResult left = result.register_result(factor());
             if(result.state == -1) { return result; }
 
             BinaryOperationNode* op = new BinaryOperationNode();
@@ -144,17 +146,17 @@ class Parser {
 
             while(current_t.type == TT_MUL || current_t.type == TT_DIV || current_t.type == TT_MOD) {
                 Token op_token = current_t;
-                (*op).init(op_token);
-                advance();
+                op->init(op_token);
+                result.register_advance(advance());
 
-                ParserResult right = result.registerResult(factor());
+                ParserResult right = result.register_result(factor());
                 if(result.state == -1) {
                     break;
                 }
 
-                if((*op).right_type != NODE_UNKNOWN) {
+                if(op->right_type != NODE_UNKNOWN) {
                     BinaryOperationNode* copy = op->copy();
-                    (*op).set_left(copy);
+                    op->set_left(copy);
                 }
                 right.set_to_right(op);
             }
@@ -169,7 +171,7 @@ class Parser {
             result.init();
 
             if(current_t.matches(TT_KEYWORD, KEYWORD_VAR)) {
-                advance();
+                result.register_advance(advance());
                 if(current_t.type != TT_IDENFIFIER) {
                     InvalidSyntaxError e;
                     e.init(current_t.start, current_t.end, "Expected identifier");
@@ -177,7 +179,7 @@ class Parser {
                 }
 
                 Token identifier = current_t;
-                advance();
+                result.register_advance(advance());
 
                 if(current_t.type != TT_EQ) {
                     InvalidSyntaxError e;
@@ -185,8 +187,8 @@ class Parser {
                     return result.failure(e);
                 }
 
-                advance();
-                ParserResult expr = result.registerResult(expression());
+                result.register_advance(advance());
+                ParserResult expr = result.register_result(expression());
                 if(result.state == -1) { return result; }
 
                 VariableAssignmentNode n; n.init(identifier); n = expr.set_to_assignment(n);
@@ -196,7 +198,7 @@ class Parser {
                 return result.success();
             }
 
-            ParserResult left = result.registerResult(term());
+            ParserResult left = result.register_result(term());
             if(result.state == -1) { return result; }
 
             BinaryOperationNode* op = new BinaryOperationNode();
@@ -204,17 +206,17 @@ class Parser {
             
             while(current_t.type == TT_PLUS || current_t.type == TT_MINUS) {
                 Token op_token = current_t;
-                (*op).init(op_token);
-                advance();
+                op->init(op_token);
+                result.register_advance(advance());
 
-                ParserResult right = result.registerResult(term());
+                ParserResult right = result.register_result(term());
                 if(result.state == -1) {
                     break;
                 }
 
-                if((*op).right_type != NODE_UNKNOWN) {
+                if(op->right_type != NODE_UNKNOWN) {
                     BinaryOperationNode* copy = op->copy();
-                    (*op).set_left(copy);
+                    op->set_left(copy);
                 }
                 right.set_to_right(op);
             }

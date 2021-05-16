@@ -18,7 +18,11 @@ class ParserResult {
 
         }
 
-        ParserResult registerResult(ParserResult _result) {
+        void register_advance(int _result) {
+            return;
+        }
+
+        ParserResult register_result(ParserResult _result) {
             state = _result.state;
             e = _result.e;
 
@@ -61,20 +65,20 @@ class ParserResult {
         }
 
         void set_from(BinaryOperationNode* _node) {
-            if(((*_node).left_type == NODE_INT || (*_node).left_type == NODE_FLOAT) && (*_node).right_type == NODE_UNKNOWN) {
-                node_type = (*_node).left.type;
-                node_number = (*_node).left;
-            } else if((*_node).left_type == NODE_BINARY && (*_node).right_type == NODE_UNKNOWN) {
-                node_type = (*(*_node).left_binary).type;
-                node_binary = (*_node).left_binary;
-            } else if((*_node).left_type == NODE_UNARY && (*_node).right_type == NODE_UNKNOWN) {
-                node_type = (*_node).left_unary.type;
-                node_unary = (*_node).left_unary;
-            } else if((*_node).left_type == NODE_ACCESS && (*_node).right_type == NODE_UNKNOWN) {
-                node_type = (*_node).left_access.type;
-                node_access = (*_node).left_access;
+            if((_node->left_type == NODE_INT || _node->left_type == NODE_FLOAT) && _node->right_type == NODE_UNKNOWN) {
+                node_type = _node->left.type;
+                node_number = _node->left;
+            } else if(_node->left_type == NODE_BINARY && _node->right_type == NODE_UNKNOWN) {
+                node_type = _node->left_binary->type;
+                node_binary = _node->left_binary;
+            } else if(_node->left_type == NODE_UNARY && _node->right_type == NODE_UNKNOWN) {
+                node_type = _node->left_unary.type;
+                node_unary = _node->left_unary;
+            } else if(_node->left_type == NODE_ACCESS && _node->right_type == NODE_UNKNOWN) {
+                node_type = _node->left_access.type;
+                node_access = _node->left_access;
             } else {
-                node_type = (*_node).type;
+                node_type = _node->type;
                 node_binary = _node;
             }
         }

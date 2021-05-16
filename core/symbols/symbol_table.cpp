@@ -14,17 +14,17 @@ class SymbolTable {
 
         }
 
-        SymbolContainer get(string _name) {
+        SymbolContainer* get(string _name) {
             try {
                 SymbolContainer* value = symbols.at(_name);
-                return (*value);
+                return value;
             } catch(out_of_range e) {
                 if(parent != nullptr) {
                     return parent->get(_name);
                 }
 
-                SymbolContainer res_err;
-                res_err.state = -1;
+                SymbolContainer* res_err = new SymbolContainer();
+                res_err->state = -1;
                 return res_err;
             }
         }

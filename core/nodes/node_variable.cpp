@@ -29,8 +29,8 @@ class VariableAssignmentNode : public Node {
 
         void set_value(BinaryOperationNode* _value) {
             value_binary = _value;
-            value_type = (*_value).type;
-            end = (*_value).end;
+            value_type = _value->type;
+            end = _value->end;
         }
 
         void set_value(UnaryOperationNode _value) {

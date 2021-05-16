@@ -16,13 +16,13 @@ class VariableAccessNode : public Node {
             end = _name.end;
         }
 
-        VariableAccessNode copy() {
+        VariableAccessNode* copy() {
             VariableAccessNode* node = new VariableAccessNode();
-            node->init(name.copy());
+            node->init((*name.copy()));
 
             node->start = start.copy();
             node->end = end.copy();
-            return (*node);
+            return node;
         }
 
         string repr() {

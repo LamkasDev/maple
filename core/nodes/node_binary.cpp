@@ -33,8 +33,8 @@ class BinaryOperationNode : public Node {
 
         void set_left(BinaryOperationNode* _left) {
             left_binary = _left;
-            left_type = (*_left).type;
-            start = (*_left).start.copy();
+            left_type = _left->type;
+            start = _left->start.copy();
         }
 
         void set_left(UnaryOperationNode _left) {
@@ -57,8 +57,8 @@ class BinaryOperationNode : public Node {
 
         void set_right(BinaryOperationNode* _right) {
             right_binary = _right;
-            right_type = (*_right).type;
-            end = (*_right).end.copy();
+            right_type = _right->type;
+            end = _right->end.copy();
         }
 
         void set_right(UnaryOperationNode _right) {
@@ -75,24 +75,24 @@ class BinaryOperationNode : public Node {
 
         BinaryOperationNode* copy() {
             BinaryOperationNode* copy = new BinaryOperationNode();
-            copy->init(op.copy());
+            copy->init((*op.copy()));
             if(left_type == NODE_BINARY) {
                 copy->set_left(left_binary->copy());
             } else if(left_type == NODE_UNARY) {
-                copy->set_left(left_unary.copy());
+                copy->set_left((*left_unary.copy()));
             } else if(left_type == NODE_ACCESS) {
-                copy->set_left(left_access.copy());
+                copy->set_left((*left_access.copy()));
             } else {
-                copy->set_left(left.copy());
+                copy->set_left((*left.copy()));
             }
             if(right_type == NODE_BINARY) {
                 copy->set_right(right_binary->copy());
             } else if(right_type == NODE_UNARY) {
-                copy->set_right(right_unary.copy());
+                copy->set_right((*right_unary.copy()));
             } else if(right_type == NODE_ACCESS) {
-                copy->set_right(right_access.copy());
+                copy->set_right((*right_access.copy()));
             } else {
-                copy->set_right(right.copy());
+                copy->set_right((*right.copy()));
             }
 
             return copy;
@@ -101,7 +101,7 @@ class BinaryOperationNode : public Node {
         string repr() {
             string s = "(";
             if(left_type == NODE_BINARY) {
-                s += (*left_binary).repr();
+                s += left_binary->repr();
             } else if(left_type == NODE_UNARY) {
                 s += left_unary.repr();
             } else if(left_type == NODE_ACCESS) {
@@ -111,7 +111,7 @@ class BinaryOperationNode : public Node {
             }
             s += "-" + op.repr() + "-";
             if(right_type == NODE_BINARY) {
-                s += (*right_binary).repr();
+                s += right_binary->repr();
             } else if(right_type == NODE_UNARY) {
                 s += right_unary.repr();
             } else if(right_type == NODE_ACCESS) {

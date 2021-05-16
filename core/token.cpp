@@ -57,7 +57,7 @@ class Token {
             return type == _type && value_string == _value;
         }
 
-        Token copy() {
+        Token* copy() {
             Token* copy = new Token();
             copy->init(type);
             copy->set_start(start);
@@ -65,7 +65,7 @@ class Token {
             copy->value_int = value_int;
             copy->value_float = value_float;
 
-            return (*copy);
+            return copy;
         }
 
         string repr() {

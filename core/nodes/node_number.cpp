@@ -13,7 +13,7 @@ class NumberNode : public Node {
             type = _type;
         }
 
-        NumberNode copy() {
+        NumberNode* copy() {
             NumberNode* node = new NumberNode();
             node->init(type);
             if(type == NODE_INT) {
@@ -24,7 +24,7 @@ class NumberNode : public Node {
 
             node->start = start.copy();
             node->end = end.copy();
-            return (*node);
+            return node;
         }
 
         string repr() {
@@ -76,11 +76,11 @@ class UnaryOperationNode : public Node {
             end = _node.end;
         }
 
-        UnaryOperationNode copy() {
+        UnaryOperationNode* copy() {
             UnaryOperationNode* copy = new UnaryOperationNode();
-            copy->init(op.copy(), node.copy());
+            copy->init((*op.copy()), (*node.copy()));
 
-            return (*copy);
+            return copy;
         }
 
         string repr() {
