@@ -10,7 +10,7 @@
 #include "tests/tests.cpp"
 using namespace std;
 
-const string VERSION = "0.2";
+const string VERSION = "0.3";
 
 void printResult(RunResult result) {
     string r = result.interpreterResult.type == NODE_INT ? to_string(result.interpreterResult.res_int.value) : to_string(result.interpreterResult.res_float.value);

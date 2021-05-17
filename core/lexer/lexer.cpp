@@ -100,10 +100,27 @@ class Lexer {
                     }
 
                     case '=': {
-                        Token* t = new Token();
-                        t->init(TT_EQ);
-                        t->set_start(pos);
-                        result.tokens.push_back(t); advance();
+                        Token* t = make_equals();
+                        result.tokens.push_back(t);
+                        break;
+                    }
+
+                    case '<': {
+                        Token* t = make_less_than();
+                        result.tokens.push_back(t);
+                        break;
+                    }
+
+                    case '>': {
+                        Token* t = make_greater_than();
+                        result.tokens.push_back(t);
+                        break;
+                    }
+
+                    case '!': {
+                        Token* t = make_not_equals();
+                        //RETURN ERROR
+                        result.tokens.push_back(t);
                         break;
                     }
 
@@ -190,5 +207,72 @@ class Lexer {
 
                 return t;
             }
+        }
+
+        Token* make_not_equals() {
+            string str;
+            Token* t = new Token();
+            t->set_start(pos.copy());
+            t->set_end(pos.copy());
+
+            advance();
+            if(current_c == '=') {
+                advance();
+                t->init(TT_NEQ);
+            } else {
+                ExpectedCharacterError e;
+                e.init(pos.copy(), pos.copy(), "'=' (after '!')");
+                //RETURN ERROR
+            }
+            
+            return t;
+        }
+
+        Token* make_equals() {
+            string str;
+            Token* t = new Token();
+            t->init(TT_EQ);
+            t->set_start(pos.copy());
+            t->set_end(pos.copy());
+
+            advance();
+            if(current_c == '=') {
+                advance();
+                t->init(TT_EQEQ);
+            }
+
+            return t;
+        }
+
+        Token* make_less_than() {
+            string str;
+            Token* t = new Token();
+            t->init(TT_LTHAN);
+            t->set_start(pos.copy());
+            t->set_end(pos.copy());
+
+            advance();
+            if(current_c == '=') {
+                advance();
+                t->init(TT_LTHANEQ);
+            }
+
+            return t;
+        }
+
+        Token* make_greater_than() {
+            string str;
+            Token* t = new Token();
+            t->init(TT_GTHAN);
+            t->set_start(pos.copy());
+            t->set_end(pos.copy());
+
+            advance();
+            if(current_c == '=') {
+                advance();
+                t->init(TT_GTHANEQ);
+            }
+
+            return t;
         }
 };

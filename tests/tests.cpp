@@ -67,5 +67,19 @@ void runTests(Runner* runner) {
     totalTests += 6;
 
     printf("----------\n");
+    passed += runIntegerTest(runner, "Logical 1 (1 == 1)", "1 == 1", 1);
+    passed += runIntegerTest(runner, "Logical 2 (1 < 2)", "1 < 2", 1);
+    passed += runIntegerTest(runner, "Logical 3 (2 > 1)", "2 > 1", 1);
+    passed += runIntegerTest(runner, "Logical 4 (1 != 1)", "1 != 1", 0);
+    passed += runIntegerTest(runner, "Logical 5 (2 <= 2)", "2 <= 2", 1);
+    passed += runIntegerTest(runner, "Logical 6 (2 >= 2)", "2 >= 2", 1);
+    passed += runIntegerTest(runner, "Logical 7 (1 AND 1)", "1 AND 1", 1);
+    passed += runIntegerTest(runner, "Logical 8 (1 AND 0)", "1 AND 0", 0);
+    passed += runIntegerTest(runner, "Logical 9 (1 OR 0)", "1 OR 0", 1);
+    passed += runIntegerTest(runner, "Logical 10 (0 OR 0)", "0 OR 0", 0);
+    passed += runIntegerTest(runner, "Logical 11 (NOT 1)", "NOT 1", 0);
+    totalTests += 11;
+
+    printf("----------\n");
     printf("%i PASSED, %i FAILED", passed, (totalTests - passed));
 }

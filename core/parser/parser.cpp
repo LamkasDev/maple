@@ -156,6 +156,96 @@ class Parser {
 
             return result.success();
         }
+
+        ParserResult arith_expr() {
+            ParserResult result;
+
+            ParserResult left = result.register_result(term());
+            if(result.state == -1) { return result; }
+
+            Node* op = new Node();
+            op->set_type(NODE_BINARY);
+            op->set_to_left(left.node);
+
+            while(current_t->type == TT_PLUS || current_t->type == TT_MINUS) {
+                Token* op_token = current_t;
+                op->set_token(op_token);
+                result.register_advance(advance());
+
+                ParserResult right = result.register_result(term());
+                if(result.state == -1) {
+                    break;
+                }
+
+                if(op->right != nullptr) {
+                    Node* copy = op->copy();
+                    op->set_to_left(copy);
+                }
+                op->set_to_right(right.node);
+            }
+            if(result.state == -1) { return result; }
+            result.set_node(op);
+
+            return result.success();
+        }
+
+        ParserResult arith_expr_pre() {
+            ParserResult result;
+
+            ParserResult left = result.register_result(arith_expr());
+            if(result.state == -1) { return result; }
+
+            Node* op = new Node();
+            op->set_type(NODE_BINARY);
+            op->set_to_left(left.node);
+
+            while(current_t->type == TT_EQEQ || current_t->type == TT_NEQ || current_t->type == TT_LTHAN || current_t->type == TT_GTHAN || current_t->type == TT_LTHANEQ || current_t->type == TT_GTHANEQ) {
+                Token* op_token = current_t;
+                op->set_token(op_token);
+                result.register_advance(advance());
+
+                ParserResult right = result.register_result(term());
+                if(result.state == -1) {
+                    break;
+                }
+
+                if(op->right != nullptr) {
+                    Node* copy = op->copy();
+                    op->set_to_left(copy);
+                }
+                op->set_to_right(right.node);
+            }
+            if(result.state == -1) { return result; }
+            result.set_node(op);
+
+            return result.success();
+        }
+
+        ParserResult comp_expr() {
+            ParserResult result;
+
+            if(current_t->matches(TT_KEYWORD, KEYWORD_NOT)) {
+                Token* op_token = current_t;
+                result.register_advance(advance());
+
+                ParserResult expr = result.register_result(comp_expr());
+                if(result.state == -1) { return result; }
+                Node* n = new Node(); n->set_type(NODE_UNARY); n->set_token(op_token); n->set_to_left(expr.node);
+
+                result.set_node(n);
+                return result.success();
+            }
+
+            ParserResult arith = result.register_result(arith_expr_pre());
+            if(result.state == -1) {
+                InvalidSyntaxError e;
+                e.init(current_t->start, current_t->end, "Expected int/float, identifier, '+', '-', '(' or 'NOT'");
+                return result.failure(e);
+            }
+            result.set_node(arith.node);
+
+            return result.success();
+        }
         
         ParserResult expression() {
             ParserResult result;
@@ -192,10 +282,10 @@ class Parser {
                 return result.success();
             }
 
-            ParserResult left = result.register_result(term());
+            ParserResult left = result.register_result(comp_expr());
             if(result.state == -1) {
                 InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected 'VAR', int/float, identifier, '+', '-' or '('");
+                e.init(current_t->start, current_t->end, "Expected 'VAR', int/float, identifier, '+', '-' or '(' or 'NOT'");
                 return result.failure(e);
             }
 
@@ -203,12 +293,12 @@ class Parser {
             op->set_type(NODE_BINARY);
             op->set_to_left(left.node);
             
-            while(current_t->type == TT_PLUS || current_t->type == TT_MINUS) {
+            while(current_t->matches(TT_KEYWORD, KEYWORD_AND) || current_t->matches(TT_KEYWORD, KEYWORD_OR)) {
                 Token* op_token = current_t;
                 op->set_token(op_token);
                 result.register_advance(advance());
 
-                ParserResult right = result.register_result(term());
+                ParserResult right = result.register_result(comp_expr());
                 if(result.state == -1) {
                     break;
                 }

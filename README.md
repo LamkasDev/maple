@@ -25,7 +25,8 @@
     <p>
         Basic math operations (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>^</code>)<br />
         Support for integers and floats<br />
-        Variables (<code>VAR</code>)
+        Variables (<code>VAR</code>)<br />
+        Logical operators (<code>==</code>, <code><</code>, <code>></code>, <code><=</code>, <code>>=</code>, <code>AND</code>, <code>OR</code>)
     </p>
     <h3>Is that all?</h3>
     <p>
@@ -45,6 +46,7 @@
     <p>
         <code>.\maple-shell</code> - Starts the standard shell to execute Maple code<br />
         <code>.\maple-shell -tests</code> - Runs the default test suite<br />
+        <code>.\maple-shell -v</code> - Shows the current version and information<br />
         <code>.\maple-shell -run [file_name].maple</code> - Runs a specified <code>.maple</code> file
     </p>
 </div>

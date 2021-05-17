@@ -111,3 +111,15 @@ class RuntimeError : public Error {
             context = _context;
         }
 };
+
+class ExpectedCharacterError : public Error {
+    public:
+        void init(Position _start, Position _end, string _details) {
+            start = _start;
+            end = _end;
+
+            type = ERROR_RUNTIME;
+            name = "ExpectedCharacterError";
+            details = _details;
+        }
+};
