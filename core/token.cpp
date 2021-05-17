@@ -115,5 +115,5 @@ class MakeTokensResult {
     public:
         int state = 0;
         Error e;
-        list<Token> tokens;
+        list<Token*> tokens;
 };

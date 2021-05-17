@@ -57,16 +57,16 @@ class InterpreterResult {
             }
         }
 
-        InterpreterResult processNumber(InterpreterResult _left, Token _op, InterpreterResult _right) {
-            if(_op.type == TT_PLUS) {
+        InterpreterResult processNumber(InterpreterResult _left, Token* _op, InterpreterResult _right) {
+            if(_op->type == TT_PLUS) {
                 return _left.added_to(_right);
-            } else if(_op.type == TT_MINUS) {
+            } else if(_op->type == TT_MINUS) {
                 return _left.substracted_by(_right);
-            } else if(_op.type == TT_MUL) {
+            } else if(_op->type == TT_MUL) {
                 return _left.multiplied_by(_right);
-            } else if(_op.type == TT_DIV) {
+            } else if(_op->type == TT_DIV) {
                 return _left.divided_by(_right);
-            } else if(_op.type == TT_POW) {
+            } else if(_op->type == TT_POW) {
                 return _left.power_on(_right);
             } else {
                 return _left.modulo_of(_right);

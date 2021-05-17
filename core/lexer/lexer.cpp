@@ -36,82 +36,84 @@ class Lexer {
                         break;
 
                     case '+': {
-                        Token t;
-                        t.init(TT_PLUS);
-                        t.set_start(pos);
+                        Token* t = new Token();
+                        t->init(TT_PLUS);
+                        t->set_start(pos);
                         result.tokens.push_back(t); advance();
                         break;
                     }
 
                     case '-': {
-                        Token t;
-                        t.init(TT_MINUS);
-                        t.set_start(pos);
+                        Token* t = new Token();
+                        t->init(TT_MINUS);
+                        t->set_start(pos);
                         result.tokens.push_back(t); advance();
                         break;
                     }
 
                     case '*': {
-                        Token t;
-                        t.init(TT_MUL);
-                        t.set_start(pos);
+                        Token* t = new Token();
+                        t->init(TT_MUL);
+                        t->set_start(pos);
                         result.tokens.push_back(t); advance();
                         break;
                     }
 
                     case '/': {
-                        Token t;
-                        t.init(TT_DIV);
-                        t.set_start(pos);
+                        Token* t = new Token();
+                        t->init(TT_DIV);
+                        t->set_start(pos);
                         result.tokens.push_back(t); advance();
                         break;
                     }
 
                     case '^': {
-                        Token t;
-                        t.init(TT_POW);
-                        t.set_start(pos);
+                        Token* t = new Token();
+                        t->init(TT_POW);
+                        t->set_start(pos);
                         result.tokens.push_back(t); advance();
                         break;
                     }
 
                     case '%': {
-                        Token t;
-                        t.init(TT_MOD);
-                        t.set_start(pos);
+                        Token* t = new Token();
+                        t->init(TT_MOD);
+                        t->set_start(pos);
                         result.tokens.push_back(t); advance();
                         break;
                     }
 
                     case '(': {
-                        Token t;
-                        t.init(TT_LPAREN);
-                        t.set_start(pos);
+                        Token* t = new Token();
+                        t->init(TT_LPAREN);
+                        t->set_start(pos);
                         result.tokens.push_back(t); advance();
                         break;
                     }
 
                     case ')': {
-                        Token t;
-                        t.init(TT_RPAREN);
-                        t.set_start(pos);
+                        Token* t = new Token();
+                        t->init(TT_RPAREN);
+                        t->set_start(pos);
                         result.tokens.push_back(t); advance();
                         break;
                     }
 
                     case '=': {
-                        Token t;
-                        t.init(TT_EQ);
-                        t.set_start(pos);
+                        Token* t = new Token();
+                        t->init(TT_EQ);
+                        t->set_start(pos);
                         result.tokens.push_back(t); advance();
                         break;
                     }
 
                     default: {
                         if (DIGITS.find(current_c) != string::npos) {
-                            result.tokens.push_back(make_number());
+                            Token* t = make_number();
+                            result.tokens.push_back(t);
                         } else if (LETTERS.find(current_c) != string::npos) {
-                            result.tokens.push_back(make_identifier());
+                            Token* t = make_identifier();
+                            result.tokens.push_back(t);
                         } else {
                             char c = current_c;
                             Position start = pos.copy();
@@ -127,20 +129,18 @@ class Lexer {
                 }
             }
 
-            Token t;
-            t.init(TT_EOF);
-            t.set_start(pos);
+            Token* t = new Token();
+            t->init(TT_EOF);
+            t->set_start(pos);
             result.tokens.push_back(t);
 
             result.state = 0;
             return result;
         }
 
-        Token make_number() {
+        Token* make_number() {
             string str;
             int dot = 0;
-            Position start = pos.copy();
-
             while(pos.index < text.length() && (DIGITS + ".").find(current_c) != string::npos) {
                 if(current_c == '.') {
                     if(dot == 1) { break; }
@@ -152,43 +152,41 @@ class Lexer {
             }
             
             if(dot == 0) {
-                TokenInt t;
-                t.init(stoi(str));
-                t.set_start(start);
-                t.set_end(pos);
+                TokenInt* t = new TokenInt();
+                t->init(stoi(str));
+                t->set_start(pos.copy());
+                t->set_end(pos.copy());
 
                 return t;
             } else {
-                TokenFloat t;
-                t.init(atof(str.c_str()));
-                t.set_start(start);
-                t.set_end(pos);
+                TokenFloat* t = new TokenFloat();
+                t->init(atof(str.c_str()));
+                t->set_start(pos.copy());
+                t->set_end(pos.copy());
 
                 return t;
             }
         }
 
-        Token make_identifier() {
+        Token* make_identifier() {
             string str;
-            Position start = pos.copy();
-
             while(pos.index < text.length() && (LETTERS_DIGITS + '_').find(current_c) != string::npos) {
                 str += current_c;
                 advance();
             }
 
             if(in_array(str, KEYWORDS)) {
-                TokenKeyword t;
-                t.init(str);
-                t.set_start(start);
-                t.set_end(pos);
+                TokenKeyword* t = new TokenKeyword();
+                t->init(str);
+                t->set_start(pos.copy());
+                t->set_end(pos.copy());
 
                 return t;
             } else {
-                TokenIdentifier t;
-                t.init(str);
-                t.set_start(start);
-                t.set_end(pos);
+                TokenIdentifier* t = new TokenIdentifier();
+                t->init(str);
+                t->set_start(pos.copy());
+                t->set_end(pos.copy());
 
                 return t;
             }

@@ -13,14 +13,10 @@
 
 #include "../core/interpreter/interpreter.cpp"
 #include "../core/interpreter/interpreter_result.cpp"
-
 #include "../core/lexer/lexer.cpp"
 
 #include "../core/nodes/node.cpp"
-#include "../core/nodes/node_number.cpp"
-#include "../core/nodes/node_variable.cpp"
-#include "../core/nodes/node_variable_access.cpp"
-#include "../core/nodes/node_binary.cpp"
+#include "../core/nodes/node_value.cpp"
 
 #include "../core/parser/parser.cpp"
 #include "../core/parser/parser_result.cpp"
@@ -77,17 +73,17 @@ class Runner {
             string node_type = parserResult.node_type;
             //printf("Root Node: %s\n", node_type.c_str());
             if(node_type == NODE_INT) {
-                interpreterResult = interpreter.visit_int_node(parserResult.node_number, context);
+                interpreterResult = interpreter.visit_int_node(parserResult.node, context);
             } else if(node_type == NODE_FLOAT) {
-                interpreterResult = interpreter.visit_float_node(parserResult.node_number, context);
+                interpreterResult = interpreter.visit_float_node(parserResult.node, context);
             } else if(node_type == NODE_BINARY) {
-                interpreterResult = interpreter.visit_binary_node(parserResult.node_binary, context);
+                interpreterResult = interpreter.visit_binary_node(parserResult.node, context);
             } else if(node_type == NODE_UNARY) {
-                interpreterResult = interpreter.visit_unary_node(parserResult.node_unary, context);
+                interpreterResult = interpreter.visit_unary_node(parserResult.node, context);
             } else if(node_type == NODE_ACCESS) {
-                interpreterResult = interpreter.visit_variable_access(parserResult.node_access, context);
+                interpreterResult = interpreter.visit_variable_access(parserResult.node, context);
             } else if(node_type == NODE_ASSIGNMENT) {
-                interpreterResult = interpreter.visit_variable_assign(parserResult.node_assignment, context);
+                interpreterResult = interpreter.visit_variable_assign(parserResult.node, context);
             } else {
                 interpreter.no_visit_method(node_type);
             }
