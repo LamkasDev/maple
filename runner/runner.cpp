@@ -35,9 +35,15 @@ class Runner {
         void initialize_global_symbol_table() {
             SymbolContainer* sc_null = new SymbolContainer();
             sc_null->init(0);
+            SymbolContainer* sc_true = new SymbolContainer();
+            sc_true->init(1);
+            SymbolContainer* sc_false = new SymbolContainer();
+            sc_false->init(0);
 
             global_symbol_table = new SymbolTable();
             global_symbol_table->set("NULL", sc_null);
+            global_symbol_table->set("TRUE", sc_true);
+            global_symbol_table->set("FALSE", sc_false);
         }
 
         RunResult run(string _fileName, string _text) {
