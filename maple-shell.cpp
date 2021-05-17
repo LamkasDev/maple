@@ -10,6 +10,8 @@
 #include "tests/tests.cpp"
 using namespace std;
 
+const string VERSION = "0.2";
+
 void printResult(RunResult result) {
     string r = result.interpreterResult.type == NODE_INT ? to_string(result.interpreterResult.res_int.value) : to_string(result.interpreterResult.res_float.value);
     printf("Result - %s \n\n", ("[" + result.interpreterResult.type + "] " +  r).c_str());
@@ -20,8 +22,8 @@ int main(int argc, char** argv) {
     runner->initialize_global_symbol_table();
 
     if(argc >= 2) {
-        if(argc >= 3) {
-            if(string(argv[1]) == "-run") {
+        if(string(argv[1]) == "-run") {
+            if(argc >= 3) {
                 ifstream file;
                 file.open(string(argv[2]));
                 if(!file) {
@@ -37,16 +39,23 @@ int main(int argc, char** argv) {
 
                     return 1;
                 }
+            } else {
+                printf("No file name was specified-");
+                return 0;
             }
-        }
-
-        if(string(argv[1]) == "-tests") {
+        } else if(string(argv[1]) == "-tests") {
             runTests(runner);
             return 1;
+        } else if(string(argv[1]) == "-v") {
+            printf("Maple version %s (Built by LamkasDev)-", VERSION.c_str());
+            return 1;
+        } else {
+            printf("Unknown argument '%s'", string(argv[1]).c_str());
+            return 0;
         }
     }
 
-    printf("[Maple 0.0.1] C++ based programming language\n");
+    printf("[Maple %s] C++ based programming language\n", VERSION.c_str());
     printf("Commands: exit(), tests()\n");
 
     char s[512];
