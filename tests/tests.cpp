@@ -25,7 +25,7 @@ int runFloatTest(Runner* runner, string name, string code, float value) {
     }
 }
 
-void runTests(Runner* runner) {
+bool runTests(Runner* runner) {
     int totalTests = 0, passed = 0;
 
     printf("----------\n");
@@ -82,4 +82,5 @@ void runTests(Runner* runner) {
 
     printf("----------\n");
     printf("%i PASSED, %i FAILED", passed, (totalTests - passed));
+    return passed < totalTests;
 }

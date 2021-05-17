@@ -72,11 +72,14 @@ class InterpreterResult {
                 return _left.get_comparison(_op, _right);
             } else if(_op->matches(TT_KEYWORD, KEYWORD_AND)) {
                 return _left.and_by(_right);
-            }else if(_op->matches(TT_KEYWORD, KEYWORD_OR))  {
+            } else if(_op->matches(TT_KEYWORD, KEYWORD_OR))  {
                 return _left.or_by(_right);
             } else if(_op->type == TT_MOD) {
                 return _left.modulo_of(_right);
-            } 
+            }
+
+            InterpreterResult res;
+            return res;
         }
 
         InterpreterResult added_to(InterpreterResult _right) {

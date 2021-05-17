@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
                 file.open(string(argv[2]));
                 if(!file) {
                     printf("File doesn't exist-");
-                    return 0;
+                    exit(1);
                 } else {
                     stringstream stream;
                     stream << file.rdbuf();
@@ -37,21 +37,20 @@ int main(int argc, char** argv) {
                     RunResult result = runner->run("<file>", contents);
                     printResult(result);
 
-                    return 1;
+                    exit(0);
                 }
             } else {
                 printf("No file name was specified-");
-                return 0;
+                exit(1);
             }
         } else if(string(argv[1]) == "-tests") {
-            runTests(runner);
-            return 1;
+            exit(runTests(runner));
         } else if(string(argv[1]) == "-v") {
             printf("Maple version %s (Built by LamkasDev)-", VERSION.c_str());
-            return 1;
+            exit(0);
         } else {
             printf("Unknown argument '%s'", string(argv[1]).c_str());
-            return 0;
+            exit(1);
         }
     }
 
@@ -87,5 +86,5 @@ int main(int argc, char** argv) {
         }
     }
 
-    return 1;
+    exit(0);
 }
