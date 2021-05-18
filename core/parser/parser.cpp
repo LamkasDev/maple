@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "../token.cpp"
 using namespace std;
 
 class Parser {
@@ -70,6 +71,12 @@ class Parser {
                     e.init(current_t->start, current_t->end, "Expected ')'");
                     return result.failure(e);
                 }
+            } else if(t->matches(TT_KEYWORD, KEYWORD_IF)) {
+                ParserResult expr = if_expr();
+                if(expr.state == -1) { return result.failure(expr.e); }
+
+                result.set_node(expr.node);
+                return result.success();
             }
 
             InvalidSyntaxError e;
@@ -311,6 +318,73 @@ class Parser {
             }
             if(result.state == -1) { return result; }
             result.set_node(op);
+
+            return result.success();
+        }
+
+        ParserResult if_expr() {
+            ParserResult result;
+            list<Node*> cases;
+
+            Node* node = new Node();
+            node->set_type(NODE_IF);
+
+            if(current_t->matches(TT_KEYWORD, KEYWORD_IF) == false) {
+                InvalidSyntaxError e;
+                e.init(current_t->start, current_t->end, "Expected 'IF'");
+                return result.failure(e);
+            }
+
+            result.register_advance(advance());
+
+            ParserResult condition = result.register_result(expression());
+            if(result.state == -1) { return result; }
+
+            if(current_t->matches(TT_KEYWORD, KEYWORD_THEN) == false) {
+                InvalidSyntaxError e;
+                e.init(current_t->start, current_t->end, "Expected 'THEN'");
+                return result.failure(e);
+            }
+
+            result.register_advance(advance());
+
+            ParserResult expr = result.register_result(expression());
+            if(result.state == -1) { return result; }
+
+            cases.push_back(condition.node);
+            cases.push_back(expr.node);
+
+            while(current_t->matches(TT_KEYWORD, KEYWORD_ELIF)) {
+                result.register_advance(advance());
+
+                ParserResult condition_1 = result.register_result(expression());
+                if(result.state == -1) { return result; }
+
+                if(current_t->matches(TT_KEYWORD, KEYWORD_THEN) == false) {
+                    InvalidSyntaxError e;
+                    e.init(current_t->start, current_t->end, "Expected 'THEN'");
+                    return result.failure(e);
+                }
+
+                result.register_advance(advance());
+
+                ParserResult expr_1 = result.register_result(expression());
+                if(result.state == -1) { return result; }
+                
+                cases.push_back(condition_1.node);
+                cases.push_back(expr_1.node);
+            }
+
+            if(current_t->matches(TT_KEYWORD, KEYWORD_ELSE)) {
+                result.register_advance(advance());
+
+                ParserResult else_case = result.register_result(expression());
+                if(result.state == -1) { return result; }
+                node->set_else_result(else_case.node);
+            }
+
+            node->set_if_results(cases);
+            result.set_node(node);
 
             return result.success();
         }

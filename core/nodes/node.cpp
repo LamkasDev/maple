@@ -2,6 +2,7 @@
 #include <string>
 #include "../token.cpp"
 #include "../position.cpp"
+#include "../parser/parser_result.cpp"
 #include "node_value.cpp"
 using namespace std;
 
@@ -12,6 +13,7 @@ const string NODE_BINARY = "BINARY";
 const string NODE_UNARY = "UNARY";
 const string NODE_ACCESS = "ACCESS";
 const string NODE_ASSIGNMENT = "ASSIGNMENT";
+const string NODE_IF = "IF";
 
 class Node {
     public:
@@ -19,14 +21,17 @@ class Node {
         Position start;
         Position end;
 
-        NodeValue* value;
-        Token* token;
+        NodeValue* value = nullptr;
+        Token* token = nullptr;
 
-        Node* left;
-        NodeValue* left_value;
+        Node* left = nullptr;
+        NodeValue* left_value = nullptr;
 
-        Node* right;
-        NodeValue* right_value;
+        Node* right = nullptr;
+        NodeValue* right_value = nullptr;
+
+        list<Node*> if_results;
+        Node* else_result = nullptr;
 
         void set_type(string _type) {
             type = _type;
@@ -50,14 +55,28 @@ class Node {
 
         void set_to_left(Node* _node) {
             left = _node;
+            start = _node->start;
+            end = _node->end;
         }
 
         void set_to_right(Node* _node) {
             right = _node;
+            end = _node->end;
         }
 
         void set_token(Token* _token) {
             token = _token;
+        }
+
+        void set_if_results(list<Node*> _if_results) {
+            if_results = _if_results;
+            start = _if_results.front()->start;
+            end = _if_results.back()->end;
+        }
+
+        void set_else_result(Node* _else_result) {
+            else_result = _else_result;
+            end = _else_result->end;
         }
 
         Node* copy() {

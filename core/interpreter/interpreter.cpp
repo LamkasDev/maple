@@ -19,14 +19,19 @@ class Interpreter {
             } else if(node->type == NODE_BINARY) {
                 res = visit_binary_node(node, context);
             } else if(node->type == NODE_ACCESS) {
-                res = visit_variable_access(node, context);
+                res = visit_variable_access_node(node, context);
+            } else if(node->type == NODE_ASSIGNMENT) {
+                res = visit_variable_assign(node, context);
+            } else if(node->type == NODE_IF) {
+                res = visit_if_node(node, context);
+            } else {
+                no_visit_method(node->type);
             }
 
             return res;
         }
 
         InterpreterResult visit_int_node(Node* node, Context* context) {
-            //printf("Found int node-\n");
             IntNumber n;
             n.init(node->value->value_int);
             n.set_pos(node->start, node->end);
@@ -41,7 +46,6 @@ class Interpreter {
         }
 
         InterpreterResult visit_float_node(Node* node, Context* context) {
-            //printf("Found float node-\n");
             FloatNumber n;
             n.init(node->value->value_float);
             n.set_pos(node->start, node->end);
@@ -54,8 +58,6 @@ class Interpreter {
         }
 
         InterpreterResult visit_unary_node(Node* node, Context* context) {
-            //printf("Found unary node-\n");
-
             InterpreterResult res;
             res.init(node->start, node->end);
 
@@ -68,12 +70,8 @@ class Interpreter {
                 n_m.init(-1);
                 InterpreterResult n_m_i;
                 n_m_i.set_from(n_m);
-                
-                if(node->left->type == NODE_INT) {
-                    res = res.processNumber(visit_int_node(node->left, context), n_t, n_m_i);
-                } else {
-                    res = res.processNumber(visit_float_node(node->left, context), n_t, n_m_i);
-                }
+
+                res = res.processNumber(visit_node(node->left, context), n_t, n_m_i);
             } else if(node->token->matches(TT_KEYWORD, KEYWORD_NOT)) {
                 Token* n_t = new Token();
                 n_t->init(TT_EQEQ);
@@ -81,20 +79,14 @@ class Interpreter {
                 n_m.init(0);
                 InterpreterResult n_m_i;
                 n_m_i.set_from(n_m);
-                
-                if(node->left->type == NODE_INT) {
-                    res = res.processNumber(visit_int_node(node->left, context), n_t, n_m_i);
-                } else {
-                    res = res.processNumber(visit_float_node(node->left, context), n_t, n_m_i);
-                }
+
+                res = res.processNumber(visit_node(node->left, context), n_t, n_m_i);
             }
 
             return res.success();
         }
 
         InterpreterResult visit_binary_node(Node* node, Context* context) {
-            //printf("Found binary node-\n");
-
             InterpreterResult res;
             res.init(node->start, node->end);
             
@@ -118,7 +110,7 @@ class Interpreter {
             return res.success();
         }
 
-        InterpreterResult visit_variable_access(Node* node, Context* context) {
+        InterpreterResult visit_variable_access_node(Node* node, Context* context) {
             InterpreterResult res;
             res.init(node->start, node->end);
 
@@ -161,6 +153,43 @@ class Interpreter {
                 context->symbol_table->set(node->token->value_string, value);
             }
             
+            return res.success();
+        }
+
+        InterpreterResult visit_if_node(Node* node, Context* context) {
+            InterpreterResult res;
+            InterpreterResult cond_res;
+            InterpreterResult expr_res;
+            res.init(node->start, node->end);
+            
+            Node* cond = nullptr;
+            for(Node* node : node->if_results) {
+                if(cond == nullptr) {
+                    cond = node;
+                    continue;
+                }
+
+                cond_res = res.registerResult(visit_node(cond, context));
+                if(res.state == -1) { return res; }
+                if(cond_res.is_true()) {
+                    expr_res = res.registerResult(visit_node(node, context));
+                    if(res.state == -1) { break; }
+
+                    res = expr_res;
+                    break;
+                }
+
+                cond = nullptr;
+            }
+            if(res.type == NODE_UNKNOWN && node->else_result != nullptr) {
+                InterpreterResult else_res = res.registerResult(visit_node(node->else_result, context));
+                if(res.state == -1) { return res; }
+
+                res = else_res;
+                return res.success();
+            }
+            if(cond_res.state == -1 || expr_res.state == -1) { return res; }
+
             return res.success();
         }
 

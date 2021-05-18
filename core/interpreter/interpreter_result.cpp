@@ -229,6 +229,10 @@ class InterpreterResult {
             return res;
         }
 
+        bool is_true() {
+            return get_value() != 0;
+        }
+
         float get_value() {
             if(type == NODE_INT) { return res_int.value; } else { return res_float.value; }
         }

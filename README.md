@@ -26,7 +26,8 @@
         Basic math operations (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>^</code>)<br />
         Support for integers and floats<br />
         Variables (<code>VAR</code>)<br />
-        Logical operators (<code>==</code>, <code><</code>, <code>></code>, <code><=</code>, <code>>=</code>, <code>AND</code>, <code>OR</code>)
+        Logical operators (<code>==</code>, <code><</code>, <code>></code>, <code><=</code>, <code>>=</code>, <code>AND</code>, <code>OR</code>)<br />
+        Conditional expressions (<code>IF</code>, <code>THEN</code>, <code>ELIF</code>, <code>ELSE</code>)
     </p>
     <h3>Is that all?</h3>
     <p>

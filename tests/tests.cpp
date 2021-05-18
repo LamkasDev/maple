@@ -81,6 +81,15 @@ bool runTests(Runner* runner) {
     totalTests += 11;
 
     printf("----------\n");
+    passed += runIntegerTest(runner, "Conditional 1 (IF 1 THEN 0)", "IF 1 THEN 0", 0);
+    passed += runIntegerTest(runner, "Conditional 2 (IF 0 THEN 1 ELSE 0)", "IF 0 THEN 1 ELSE 0", 0);
+    passed += runIntegerTest(runner, "Conditional 3 (IF a == 5 THEN 1 ELSE 0)", "IF a == 5 THEN 1 ELSE 0", 1);
+    passed += runIntegerTest(runner, "Conditional 4 (IF a AND b THEN 1 ELSE 0)", "IF a AND b THEN 1 ELSE 0", 1);
+    passed += runIntegerTest(runner, "Conditional 5 (IF NOT a THEN 1 ELIF NOT b THEN 1 ELSE 0)", "IF NOT a THEN 1 ELIF NOT b THEN 1 ELSE 0", 0);
+    passed += runIntegerTest(runner, "Conditional 6 (IF 1 THEN VAR d = 10 ELSE VAR d = 5)", "IF 1 THEN VAR d = 10 ELSE VAR d = 5", 10);
+    totalTests += 6;
+
+    printf("----------\n");
     printf("%i PASSED, %i FAILED", passed, (totalTests - passed));
     return passed < totalTests;
 }
