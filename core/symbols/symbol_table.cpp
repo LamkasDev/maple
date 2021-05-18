@@ -30,7 +30,7 @@ class SymbolTable {
         }
 
         void set(string _name, SymbolContainer* _value) {
-            symbols.insert(make_pair(_name, _value));
+            symbols[_name] = _value;
         } 
 
         void remove(string _name) {

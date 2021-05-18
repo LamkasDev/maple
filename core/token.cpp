@@ -5,7 +5,7 @@
 #include "error.cpp"
 using namespace std;
 
-const vector<string> KEYWORDS { "VAR", "AND", "OR", "NOT", "IF", "THEN", "ELSE", "ELIF" }; 
+const vector<string> KEYWORDS { "VAR", "AND", "OR", "NOT", "IF", "THEN", "ELSE", "ELIF", "FOR", "TO", "STEP", "WHILE" }; 
 const string LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 const string LETTERS_DIGITS = LETTERS + "0123456789";
 const string DIGITS = "0123456789";
@@ -43,6 +43,10 @@ const string KEYWORD_IF = "IF";
 const string KEYWORD_THEN = "THEN";
 const string KEYWORD_ELSE = "ELSE";
 const string KEYWORD_ELIF = "ELIF";
+const string KEYWORD_FOR = "FOR";
+const string KEYWORD_TO = "TO";
+const string KEYWORD_STEP = "STEP";
+const string KEYWORD_WHILE = "WHILE";
 
 class Token {
     public:
@@ -87,6 +91,10 @@ class Token {
                 return type + ":" + to_string(value_int);
             } else if(type == TT_FLOAT) {
                 return type + ":" + to_string(value_float);
+            } else if(type == TT_IDENFIFIER) {
+                return type + ":" + value_string;
+            } else if(type == TT_KEYWORD) {
+                return type + ":" + value_string;
             }
 
             return type;

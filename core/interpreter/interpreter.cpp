@@ -24,6 +24,10 @@ class Interpreter {
                 res = visit_variable_assign(node, context);
             } else if(node->type == NODE_IF) {
                 res = visit_if_node(node, context);
+            } else if(node->type == NODE_FOR) {
+                res = visit_for_node(node, context);
+            } else if(node->type == NODE_WHILE) {
+                res = visit_while_node(node, context);
             } else {
                 no_visit_method(node->type);
             }
@@ -189,6 +193,60 @@ class Interpreter {
                 return res.success();
             }
             if(cond_res.state == -1 || expr_res.state == -1) { return res; }
+
+            return res.success();
+        }
+
+        InterpreterResult visit_for_node(Node* node, Context* context) {
+            InterpreterResult res;
+            res.init(node->start, node->end);
+
+            InterpreterResult start_value = res.registerResult(visit_node(node->for_start_result, context));
+            if(res.state == -1) { return res; }
+            InterpreterResult end_value = res.registerResult(visit_node(node->for_end_result, context));
+            if(res.state == -1) { return res; }
+
+            InterpreterResult step_value;
+            if(node->for_step_result != nullptr) {
+                step_value = res.registerResult(visit_node(node->for_step_result, context));
+                if(res.state == -1) { return res; }
+            } else {
+                IntNumber n_s;
+                n_s.init(1);
+                InterpreterResult n_s_i;
+                n_s_i.set_from(n_s);
+
+                step_value = n_s_i;
+            }
+            
+            bool st_dir = step_value.get_value() >= 0 ? true : false;
+            int i = start_value.get_value();
+            while((st_dir == true && i < end_value.get_value()) || (st_dir == false && i > end_value.get_value())) {
+                SymbolContainer* container;
+                container->init(i);
+
+                context->symbol_table->set(node->token->value_string, container);
+                i += step_value.get_value();
+
+                res.registerResult(visit_node(node->for_expr_result, context));
+                if(res.state == -1) { break; }
+            }
+            if(res.state == -1) { return res; }
+
+            return res.success();
+        }
+
+        InterpreterResult visit_while_node(Node* node, Context* context) {
+            InterpreterResult res;
+            res.init(node->start, node->end);
+
+            while(true) {
+                InterpreterResult condition = res.registerResult(visit_node(node->while_condition_result, context));
+                if(res.state == -1 || condition.is_true() == false) { break; }
+
+                InterpreterResult expr = res.registerResult(visit_node(node->while_expr_result, context));
+                if(res.state == -1) { break; }
+            }
 
             return res.success();
         }

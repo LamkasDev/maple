@@ -27,7 +27,9 @@
         Support for integers and floats<br />
         Variables (<code>VAR</code>)<br />
         Logical operators (<code>==</code>, <code><</code>, <code>></code>, <code><=</code>, <code>>=</code>, <code>AND</code>, <code>OR</code>)<br />
-        Conditional expressions (<code>IF</code>, <code>THEN</code>, <code>ELIF</code>, <code>ELSE</code>)
+        Conditional expressions (<code>IF</code>, <code>THEN</code>, <code>ELIF?</code>, <code>ELSE?</code>)<br />
+        For loops (<code>FOR</code>, <code>TO</code>, <code>STEP?</code>, <code>THEN</code>)<br />
+        While loops (<code>WHILE</code>, <code>THEN</code>)
     </p>
     <h3>Is that all?</h3>
     <p>
@@ -49,5 +51,13 @@
         <code>.\maple-shell -tests</code> - Runs the default test suite<br />
         <code>.\maple-shell -v</code> - Shows the current version and information<br />
         <code>.\maple-shell -run [file_name].maple</code> - Runs a specified <code>.maple</code> file
+    </p>
+    <h3>Changelog</h3>
+    <p>
+        <code>Maple - 0.5</code> - For/While loops<br />
+        <code>Maple - 0.4</code> - Conditional expressions<br />
+        <code>Maple - 0.3</code> - Logical operators<br />
+        <code>Maple - 0.2</code> - Variable accessing/assigning<br />
+        <code>Maple - 0.0.1</code> - First release<br />
     </p>
 </div>

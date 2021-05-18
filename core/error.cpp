@@ -17,6 +17,7 @@ class Error {
         string type = ERROR_UNKNOWN;
         string name;
         string details;
+        int extra = 0;
 
         void init(Position _start, Position _end, string _name, string _details) {
             start = _start;
@@ -28,7 +29,7 @@ class Error {
         string as_string() {
             if(type != ERROR_RUNTIME) {
                 string s = name + ": " + details + "\n";
-                s += "File " + start.fileName + ", line " + to_string(start.line + 1);
+                s += "File " + start.fileName + ", line " + to_string(start.line + 1) + ", index " + to_string(start.index) + "-" + to_string(end.index);
 		        s += "\n\n" + print_error(start.fileContents, start, end);
                 return s;
             } else {
@@ -43,7 +44,7 @@ class Error {
             Position _start = start;
             Context* _context = context;
             while(_context != nullptr) {
-                res = "  File " + start.fileName + ", line " + to_string(start.line + 1) + ", in " + _context->display_name + "\n" + res;
+                res = "  File " + start.fileName + ", line " + to_string(start.line + 1) + ", index " + to_string(start.index) + "-" + to_string(end.index) + " in " + _context->display_name + "\n" + res;
                 _start = _context->parent_entry_pos;
                 _context = _context->parent;
             }
