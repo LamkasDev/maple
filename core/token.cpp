@@ -87,6 +87,7 @@ class Token {
             copy->set_end(end);
             copy->value_int = value_int;
             copy->value_float = value_float;
+            copy->value_string = value_string;
 
             return copy;
         }
@@ -96,6 +97,8 @@ class Token {
                 return type + ":" + to_string(value_int);
             } else if(type == TT_FLOAT) {
                 return type + ":" + to_string(value_float);
+            } else if(type == TT_STRING) {
+                return type + ":" + value_string;
             } else if(type == TT_IDENFIFIER) {
                 return type + ":" + value_string;
             } else if(type == TT_KEYWORD) {

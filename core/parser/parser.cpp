@@ -166,7 +166,6 @@ class Parser {
 
             while(current_t->type == TT_POW) {
                 Token* op_token = current_t;
-                op->set_token(op_token);
                 result.register_advance(advance());
 
                 ParserResult right = result.register_result(factor());
@@ -178,6 +177,7 @@ class Parser {
                     Node* copy = op->copy();
                     op->set_to_left(copy);
                 }
+                op->set_token(op_token);
                 op->set_end(right.node->end);
                 op->set_to_right(right.node);
             }
@@ -200,7 +200,6 @@ class Parser {
 
             while(current_t->type == TT_POW) {
                 Token* op_token = current_t;
-                op->set_token(op_token);
                 result.register_advance(advance());
 
                 ParserResult right = result.register_result(factor());
@@ -212,6 +211,7 @@ class Parser {
                     Node* copy = op->copy();
                     op->set_to_left(copy);
                 }
+                op->set_token(op_token);
                 op->set_end(right.node->end);
                 op->set_to_right(right.node);
             }
@@ -250,7 +250,6 @@ class Parser {
 
             while(current_t->type == TT_MUL || current_t->type == TT_DIV || current_t->type == TT_MOD) {
                 Token* op_token = current_t;
-                op->set_token(op_token);
                 result.register_advance(advance());
 
                 ParserResult right = result.register_result(factor());
@@ -262,6 +261,7 @@ class Parser {
                     Node* copy = op->copy();
                     op->set_to_left(copy);
                 }
+                op->set_token(op_token);
                 op->set_end(right.node->end);
                 op->set_to_right(right.node);
             }
@@ -284,7 +284,6 @@ class Parser {
 
             while(current_t->type == TT_PLUS || current_t->type == TT_MINUS) {
                 Token* op_token = current_t;
-                op->set_token(op_token);
                 result.register_advance(advance());
 
                 ParserResult right = result.register_result(term());
@@ -296,6 +295,7 @@ class Parser {
                     Node* copy = op->copy();
                     op->set_to_left(copy);
                 }
+                op->set_token(op_token);
                 op->set_end(right.node->end);
                 op->set_to_right(right.node);
             }
@@ -318,7 +318,6 @@ class Parser {
 
             while(current_t->type == TT_EQEQ || current_t->type == TT_NEQ || current_t->type == TT_LTHAN || current_t->type == TT_GTHAN || current_t->type == TT_LTHANEQ || current_t->type == TT_GTHANEQ) {
                 Token* op_token = current_t;
-                op->set_token(op_token);
                 result.register_advance(advance());
 
                 ParserResult right = result.register_result(term());
@@ -330,6 +329,7 @@ class Parser {
                     Node* copy = op->copy();
                     op->set_to_left(copy);
                 }
+                op->set_token(op_token);
                 op->set_end(right.node->end);
                 op->set_to_right(right.node);
             }
