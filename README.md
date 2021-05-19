@@ -43,8 +43,14 @@
 <div align="center">
     <h3>Compiling the shell</h3>
     <p>
-        You're gonna need <code>gcc (version 5>=, supports C++ 17 features)</code>, <code>make (version 3.81>=)</code><br />
-        Once you have that, you can just run <code>make</code> :)
+        Requirements: <code>g++</code> 5.1 or later and <code>make</code> 3.81 or later<br />
+        (Windows) Installing g++: <a href="http://mingw-w64.org/doku.php">mingw-w64</a><br />
+        (Windows) Installing make: <a href="https://chocolatey.org/install">Chocolatey</a> and then install with <code>choco install make</code><br />
+        (Linux) Installing g++: <code>sudo apt-get install g++</code><br />
+        (Linux) Installing make: <code>sudo apt-get install build-essential</code><br />
+        (macOS) Installing g++ and make: Type in <code>g++ -v</code> and accept installation of developer tools<br />
+        <br />
+        Once you have all required tools, you can just run <code>make</code> in the project directory :)
     </p>
     <h3>Commands</h3>
     <p>
