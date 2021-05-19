@@ -6,8 +6,8 @@ using namespace std;
 
 class Context {
     public:
-        string display_name;
-        Context* parent;
+        string display_name = "";
+        Context* parent = nullptr;
         Position parent_entry_pos;
         SymbolTable* symbol_table;
 

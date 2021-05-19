@@ -9,13 +9,17 @@ using namespace std;
 const string NODE_UNKNOWN = "UNKNOWN";
 const string NODE_INT = "INT";
 const string NODE_FLOAT = "FLOAT";
+const string NODE_STRING = "STRING";
+
 const string NODE_BINARY = "BINARY";
 const string NODE_UNARY = "UNARY";
 const string NODE_ACCESS = "ACCESS";
 const string NODE_ASSIGNMENT = "ASSIGNMENT";
+
 const string NODE_IF = "IF";
 const string NODE_FOR = "FOR";
 const string NODE_WHILE = "WHILE";
+
 const string NODE_FUNC_DEF = "FUNC_DEF";
 const string NODE_FUNC_CALL = "FUNC_CALL";
 
@@ -65,6 +69,12 @@ class Node {
             value = new NodeValue();
             value->init(_value);
             type = NODE_FLOAT;
+        }
+
+        void set_value(string _value) {
+            value = new NodeValue();
+            value->init(_value);
+            type = NODE_STRING;
         }
 
         void set_value(NodeValue* _value) {
@@ -187,6 +197,8 @@ class Node {
                 return "(" + type + ":(" + func_call_expression_result->token->value_string + "))";
             } else if(type == NODE_FUNC_DEF) {
                 return "(" + type + ":(" + token->value_string + "))";
+            } else if(type == NODE_STRING) {
+                return "(" + type + ":" + value->value_string + ")";
             }
 
             return type;

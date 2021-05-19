@@ -25,6 +25,17 @@ int runFloatTest(Runner* runner, string name, string code, float value) {
     }
 }
 
+int runStringTest(Runner* runner, string name, string code, string value) {
+    RunResult result = runner->run(name, code);
+    if(result.interpreterResult.res_string.value == value) {
+        printf("Result of %s - %s (%s)\n", result.lexer.fileName.c_str(), "PASSED", (result.interpreterResult.res_string.repr() + "/" + value).c_str());
+        return 1;
+    } else {
+        printf("Result of %s - %s (%s)\n", result.lexer.fileName.c_str(), "FAILED", (result.interpreterResult.res_string.repr() + "/" + value).c_str());
+        return 0;
+    }
+}
+
 bool runTests(Runner* runner) {
     int totalTests = 0, passed = 0;
 
@@ -111,6 +122,11 @@ bool runTests(Runner* runner) {
     passed += runIntegerTest(runner, "Functions 7 (f_c(5, 10))", "f_c(5, 10)", 15);
     passed += runIntegerTest(runner, "Functions 8 (f_d())", "f_d()", 45);
     totalTests += 8;
+
+    printf("----------\n");
+    passed += runStringTest(runner, "Strings 1 (\"a\")", "\"a\"", "a");
+    passed += runStringTest(runner, "Strings 2 (\"a\" + \"b\" + \"c\")", "\"a\" + \"b\" + \"c\"", "abc");
+    totalTests += 2;
 
     printf("----------\n");
     printf("%i PASSED, %i FAILED", passed, (totalTests - passed));

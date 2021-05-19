@@ -10,11 +10,10 @@
 #include "tests/tests.cpp"
 using namespace std;
 
-const string VERSION = "0.6";
+const string VERSION = "0.7";
 
 void printResult(RunResult result) {
-    string r = result.interpreterResult.type == NODE_INT ? to_string(result.interpreterResult.res_int.value) : to_string(result.interpreterResult.res_float.value);
-    printf("Result - %s \n\n", ("[" + result.interpreterResult.type + "] " +  r).c_str());
+    printf("Result - %s \n\n", ("[" + result.interpreterResult.type + "] " +  result.interpreterResult.repr()).c_str());
 }
 
 int main(int argc, char** argv) {

@@ -5,7 +5,7 @@ using namespace std;
 
 class Interpreter {
     public:
-        SymbolTable* global_symbol_table;
+        SymbolTable* global_symbol_table = nullptr;
         map<string, Function> functions;
 
         void init() {
@@ -46,6 +46,8 @@ class Interpreter {
                 res = visit_func_call_node(node, context);
             } else if(node->type == NODE_FUNC_DEF) {
                 res = visit_func_def_node(node, context);
+            } else if(node->type == NODE_STRING) {
+                res = visit_string_node(node, context);
             } else {
                 no_visit_method(node->type);
             }
@@ -79,6 +81,18 @@ class Interpreter {
             return res.success();
         }
 
+        InterpreterResult visit_string_node(Node* node, Context* context) {
+            String n;
+            n.init(node->value->value_string);
+            n.set_pos(node->start, node->end);
+
+            InterpreterResult res;
+            res.init(n.start, n.end);
+            res.set_from(n);
+
+            return res.success();
+        }
+
         InterpreterResult visit_unary_node(Node* node, Context* context) {
             InterpreterResult res;
             res.init(node->start, node->end);
@@ -93,7 +107,7 @@ class Interpreter {
                 InterpreterResult n_m_i;
                 n_m_i.set_from(n_m);
 
-                res = res.processNumber(visit_node(node->left, context), n_t, n_m_i);
+                res = res.process_binary(visit_node(node->left, context), n_t, n_m_i);
             } else if(node->token->matches(TT_KEYWORD, KEYWORD_NOT)) {
                 Token* n_t = new Token();
                 n_t->init(TT_EQEQ);
@@ -102,7 +116,7 @@ class Interpreter {
                 InterpreterResult n_m_i;
                 n_m_i.set_from(n_m);
 
-                res = res.processNumber(visit_node(node->left, context), n_t, n_m_i);
+                res = res.process_binary(visit_node(node->left, context), n_t, n_m_i);
             }
 
             return res.success();
@@ -115,8 +129,6 @@ class Interpreter {
             InterpreterResult left_res;
             InterpreterResult right_res;
 
-            //printf("%s\n", (left_type + "<>" + right_type).c_str());
-
             left_res = visit_node(node->left, context);
             res.registerResult(left_res);
             if(res.state == -1) { return res; }
@@ -125,10 +137,9 @@ class Interpreter {
             res.registerResult(right_res);
             if(res.state == -1) { return res; }
 
-            res = res.processNumber(left_res, node->token, right_res);
+            res = res.process_binary(left_res, node->token, right_res);
             if(res.state == -1) { return res; }
-            
-            //printf("returning: %s\n", (res.type == NODE_INT ? to_string(res.res_int.value).c_str() : to_string(res.res_float.value).c_str()));
+
             return res.success();
         }
 
@@ -146,9 +157,13 @@ class Interpreter {
                     IntNumber n;
                     n.init(value.value_int);
                     res.set_from(n);
-                } else  if(value.type == SYMBOL_FLOAT) {
+                } else if(value.type == SYMBOL_FLOAT) {
                     FloatNumber n;
                     n.init(value.value_float);
+                    res.set_from(n);
+                } else if(value.type == SYMBOL_STRING) {
+                    String n;
+                    n.init(value.value_string);
                     res.set_from(n);
                 }
             }
@@ -197,8 +212,8 @@ class Interpreter {
             if(res.type == NODE_UNKNOWN && node->else_result != nullptr) {
                 InterpreterResult else_res = res.registerResult(visit_node(node->else_result, context));
                 if(res.state == -1) { return res; }
-
                 res.set_from(else_res);
+
                 return res.success();
             }
             if(cond_res.state == -1 || expr_res.state == -1) { return res; }
@@ -231,7 +246,7 @@ class Interpreter {
             bool st_dir = step_value.get_value() >= 0 ? true : false;
             int i = start_value.get_value();
             while((st_dir == true && i < end_value.get_value()) || (st_dir == false && i > end_value.get_value())) {
-                SymbolContainer* container;
+                SymbolContainer* container = new SymbolContainer();
                 container->init(i);
 
                 context->symbol_table->set(node->token->value_string, container);
@@ -256,6 +271,7 @@ class Interpreter {
                 InterpreterResult expr = res.registerResult(visit_node(node->while_expr_result, context));
                 if(res.state == -1) { break; }
             }
+            if(res.state == -1) { return res; }
 
             return res.success();
         }
@@ -349,6 +365,10 @@ class Interpreter {
                 context->symbol_table->set(name, value);
             } else if(res.type == NODE_FUNC_DEF) {
                 functions[name] = res.res_func;
+            } else if(res.type == NODE_STRING) {
+                SymbolContainer* value = new SymbolContainer();
+                value->init(res.res_string.value);
+                context->symbol_table->set(name, value);
             }
         }
 

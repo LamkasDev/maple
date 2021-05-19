@@ -26,6 +26,7 @@
 
 #include "../structures/number.cpp"
 #include "../structures/function.cpp"
+#include "../structures/string.cpp"
 
 using namespace std;
 

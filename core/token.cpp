@@ -10,8 +10,10 @@ const string LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 const string LETTERS_DIGITS = LETTERS + "0123456789";
 const string DIGITS = "0123456789";
 
-const string TT_INT = "TT_INT";
-const string TT_FLOAT = "TT_FLOAT";
+const string TT_UNKNOWN = "UNKNOWN";
+const string TT_INT = "INT";
+const string TT_FLOAT = "FLOAT";
+const string TT_STRING = "STRING";
 
 const string TT_IDENFIFIER = "IDENTIFIER";
 const string TT_KEYWORD = "KEYWORD";
@@ -55,10 +57,10 @@ class Token {
     public:
         Position start;
         Position end;
-        string type;
+        string type = TT_UNKNOWN;
         int value_int = 0;
         float value_float = 0;
-        string value_string;
+        string value_string = "";
 
         void init(string _type) {
             type = _type;
@@ -133,6 +135,14 @@ class TokenFloat : public Token {
         void init(float _value) {
             type = TT_FLOAT;
             value_float = _value;
+        }
+};
+
+class TokenString : public Token {
+    public:
+        void init(string _value) {
+            type = TT_STRING;
+            value_string = _value;
         }
 };
 

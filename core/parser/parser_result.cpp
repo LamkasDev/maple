@@ -9,7 +9,7 @@ class ParserResult {
         int advance_count = 0;
 
         string node_type = NODE_UNKNOWN;
-        Node* node;
+        Node* node = nullptr;
         Error e;
 
         void set_node(Node* _node) {

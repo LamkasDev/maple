@@ -2,6 +2,7 @@
 #include <string>
 #include "../../structures/number.cpp"
 #include "../../structures/function.cpp"
+#include "../../structures/string.cpp"
 using namespace std;
 
 class InterpreterResult {
@@ -14,6 +15,7 @@ class InterpreterResult {
         string type = NODE_UNKNOWN;
         IntNumber res_int;
         FloatNumber res_float;
+        String res_string;
         Function res_func;
 
         void init(Position _start, Position _end) {
@@ -54,6 +56,11 @@ class InterpreterResult {
             type = NODE_FUNC_DEF;
         }
 
+        void set_from(String _res_string) {
+            res_string = _res_string;
+            type = NODE_STRING;
+        }
+
         void set_from(InterpreterResult _res) {
             if(_res.type == NODE_INT) {
                 res_int = _res.res_int;
@@ -61,13 +68,16 @@ class InterpreterResult {
             } else if(_res.type == NODE_FLOAT) {
                 res_float = _res.res_float;
                 type = NODE_FLOAT;
-            } else {
+            } else if(_res.type == NODE_FUNC_DEF) {
                 res_func = _res.res_func;
                 type = NODE_FUNC_DEF;
+            } else if(_res.type == NODE_STRING) {
+                res_string = _res.res_string;
+                type = NODE_STRING;
             }
         }
 
-        InterpreterResult processNumber(InterpreterResult _left, Token* _op, InterpreterResult _right) {
+        InterpreterResult process_binary(InterpreterResult _left, Token* _op, InterpreterResult _right) {
             if(_op->type == TT_PLUS) {
                 return _left.added_to(_right);
             } else if(_op->type == TT_MINUS) {
@@ -93,7 +103,17 @@ class InterpreterResult {
         }
 
         InterpreterResult added_to(InterpreterResult _right) {
-            if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right); }
+            if((type == NODE_STRING && _right.type == NODE_INT) || (type == NODE_INT && _right.type == NODE_STRING) || (type == NODE_STRING && _right.type == NODE_STRING)) {
+                InterpreterResult res;
+                String n_str;
+                n_str.init(get_string_value() + _right.get_string_value());
+                n_str.set_context(get_context());
+                res.set_from(n_str);
+
+                return res;
+            }
+
+            if(((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT))) { return illegal_operation(_right); }
 
             InterpreterResult res;
             IntNumber n_int;
@@ -101,11 +121,12 @@ class InterpreterResult {
             if(type == NODE_INT && _right.type == NODE_INT) {
                 n_int.init(res_int.value + _right.res_int.value);
                 n_int.set_context(res_int.context);
+                res.set_from(n_int);
             } else {
                 n_float.init(get_value() + _right.get_value());
                 n_float.set_context(get_context());
+                res.set_from(n_float);
             }
-            if(type == NODE_INT && _right.type == NODE_INT) { res.set_from(n_int); } else { res.set_from(n_float); }
 
             return res;
         }
@@ -119,11 +140,12 @@ class InterpreterResult {
             if(type == NODE_INT && _right.type == NODE_INT) {
                 n_int.init(res_int.value - _right.res_int.value);
                 n_int.set_context(res_int.context);
+                res.set_from(n_int);
             } else {
                 n_float.init(get_value() - _right.get_value());
                 n_float.set_context(get_context());
+                res.set_from(n_float);
             }
-            if(type == NODE_INT && _right.type == NODE_INT) { res.set_from(n_int); } else { res.set_from(n_float); }
 
             return res;
         }
@@ -137,11 +159,12 @@ class InterpreterResult {
             if(type == NODE_INT && _right.type == NODE_INT) {
                 n_int.init(res_int.value * _right.res_int.value);
                 n_int.set_context(res_int.context);
+                res.set_from(n_int);
             } else {
                 n_float.init(get_value() * _right.get_value());
                 n_float.set_context(get_context());
+                res.set_from(n_float);
             }
-            if(type == NODE_INT && _right.type == NODE_INT) { res.set_from(n_int); } else { res.set_from(n_float); }
 
             return res;
         }
@@ -177,11 +200,12 @@ class InterpreterResult {
             if(type == NODE_INT && _right.type == NODE_INT) {
                 n_int.init(pow(res_int.value, _right.res_int.value));
                 n_int.set_context(res_int.context);
+                res.set_from(n_int);
             } else {
                 n_float.init(pow(get_value(), _right.get_value()));
                 n_float.set_context(get_context());
+                res.set_from(n_float);
             }
-            if(type == NODE_INT && _right.type == NODE_INT) { res.set_from(n_int); } else { res.set_from(n_float); }
 
             return res;
         }
@@ -195,11 +219,12 @@ class InterpreterResult {
             if(type == NODE_INT && _right.type == NODE_INT) {
                 n_int.init(res_int.value % _right.res_int.value);
                 n_int.set_context(res_int.context);
+                res.set_from(n_int);
             } else {
                 n_float.init(fmod(get_value(), _right.get_value()));
                 n_float.set_context(get_context());
+                res.set_from(n_float);
             }
-            if(type == NODE_INT && _right.type == NODE_INT) { res.set_from(n_int); } else { res.set_from(n_float); }
 
             return res;
         }
@@ -255,7 +280,13 @@ class InterpreterResult {
         }
 
         bool is_true() {
-            return get_value() != 0;
+            if(type == NODE_INT || type == NODE_FLOAT) {
+                return get_value() != 0;
+            } else if(type == NODE_STRING) {
+                return get_string_value().length() > 0;
+            } else {
+                return false;
+            }
         }
 
         InterpreterResult illegal_operation(InterpreterResult _right) {
@@ -269,8 +300,20 @@ class InterpreterResult {
         float get_value() {
             if(type == NODE_INT) {
                 return res_int.value;
-            } else {
+            } else if(type == NODE_FLOAT) {
                 return res_float.value;
+            } else {
+                return 0;
+            }
+        }
+
+        string get_string_value() {
+            if(type == NODE_INT) {
+                return to_string(res_int.value);
+            } else if(type == NODE_STRING) {
+                return res_string.value;
+            } else {
+                return "";
             }
         }
 
@@ -279,8 +322,26 @@ class InterpreterResult {
                 return res_int.context;
             } else if(type == NODE_FLOAT) {
                 return res_float.context;
-            } else {
+            } else if(type == NODE_FUNC_DEF) {
                 return res_func.context;
+            } else if(type == NODE_STRING) {
+                return res_func.context;
+            } else {
+                return nullptr;
+            }
+        }
+
+        string repr() {
+            if(type == NODE_INT) {
+                return to_string(res_int.value);
+            } else if(type == NODE_FLOAT) {
+                return to_string(res_float.value);
+            } else if(type == NODE_FUNC_DEF) {
+                return res_func.name->value_string;
+            } else if(type == NODE_STRING) {
+                return res_string.value;
+            } else {
+                return "";
             }
         }
 };

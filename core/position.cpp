@@ -7,8 +7,8 @@ class Position {
         int index = 0;
         int line = 0;
         int column = 0;
-        string fileName;
-        string fileContents;
+        string fileName = "";
+        string fileContents = "";
 
         void init(int _index, int _line, int _column, string _fileName, string _fileContents) {
             index = _index;

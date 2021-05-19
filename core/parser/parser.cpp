@@ -7,7 +7,7 @@ class Parser {
     public:
         list<Token*> tokens;
         int index = 0;
-        Token* current_t;
+        Token* current_t = nullptr;
 
         void init(list<Token*> _tokens) {
             tokens = _tokens;
@@ -48,6 +48,12 @@ class Parser {
             } else if(t->type == TT_FLOAT) {
                 result.register_advance(advance());
                 Node* n = new Node(); n->set_pos(t->start, t->end); n->set_value(t->value_float);
+
+                result.set_node(n);
+                return result.success();
+            } else if(t->type == TT_STRING) {
+                result.register_advance(advance());
+                Node* n = new Node(); n->set_pos(t->start, t->end); n->set_value(t->value_string);
 
                 result.set_node(n);
                 return result.success();

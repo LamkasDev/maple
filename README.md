@@ -24,7 +24,7 @@
     <h3>🔥 Features</h3>
     <p>
         Basic math operations (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>^</code>)<br />
-        Support for integers and floats<br />
+        Support for integers, floats and strings<br />
         Variables (<code>VAR</code>)<br />
         Logical operators (<code>==</code>, <code><</code>, <code>></code>, <code><=</code>, <code>>=</code>, <code>AND</code>, <code>OR</code>)<br />
         Conditional expressions (<code>IF</code>, <code>THEN</code>, <code>ELIF?</code>, <code>ELSE?</code>)<br />
@@ -55,6 +55,7 @@
     </p>
     <h3>Changelog</h3>
     <p>
+        <code>Maple - 0.7</code> - Strings<br />
         <code>Maple - 0.6</code> - Functions<br />
         <code>Maple - 0.5</code> - For/While loops<br />
         <code>Maple - 0.4</code> - Conditional expressions<br />

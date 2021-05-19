@@ -4,15 +4,16 @@
 #include "../core/nodes/node.cpp"
 using namespace std;
 
-class Function {
+class String {
     public:
         Position start;
         Position end;
         Context* context = nullptr;
+        string value = "";
 
-        Token* name = nullptr;
-        list<Token*> arguments;
-        Node* expression = nullptr;
+        void init(string _value) {
+            value = _value;
+        }
 
         void set_pos(Position _start, Position _end) {
             start = _start;
@@ -23,15 +24,7 @@ class Function {
             context = _context;
         }
 
-        void set_name(Token* _name) {
-            name = _name;
-        }
-
-        void set_arguments(list<Token*> _arguments) {
-            arguments = _arguments;
-        }
-
-        void set_expression(Node* _expression) {
-            expression = _expression;
+        string repr() {
+            return value;
         }
 };

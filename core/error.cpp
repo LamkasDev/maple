@@ -15,8 +15,8 @@ class Error {
         Context* context = nullptr;
 
         string type = ERROR_UNKNOWN;
-        string name;
-        string details;
+        string name = "";
+        string details = "";
         int extra = 0;
 
         void init(Position _start, Position _end, string _name, string _details) {

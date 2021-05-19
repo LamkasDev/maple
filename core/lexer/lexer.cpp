@@ -5,8 +5,8 @@ using namespace std;
 
 class Lexer {
     public:
-        string fileName;
-        string text;
+        string fileName = "";
+        string text = "";
         Position pos;
         char current_c;
 
@@ -123,6 +123,12 @@ class Lexer {
                         break;
                     }
 
+                    case '"': {
+                        Token* t = make_string();
+                        result.tokens.push_back(t);
+                        break;
+                    }
+
                     case '!': {
                         Token* t = make_not_equals();
                         //RETURN ERROR
@@ -213,6 +219,42 @@ class Lexer {
 
                 return t;
             }
+        }
+
+        Token* make_string() {
+            string str;
+            bool escaped = false;
+            advance();
+
+            while(pos.index < text.length() && (current_c != '"' || escaped == true)) {
+                if(escaped == true) {
+                    if(current_c == 'n') {
+                        str += '\n';
+                    } else if(current_c == 't') {
+                        str += '\t';
+                    } else {
+                        str += current_c;
+                    }
+                } else {
+                    if(current_c == '\\') {
+                        escaped = true;
+                    } else {
+                        str += current_c;
+                    }
+                }
+
+                advance();
+                escaped = false;
+            }
+
+            advance();
+
+            TokenString* t = new TokenString();
+            t->init(str);
+            t->set_start(pos.copy());
+            t->set_end(pos.copy());
+
+            return t;
         }
 
         Token* make_not_equals() {
