@@ -15,7 +15,7 @@
     <h4>Quick Start</h4>
     <p>Read <a href="https://github.com/LamkasDev/maple/wiki">here</a> (soon)</p>
     <h4>Contributing</h4>
-    <p>That's great! Make a <a href="https://github.com/LamkasDev/maple/pullse">pull request</a>~</p>
+    <p>That's great! Make a <a href="https://github.com/LamkasDev/maple/pulls">pull request</a>~</p>
 </div>
 
 <hr />
