@@ -1,11 +1,25 @@
 #pragma once
 #include <string>
+#include <map>
 using namespace std;
 
 class Interpreter {
     public:
+        SymbolTable* global_symbol_table;
+        map<string, Function> functions;
+
         void init() {
-            
+            SymbolContainer* sc_null = new SymbolContainer();
+            sc_null->init(0);
+            SymbolContainer* sc_true = new SymbolContainer();
+            sc_true->init(1);
+            SymbolContainer* sc_false = new SymbolContainer();
+            sc_false->init(0);
+
+            global_symbol_table = new SymbolTable();
+            global_symbol_table->set("NULL", sc_null);
+            global_symbol_table->set("TRUE", sc_true);
+            global_symbol_table->set("FALSE", sc_false);
         }
 
         InterpreterResult visit_node(Node* node, Context* context) {
@@ -28,6 +42,10 @@ class Interpreter {
                 res = visit_for_node(node, context);
             } else if(node->type == NODE_WHILE) {
                 res = visit_while_node(node, context);
+            } else if(node->type == NODE_FUNC_CALL) {
+                res = visit_func_call_node(node, context);
+            } else if(node->type == NODE_FUNC_DEF) {
+                res = visit_func_def_node(node, context);
             } else {
                 no_visit_method(node->type);
             }
@@ -147,16 +165,7 @@ class Interpreter {
             if(res.state == -1) { return res; }
             res.set_from(value_res);
 
-            if(res.type == NODE_INT) {
-                SymbolContainer* value = new SymbolContainer();
-                value->init(res.res_int.value);
-                context->symbol_table->set(node->token->value_string, value);
-            } else if(res.type == NODE_FLOAT) {
-                SymbolContainer* value = new SymbolContainer();
-                value->init(res.res_float.value);
-                context->symbol_table->set(node->token->value_string, value);
-            }
-            
+            save_to_context(node->token->value_string, res, context);
             return res.success();
         }
 
@@ -179,7 +188,7 @@ class Interpreter {
                     expr_res = res.registerResult(visit_node(node, context));
                     if(res.state == -1) { break; }
 
-                    res = expr_res;
+                    res.set_from(expr_res);
                     break;
                 }
 
@@ -189,7 +198,7 @@ class Interpreter {
                 InterpreterResult else_res = res.registerResult(visit_node(node->else_result, context));
                 if(res.state == -1) { return res; }
 
-                res = else_res;
+                res.set_from(else_res);
                 return res.success();
             }
             if(cond_res.state == -1 || expr_res.state == -1) { return res; }
@@ -249,6 +258,98 @@ class Interpreter {
             }
 
             return res.success();
+        }
+
+        InterpreterResult visit_func_def_node(Node* node, Context* context) {
+            InterpreterResult res;
+            res.init(node->start, node->end);
+
+            Function function;
+            function.set_pos(node->start, node->end);
+            function.set_context(context);
+            function.set_name(node->token);
+            function.set_arguments(node->func_def_argument_tokens_result);
+            function.set_expression(node->func_def_expression_result);
+            res.set_from(function);
+
+            if(node->token != nullptr) {
+                save_to_context(node->token->value_string, res, context);
+            }
+
+            return res.success();
+        }
+
+        InterpreterResult visit_func_call_node(Node* node, Context* context) {
+            InterpreterResult res;
+            res.init(node->start, node->end);
+
+            InterpreterResult expr = res.registerResult(execute(node->func_call_expression_result, node->func_call_argument_nodes_result, context));
+            if(res.state == -1) { return res; }
+
+            res.set_from(expr);
+            return res.success();
+        }
+
+        InterpreterResult execute(Node* node, list<Node*> arguments, Context* context) {
+            InterpreterResult res;
+            res.init(node->start, node->end);
+
+            Interpreter* interpreter = new Interpreter();
+            interpreter->init();
+            Context* new_context = new Context();
+            new_context->init(node->token->value_string);
+            new_context->set_parent(context);
+            new_context->set_parent_entry_pos(node->start);
+            new_context->set_symbol_table(new_context->parent->symbol_table);
+
+            string func_name = node->token->value_string;
+            try {
+                Function function = functions.at(func_name);
+
+                if(arguments.size() > function.arguments.size()) {
+                    RuntimeError e;
+                    e.init(node->start, node->end, ((arguments.size() - function.arguments.size()) + " too many args passed into " + node->token->value_string), context);
+                    return res.failure(e);
+                } else if(arguments.size() < function.arguments.size()) {
+                    RuntimeError e;
+                    e.init(node->start, node->end, ((function.arguments.size() - arguments.size()) + " too few args passed into " + node->token->value_string), context);
+                    return res.failure(e);
+                }
+
+                for(Node* arg : arguments) {
+                    Token* token = function.arguments.back();
+                    InterpreterResult arg_res = res.registerResult(visit_node(arg, new_context));
+                    if(arg_res.state == -1) { break; }
+
+                    save_to_context(token->value_string, arg_res, new_context);
+                    function.arguments.pop_back();
+                }
+                if(res.state == -1) { return res; }
+
+                InterpreterResult expr = res.registerResult(visit_node(function.expression, new_context));
+                if(res.state == -1) { return res; }
+
+                res.set_from(expr);
+                return res.success();
+            } catch(out_of_range e_0) {
+                RuntimeError e;
+                e.init(node->start, node->end, "Function '" + func_name + "' does not exist", context);
+                return res.failure(e);
+            }
+        }
+
+        void save_to_context(string name, InterpreterResult res, Context* context) {
+            if(res.type == NODE_INT) {
+                SymbolContainer* value = new SymbolContainer();
+                value->init(res.res_int.value);
+                context->symbol_table->set(name, value);
+            } else if(res.type == NODE_FLOAT) {
+                SymbolContainer* value = new SymbolContainer();
+                value->init(res.res_float.value);
+                context->symbol_table->set(name, value);
+            } else if(res.type == NODE_FUNC_DEF) {
+                functions[name] = res.res_func;
+            }
         }
 
         void no_visit_method(string type) {

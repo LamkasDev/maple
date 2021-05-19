@@ -44,10 +44,8 @@ class Lexer {
                     }
 
                     case '-': {
-                        Token* t = new Token();
-                        t->init(TT_MINUS);
-                        t->set_start(pos);
-                        result.tokens.push_back(t); advance();
+                        Token* t = make_minus();
+                        result.tokens.push_back(t);
                         break;
                     }
 
@@ -114,6 +112,14 @@ class Lexer {
                     case '>': {
                         Token* t = make_greater_than();
                         result.tokens.push_back(t);
+                        break;
+                    }
+
+                    case ',': {
+                        Token* t = new Token();
+                        t->init(TT_COMMA);
+                        t->set_start(pos);
+                        result.tokens.push_back(t); advance();
                         break;
                     }
 
@@ -271,6 +277,22 @@ class Lexer {
             if(current_c == '=') {
                 advance();
                 t->init(TT_GTHANEQ);
+            }
+
+            return t;
+        }
+
+        Token* make_minus() {
+            string str;
+            Token* t = new Token();
+            t->init(TT_MINUS);
+            t->set_start(pos.copy());
+            t->set_end(pos.copy());
+
+            advance();
+            if(current_c == '>') {
+                advance();
+                t->init(TT_ARROW);
             }
 
             return t;

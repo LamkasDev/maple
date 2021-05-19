@@ -5,6 +5,7 @@ using namespace std;
 const string SYMBOL_UNKNOWN = "UNKNOWN";
 const string SYMBOL_INT = "INT";
 const string SYMBOL_FLOAT = "FLOAT";
+const string SYMBOL_FUNC = "FUNC";
 
 class SymbolContainer {
     public:

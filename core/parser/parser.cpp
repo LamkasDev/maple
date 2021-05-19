@@ -29,7 +29,7 @@ class Parser {
             ParserResult res = expression();
             if(res.state != -1 && current_t->type != TT_EOF) {
                 InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected '+', '-', '*' or '/'");
+                e.init(current_t->start, current_t->end, "Expected '+', '-', '*', '/', '^', '==', '!=', '<', '>', '<=', '>=', 'AND' or 'OR'");
                 return res.failure(e);
             }
 
@@ -89,17 +89,102 @@ class Parser {
 
                 result.set_node(expr.node);
                 return result.success();
+            } else if(t->matches(TT_KEYWORD, KEYWORD_FUNC)) {
+                ParserResult def = func_def();
+                if(def.state == -1) { return result.failure(def.e); }
+
+                result.set_node(def.node);
+                return result.success();
             }
 
             InvalidSyntaxError e;
-            e.init(t->start, t->end, "Expected int/float, identifier, '+', '-' or '('");
+            e.init(t->start, t->end, "Expected int/float, identifier, '+', '-', '(', 'IF', 'FOR', 'WHILE' or 'FUNC'");
             return result.failure(e);
+        }
+
+        ParserResult call() {
+            ParserResult result;
+            
+            ParserResult left = result.register_result(atom());
+            if(result.state == -1) { return result; }
+
+            if(current_t->type == TT_LPAREN) {
+                Node* call_node = new Node();
+                call_node->set_start(current_t->start);
+                call_node->set_type(NODE_FUNC_CALL);
+                list<Node*> arguments;
+
+                result.register_advance(advance());
+                
+                if(current_t->type == TT_RPAREN) {
+                    result.register_advance(advance());
+                } else {
+                    ParserResult arg = result.register_result(expression());
+                    if(result.state == -1) {
+                        InvalidSyntaxError e;
+                        e.init(current_t->start, current_t->end, "Expected '),' 'VAR', 'IF', 'FOR', 'WHILE', 'FUNC', int/float, identifier, '+', '-' or '(' or 'NOT'");
+                        return result.failure(e);
+                    }
+                    arguments.push_back(arg.node);
+
+                    while(current_t->type == TT_COMMA) {
+                        result.register_advance(advance());
+
+                        ParserResult arg_1 = result.register_result(expression());
+                        if(result.state == -1) { break; }
+                        arguments.push_back(arg_1.node);
+                    }
+                    if(result.state == -1) { return result; }
+
+                    if(current_t->type != TT_RPAREN) {
+                        InvalidSyntaxError e;
+                        e.init(current_t->start, current_t->end, "Expected ',' or ')'");
+                        return result.failure(e);
+                    }
+
+                    result.register_advance(advance());
+                }
+
+                call_node->set_func_call_argument_nodes_result(arguments);
+                call_node->set_func_call_expression_result(left.node);
+                call_node->set_end(left.node->end);
+                result.set_node(call_node);
+
+                return result.success();
+            }
+
+            Node* op = new Node();
+            op->set_pos(left.node->start, left.node->end);
+            op->set_type(NODE_BINARY);
+            op->set_to_left(left.node);
+
+            while(current_t->type == TT_POW) {
+                Token* op_token = current_t;
+                op->set_token(op_token);
+                result.register_advance(advance());
+
+                ParserResult right = result.register_result(factor());
+                if(result.state == -1) {
+                    break;
+                }
+
+                if(op->right != nullptr) {
+                    Node* copy = op->copy();
+                    op->set_to_left(copy);
+                }
+                op->set_end(right.node->end);
+                op->set_to_right(right.node);
+            }
+            if(result.state == -1) { return result; }
+            result.set_node(op);
+
+            return result.success();
         }
 
         ParserResult power() {
             ParserResult result;
             
-            ParserResult left = result.register_result(atom());
+            ParserResult left = result.register_result(call());
             if(result.state == -1) { return result; }
 
             Node* op = new Node();
@@ -298,11 +383,6 @@ class Parser {
                 result.register_advance(advance());
                 ParserResult expr = result.register_result(expression());
                 if(result.state == -1) { return result; }
-                if(expr.node_type == NODE_UNKNOWN) {
-                    InvalidSyntaxError e;
-                    e.init(current_t->start, current_t->end, "Expected int/float, identifier, '+', '-' or '('");
-                    return result.failure(e);
-                }
 
                 Node* n = new Node(); n->set_pos(identifier->start, expr.node->end); n->set_type(NODE_ASSIGNMENT); n->set_token(identifier); n->set_to_right(expr.node);
                 result.set_node(n);
@@ -316,7 +396,7 @@ class Parser {
                     return result;
                 } else {
                     InvalidSyntaxError e;
-                    e.init(current_t->start, current_t->end, "Expected 'VAR', int/float, identifier, '+', '-' or '(' or 'NOT'");
+                    e.init(current_t->start, current_t->end, "Expected 'VAR', 'IF', 'FOR', 'WHILE', 'FUNC', int/float, identifier, '+', '-' or '(' or 'NOT'");
                     return result.failure(e);
                 }
             }
@@ -534,6 +614,104 @@ class Parser {
             node->set_end(expr.node->end);
             node->set_while_condition_result(condition.node);
             node->set_while_expr_result(expr.node);
+            result.set_node(node);
+
+            return result.success();
+        }
+
+        ParserResult func_def() {
+            ParserResult result;
+            list<Token*> arguments;
+
+            Node* node = new Node();
+            node->set_start(current_t->start);
+            node->set_type(NODE_FUNC_DEF);
+
+            if(current_t->matches(TT_KEYWORD, KEYWORD_FUNC) == false) {
+                InvalidSyntaxError e;
+                e.init(current_t->start, current_t->end, "Expected 'FUNC'");
+                e.extra = 1;
+                return result.failure(e);
+            }
+
+            result.register_advance(advance());
+
+            if(current_t->type == TT_IDENFIFIER) {
+                Token* var_name = current_t;
+                result.register_advance(advance());
+
+                if(current_t->type != TT_LPAREN) {
+                    InvalidSyntaxError e;
+                    e.init(current_t->start, current_t->end, "Expected '('");
+                    e.extra = 1;
+                    return result.failure(e);
+                }
+
+                node->set_token(var_name);
+            } else {
+                if(current_t->type != TT_LPAREN) {
+                    InvalidSyntaxError e;
+                    e.init(current_t->start, current_t->end, "Expected identifier or '('");
+                    e.extra = 1;
+                    return result.failure(e);
+                }
+            }
+
+            result.register_advance(advance());
+
+            bool identifier_errored_out = false;
+            InvalidSyntaxError id_e;
+            if(current_t->type == TT_IDENFIFIER) {
+                arguments.push_back(current_t);
+                result.register_advance(advance());
+
+                while(current_t->type == TT_COMMA) {
+                    result.register_advance(advance());
+                    
+                    if(current_t->type != TT_IDENFIFIER) {
+                        id_e.init(current_t->start, current_t->end, "Expected identifier");
+                        id_e.extra = 1;
+                        identifier_errored_out = true;
+                        break;
+                    }
+
+                    arguments.push_back(current_t);
+                    result.register_advance(advance());
+                }
+
+                if(identifier_errored_out == false && current_t->type != TT_RPAREN) {
+                    id_e.init(current_t->start, current_t->end, "Expected ',' or ')'");
+                    id_e.extra = 1;
+                    identifier_errored_out = true;
+                }
+            } else {
+                if(current_t->type != TT_RPAREN) {
+                    id_e.init(current_t->start, current_t->end, "Expected identifier or ')'");
+                    id_e.extra = 1;
+                    identifier_errored_out = true;
+                }
+            }
+            if(identifier_errored_out == true) {
+                return result.failure(id_e);
+            }
+
+            result.register_advance(advance());
+
+            if(current_t->type != TT_ARROW) {
+                InvalidSyntaxError e;
+                e.init(current_t->start, current_t->end, "Expected '->'");
+                e.extra = 1;
+                return result.failure(e);
+            }
+
+            result.register_advance(advance());
+
+            ParserResult expr = result.register_result(expression());
+            if(result.state == -1) { return result; }
+
+            node->set_end(expr.node->end);
+            node->set_func_def_argument_tokens_result(arguments);
+            node->set_func_def_expression_result(expr.node);
             result.set_node(node);
 
             return result.success();

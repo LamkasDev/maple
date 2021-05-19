@@ -29,7 +29,8 @@
         Logical operators (<code>==</code>, <code><</code>, <code>></code>, <code><=</code>, <code>>=</code>, <code>AND</code>, <code>OR</code>)<br />
         Conditional expressions (<code>IF</code>, <code>THEN</code>, <code>ELIF?</code>, <code>ELSE?</code>)<br />
         For loops (<code>FOR</code>, <code>TO</code>, <code>STEP?</code>, <code>THEN</code>)<br />
-        While loops (<code>WHILE</code>, <code>THEN</code>)
+        While loops (<code>WHILE</code>, <code>THEN</code>)<br />
+        Functions (<code>FUNC</code>)
     </p>
     <h3>Is that all?</h3>
     <p>
@@ -54,6 +55,7 @@
     </p>
     <h3>Changelog</h3>
     <p>
+        <code>Maple - 0.6</code> - Functions<br />
         <code>Maple - 0.5</code> - For/While loops<br />
         <code>Maple - 0.4</code> - Conditional expressions<br />
         <code>Maple - 0.3</code> - Logical operators<br />

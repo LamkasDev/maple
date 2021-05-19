@@ -10,7 +10,7 @@
 #include "tests/tests.cpp"
 using namespace std;
 
-const string VERSION = "0.5";
+const string VERSION = "0.6";
 
 void printResult(RunResult result) {
     string r = result.interpreterResult.type == NODE_INT ? to_string(result.interpreterResult.res_int.value) : to_string(result.interpreterResult.res_float.value);
@@ -19,8 +19,7 @@ void printResult(RunResult result) {
 
 int main(int argc, char** argv) {
     Runner* runner = new Runner();
-    runner->initialize_global_symbol_table();
-
+    runner->init();
     if(argc >= 2) {
         if(string(argv[1]) == "-run") {
             if(argc >= 3) {

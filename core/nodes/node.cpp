@@ -16,6 +16,8 @@ const string NODE_ASSIGNMENT = "ASSIGNMENT";
 const string NODE_IF = "IF";
 const string NODE_FOR = "FOR";
 const string NODE_WHILE = "WHILE";
+const string NODE_FUNC_DEF = "FUNC_DEF";
+const string NODE_FUNC_CALL = "FUNC_CALL";
 
 class Node {
     public:
@@ -42,6 +44,12 @@ class Node {
 
         Node* while_condition_result = nullptr;
         Node* while_expr_result = nullptr;
+
+        list<Token*> func_def_argument_tokens_result;
+        Node* func_def_expression_result = nullptr;
+
+        list<Node*> func_call_argument_nodes_result;
+        Node* func_call_expression_result = nullptr;
 
         void set_type(string _type) {
             type = _type;
@@ -120,6 +128,22 @@ class Node {
             while_expr_result = _while_expr_result;
         }
 
+        void set_func_def_argument_tokens_result(list<Token*> _func_def_argument_tokens_result) {
+            func_def_argument_tokens_result = _func_def_argument_tokens_result;
+        }
+
+        void set_func_def_expression_result(Node* _func_def_expression_result) {
+            func_def_expression_result = _func_def_expression_result;
+        }
+
+        void set_func_call_argument_nodes_result(list<Node*> _func_call_argument_nodes_result) {
+            func_call_argument_nodes_result = _func_call_argument_nodes_result;
+        }
+
+        void set_func_call_expression_result(Node* _func_call_expression_result) {
+            func_call_expression_result = _func_call_expression_result;
+        }
+
         Node* copy() {
             Node* copy = new Node();
 
@@ -159,6 +183,10 @@ class Node {
                 return "(" + type + ":(" + for_start_result->repr() + ":" + for_end_result->repr() + ":" + (for_step_result != nullptr ? for_step_result->repr() : "(-)") + "->" + for_expr_result->repr() + ")";
             } else if(type == NODE_WHILE) {
                 return "(" + type + ":(" + while_condition_result->repr() + "->" + while_expr_result->repr() + ")";
+            } else if(type == NODE_FUNC_CALL) {
+                return "(" + type + ":(" + func_call_expression_result->token->value_string + "))";
+            } else if(type == NODE_FUNC_DEF) {
+                return "(" + type + ":(" + token->value_string + "))";
             }
 
             return type;

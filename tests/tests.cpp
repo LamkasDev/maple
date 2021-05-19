@@ -102,6 +102,17 @@ bool runTests(Runner* runner) {
     totalTests += 9;
 
     printf("----------\n");
+    passed += runIntegerTest(runner, "Functions 1 (FUNC f_a() -> 1)", "FUNC f_a() -> 1", 0);
+    passed += runIntegerTest(runner, "Functions 2 (FUNC f_b(num) -> num)", "FUNC f_b(num) -> num", 0);
+    passed += runIntegerTest(runner, "Functions 3 (FUNC f_c(num, num2) -> num + num2)", "FUNC f_c(num, num2) -> num + num2", 0);
+    passed += runIntegerTest(runner, "Functions 4 (FUNC f_d() -> f_c(20, 25))", "FUNC f_d() -> f_c(20, 25)", 0);
+    passed += runIntegerTest(runner, "Functions 5 (f_a())", "f_a()", 1);
+    passed += runIntegerTest(runner, "Functions 6 (f_b(5))", "f_b(5)", 5);
+    passed += runIntegerTest(runner, "Functions 7 (f_c(5, 10))", "f_c(5, 10)", 15);
+    passed += runIntegerTest(runner, "Functions 8 (f_d())", "f_d()", 45);
+    totalTests += 8;
+
+    printf("----------\n");
     printf("%i PASSED, %i FAILED", passed, (totalTests - passed));
     return passed < totalTests;
 }
