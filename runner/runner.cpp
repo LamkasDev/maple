@@ -11,6 +11,8 @@
 #include "../core/token.cpp"
 #include "../core/utils.cpp"
 
+#include "../core/builtin/builtin_runner.cpp"
+
 #include "../core/interpreter/interpreter.cpp"
 #include "../core/interpreter/interpreter_result.cpp"
 #include "../core/lexer/lexer.cpp"

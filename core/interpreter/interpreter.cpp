@@ -1,10 +1,12 @@
 #pragma once
 #include <string>
 #include <map>
+#include "../builtin/builtin_runner.cpp"
 using namespace std;
 
 class Interpreter {
     public:
+        BuiltInRunner* builtin_runner = nullptr;
         SymbolTable* global_symbol_table = nullptr;
         map<string, Function> functions;
 
@@ -20,6 +22,25 @@ class Interpreter {
             global_symbol_table->set("NULL", sc_null);
             global_symbol_table->set("TRUE", sc_true);
             global_symbol_table->set("FALSE", sc_false);
+
+            builtin_runner = new BuiltInRunner();
+            add_builtin_function("print", "value");
+            add_builtin_function("input");
+            add_builtin_function("is_nan", "value");
+            add_builtin_function("parse_int", "value");
+            add_builtin_function("parse_float", "value");
+        }
+
+        void add_builtin_function(string name) {
+            list<string> arguments;
+            Function f = builtin_runner->create_builtin_function(name, arguments);
+            functions[f.name->value_string] = f;
+        }
+
+        void add_builtin_function(string name, string arg_1) {
+            list<string> arguments; arguments.push_back(arg_1);
+            Function f = builtin_runner->create_builtin_function(name, arguments);
+            functions[f.name->value_string] = f;
         }
 
         InterpreterResult visit_node(Node* node, Context* context) {
@@ -102,19 +123,15 @@ class Interpreter {
             } else if(node->token->type == TT_MINUS) {
                 Token* n_t = new Token();
                 n_t->init(TT_MUL);
-                IntNumber n_m;
-                n_m.init(-1);
                 InterpreterResult n_m_i;
-                n_m_i.set_from(n_m);
+                n_m_i.set_from(-1);
 
                 res = res.process_binary(visit_node(node->left, context), n_t, n_m_i);
             } else if(node->token->matches(TT_KEYWORD, KEYWORD_NOT)) {
                 Token* n_t = new Token();
                 n_t->init(TT_EQEQ);
-                IntNumber n_m;
-                n_m.init(0);
                 InterpreterResult n_m_i;
-                n_m_i.set_from(n_m);
+                n_m_i.set_from(0);
 
                 res = res.process_binary(visit_node(node->left, context), n_t, n_m_i);
             }
@@ -154,17 +171,11 @@ class Interpreter {
                 return res.failure(e);
             } else {
                 if(value.type == SYMBOL_INT) {
-                    IntNumber n;
-                    n.init(value.value_int);
-                    res.set_from(n);
+                    res.set_from(value.value_int);
                 } else if(value.type == SYMBOL_FLOAT) {
-                    FloatNumber n;
-                    n.init(value.value_float);
-                    res.set_from(n);
+                    res.set_from(value.value_float);
                 } else if(value.type == SYMBOL_STRING) {
-                    String n;
-                    n.init(value.value_string);
-                    res.set_from(n);
+                    res.set_from(value.value_string);
                 }
             }
 
@@ -312,37 +323,23 @@ class Interpreter {
 
             Interpreter* interpreter = new Interpreter();
             interpreter->init();
-            Context* new_context = new Context();
-            new_context->init(node->token->value_string);
-            new_context->set_parent(context);
-            new_context->set_parent_entry_pos(node->start);
-            new_context->set_symbol_table(new_context->parent->symbol_table);
+            Context* new_context = generate_new_context(node, context);
 
             string func_name = node->token->value_string;
             try {
                 Function function = functions.at(func_name);
-
-                if(arguments.size() > function.arguments.size()) {
-                    RuntimeError e;
-                    e.init(node->start, node->end, ((arguments.size() - function.arguments.size()) + " too many args passed into " + node->token->value_string), context);
-                    return res.failure(e);
-                } else if(arguments.size() < function.arguments.size()) {
-                    RuntimeError e;
-                    e.init(node->start, node->end, ((function.arguments.size() - arguments.size()) + " too few args passed into " + node->token->value_string), context);
-                    return res.failure(e);
-                }
-
-                for(Node* arg : arguments) {
-                    Token* token = function.arguments.back();
-                    InterpreterResult arg_res = res.registerResult(visit_node(arg, new_context));
-                    if(arg_res.state == -1) { break; }
-
-                    save_to_context(token->value_string, arg_res, new_context);
-                    function.arguments.pop_back();
-                }
+                check_args(node, new_context, res, arguments, function);
                 if(res.state == -1) { return res; }
 
-                InterpreterResult expr = res.registerResult(visit_node(function.expression, new_context));
+                populate_args(node, new_context, res, arguments, function);
+                if(res.state == -1) { return res; }
+
+                InterpreterResult expr;
+                if(function.built_in == false) {
+                    expr = res.registerResult(visit_node(function.expression, new_context));
+                } else {
+                    expr = res.registerResult(builtin_runner->run(function, new_context));
+                }
                 if(res.state == -1) { return res; }
 
                 res.set_from(expr);
@@ -351,6 +348,39 @@ class Interpreter {
                 RuntimeError e;
                 e.init(node->start, node->end, "Function '" + func_name + "' does not exist", context);
                 return res.failure(e);
+            }
+        }
+
+        Context* generate_new_context(Node* node, Context* context) {
+            Context* new_context = new Context();
+            new_context->init(node->token->value_string);
+            new_context->set_parent(context);
+            new_context->set_parent_entry_pos(node->start);
+            new_context->set_symbol_table(new_context->parent->symbol_table);
+
+            return new_context;
+        }
+        
+        void check_args(Node* node, Context* context, InterpreterResult res, list<Node*> arguments, Function function) {
+            if(arguments.size() > function.arguments.size()) {
+                RuntimeError e;
+                e.init(node->start, node->end, ((arguments.size() - function.arguments.size()) + " too many args passed into " + node->token->value_string), context);
+                res.failure(e);
+            } else if(arguments.size() < function.arguments.size()) {
+                RuntimeError e;
+                e.init(node->start, node->end, ((function.arguments.size() - arguments.size()) + " too few args passed into " + node->token->value_string), context);
+                res.failure(e);
+            }
+        }
+
+        void populate_args(Node* node, Context* context, InterpreterResult res, list<Node*> arguments, Function function) {
+            for(Node* arg : arguments) {
+                Token* token = function.arguments.back();
+                InterpreterResult arg_res = res.registerResult(visit_node(arg, context));
+                if(arg_res.state == -1) { break; }
+
+                save_to_context(token->value_string, arg_res, context);
+                function.arguments.pop_back();
             }
         }
 

@@ -41,9 +41,21 @@ class InterpreterResult {
             return *this;
         }
 
+        void set_from(int _res_int) {
+            IntNumber _res; _res.init(_res_int);
+            res_int = _res;
+            type = NODE_INT;
+        }
+
         void set_from(IntNumber _res_int) {
             res_int = _res_int;
             type = NODE_INT;
+        }
+
+        void set_from(float _res_float) {
+            FloatNumber _res; _res.init(_res_float);
+            res_float = _res;
+            type = NODE_FLOAT;
         }
 
         void set_from(FloatNumber _res_float) {
@@ -54,6 +66,12 @@ class InterpreterResult {
         void set_from(Function _res_func) {
             res_func = _res_func;
             type = NODE_FUNC_DEF;
+        }
+
+        void set_from(string _res_string) {
+            String _res; _res.init(_res_string);
+            res_string = _res;
+            type = NODE_STRING;
         }
 
         void set_from(String _res_string) {

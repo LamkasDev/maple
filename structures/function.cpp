@@ -13,6 +13,7 @@ class Function {
         Token* name = nullptr;
         list<Token*> arguments;
         Node* expression = nullptr;
+        bool built_in = false;
 
         void set_pos(Position _start, Position _end) {
             start = _start;
