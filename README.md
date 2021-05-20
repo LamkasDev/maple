@@ -58,6 +58,7 @@
     <h3>Commands</h3>
     <p>
         <code>.\maple-shell</code> - Starts the standard shell to execute Maple code<br />
+        <code>.\maple-shell -d</code> - Starts the standard shell with extra debug info<br />
         <code>.\maple-shell -tests</code> - Runs the default test suite<br />
         <code>.\maple-shell -v</code> - Shows the current version and information<br />
         <code>.\maple-shell -run [file_name].maple</code> - Runs a specified <code>.maple</code> file

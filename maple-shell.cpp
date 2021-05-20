@@ -19,6 +19,8 @@ void printResult(RunResult result) {
 int main(int argc, char** argv) {
     Runner* runner = new Runner();
     runner->init();
+
+    bool debug_mode = false;
     if(argc >= 2) {
         if(string(argv[1]) == "-run") {
             if(argc >= 3) {
@@ -46,6 +48,8 @@ int main(int argc, char** argv) {
         } else if(string(argv[1]) == "-v") {
             printf("Maple version %s (Built by LamkasDev)-", VERSION.c_str());
             exit(0);
+        } else if(string(argv[1]) == "-d") {
+            debug_mode = true;
         } else {
             printf("Unknown argument '%s'", string(argv[1]).c_str());
             exit(1);
@@ -78,8 +82,11 @@ int main(int argc, char** argv) {
         } else if(result.interpreterResult.state == -1) {
             printf("%s \n", result.interpreterResult.e.as_string().c_str());
         } else {
-            printf("Tokens - %s \n", print_tree(result.makeTokensResult.tokens).c_str());
-            printf("Nodes - %s \n", ("(" + print_node(result.parserResult) + ")").c_str());
+            if(debug_mode == true) {
+                printf("Tokens - %s \n", print_tree(result.makeTokensResult.tokens).c_str());
+                printf("Nodes - %s \n", ("(" + print_node(result.parserResult) + ")").c_str());
+            }
+
             printResult(result);
         }
     }
