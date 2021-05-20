@@ -235,6 +235,8 @@ class Lexer {
                     } else {
                         str += current_c;
                     }
+                    
+                    escaped = false;
                 } else {
                     if(current_c == '\\') {
                         escaped = true;
@@ -244,7 +246,6 @@ class Lexer {
                 }
 
                 advance();
-                escaped = false;
             }
 
             advance();
