@@ -129,7 +129,7 @@ bool runTests(Runner* runner) {
     totalTests += 2;
 
     printf("----------\n");
-    passed += runIntegerTest(runner, "Multi-line statements 1 (VAR a = 1; VAR b = 0; IF a THEN; VAR a = 0; VAR b = 1 ELSE; VAR a = 1; VAR b = 0)", "VAR a = 1; VAR b = 0; IF a THEN; VAR a = 0; VAR b = 1 ELSE; VAR a = 1; VAR b = 0", 0);
+    passed += runIntegerTest(runner, "Multi-line statements 1 (VAR a = 1; VAR b = 0; IF a THEN; VAR a = 0; VAR b = 1 ELSE; VAR a = 1; VAR b = 0)", "VAR a = 1; VAR b = 0; IF a THEN; VAR a = 0; VAR b = 1 ELSE; VAR a = 1; VAR b = 0 END", 1);
     passed += runIntegerTest(runner, "Multi-line statements 2 (a)", "a", 0);
     passed += runIntegerTest(runner, "Multi-line statements 3 (b)", "b", 1);
     totalTests += 3;
