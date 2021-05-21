@@ -10,7 +10,7 @@
 #include "tests/tests.cpp"
 using namespace std;
 
-const string VERSION = "0.7";
+const string VERSION = "0.7.2";
 
 void printResult(RunResult result) {
     printf("Result - %s \n\n", ("[" + result.interpreterResult.type + "] " +  result.interpreterResult.repr()).c_str());
