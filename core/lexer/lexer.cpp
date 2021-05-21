@@ -129,6 +129,15 @@ class Lexer {
                         break;
                     }
 
+                    case ';': 
+                    case '\n': {
+                        Token* t = new Token();
+                        t->init(TT_NEWLINE);
+                        t->set_start(pos);
+                        result.tokens.push_back(t); advance();
+                        break;
+                    }
+
                     case '!': {
                         Token* t = make_not_equals();
                         //RETURN ERROR

@@ -23,6 +23,8 @@ const string NODE_WHILE = "WHILE";
 const string NODE_FUNC_DEF = "FUNC_DEF";
 const string NODE_FUNC_CALL = "FUNC_CALL";
 
+const string NODE_STATEMENTS = "STATEMENTS";
+
 class Node {
     public:
         string type = NODE_UNKNOWN;
@@ -54,6 +56,8 @@ class Node {
 
         list<Node*> func_call_argument_nodes_result;
         Node* func_call_expression_result = nullptr;
+
+        list<Node*> statements_nodes_result;
 
         void set_type(string _type) {
             type = _type;
@@ -154,6 +158,10 @@ class Node {
             func_call_expression_result = _func_call_expression_result;
         }
 
+        void set_statements_nodes_result(list<Node*> _statements_nodes_result) {
+            statements_nodes_result = _statements_nodes_result;
+        }
+
         Node* copy() {
             Node* copy = new Node();
 
@@ -199,6 +207,8 @@ class Node {
                 return "(" + type + ":(" + token->value_string + "))";
             } else if(type == NODE_STRING) {
                 return "(" + type + ":" + value->value_string + ")";
+            } else if(type == NODE_STATEMENTS) {
+                return "(" + type + ":" + to_string(statements_nodes_result.size()) + ")";
             }
 
             return type;

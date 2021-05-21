@@ -17,16 +17,25 @@ class Parser {
 
         int advance() {
             index++;
+            update_current_token();
+            return 1;
+        }
+
+        int unadvance(int ammount) {
+            index -= ammount;
+            update_current_token();
+            return 1;
+        }
+
+        void update_current_token() {
             if(tokens.size() > 0) {
                 current_t = tokens.front();
                 tokens.pop_front();
             }
-
-            return 1;
         }
 
         ParserResult parse() {
-            ParserResult res = expression();
+            ParserResult res = statements();
             if(res.state != -1 && current_t->type != TT_EOF) {
                 InvalidSyntaxError e;
                 e.init(current_t->start, current_t->end, "Expected '+', '-', '*', '/', '^', '==', '!=', '<', '>', '<=', '>=', 'AND' or 'OR'");
@@ -362,6 +371,50 @@ class Parser {
                 return result.failure(e);
             }
             result.set_node(arith.node);
+
+            return result.success();
+        }
+
+        ParserResult statements() {
+            ParserResult result;
+            list<Node*> statements;
+            Node* node = new Node();
+            node->set_start(current_t->start);
+            node->set_type(NODE_STATEMENTS);
+
+            while(current_t->type == TT_NEWLINE) {
+                result.register_advance(advance());
+            }
+
+            ParserResult expr = result.register_result(expression());
+            if(result.state == -1) { return result; }
+            statements.push_back(expr.node);
+
+            bool has_more_statements = true;
+            while(true) {
+                int newlines = 0;
+                while(current_t->type == TT_NEWLINE) {
+                    result.register_advance(advance());
+                    newlines++;
+                }
+
+                if(newlines == 0) { has_more_statements = false; }
+                if(has_more_statements == false) { break; }
+
+                ParserResult statement = result.register_result(expression());
+                if(result.state == -1) {
+                    unadvance(result.reverse_count);
+                    has_more_statements = false;
+                    continue;
+                }
+                if(result.state == -1) { break; }
+                statements.push_back(statement.node);
+                node->set_end(statement.node->end);
+            }
+            if(result.state == -1) { return result; }
+
+            node->set_statements_nodes_result(statements);
+            result.set_node(node);
 
             return result.success();
         }

@@ -7,6 +7,7 @@ class ParserResult {
     public:
         int state = 0;
         int advance_count = 0;
+        int reverse_count = 0;
 
         string node_type = NODE_UNKNOWN;
         Node* node = nullptr;
@@ -28,6 +29,7 @@ class ParserResult {
 
         ParserResult register_result(ParserResult _result) {
             advance_count += _result.advance_count;
+            reverse_count = _result.advance_count;
             state = _result.state;
             e = _result.e;
 
