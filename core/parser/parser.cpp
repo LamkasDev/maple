@@ -500,6 +500,7 @@ class Parser {
             if(result.state == -1) { return result; }
 
             node->set_if_results(all_cases.node->if_results);
+            node->set_else_result(all_cases.node->else_result);
             result.set_node(node);
 
             return result.success();
@@ -614,7 +615,12 @@ class Parser {
                     //TODO: CHECK
                     ParserResult all_cases = result.register_result(if_expr_b_or_c());
                     if(result.state == -1) { return result; }
-                    cases.push_back(all_cases.node);
+                    for(Node* _node : all_cases.node->if_results) {
+                        cases.push_back(_node);
+                    }
+                    if(all_cases.node->else_result != nullptr) {
+                        node->set_else_result(all_cases.node->else_result);
+                    }
                 }
             } else {
                 ParserResult expr = result.register_result(expression());
@@ -626,7 +632,12 @@ class Parser {
                 //TODO: CHECK
                 ParserResult all_cases = result.register_result(if_expr_b_or_c());
                 if(result.state == -1) { return result; }
-                cases.push_back(all_cases.node);
+                for(Node* _node : all_cases.node->if_results) {
+                    cases.push_back(_node);
+                }
+                if(all_cases.node->else_result != nullptr) {
+                    node->set_else_result(all_cases.node->else_result);
+                }
             }
 
             node->set_if_results(cases);
