@@ -409,8 +409,11 @@ class Interpreter {
             res.init(node->start, node->end);
 
             for(Node* _node : node->statements_nodes_result) {
-                res.set_from(visit_node(_node, context));
+                InterpreterResult expr = res.register_result(visit_node(_node, context));
+                if(res.state == -1) { break; }
+                res.set_from(expr);
             }
+            if(res.state == -1) { return res; }
 
             return res.success();
         }
