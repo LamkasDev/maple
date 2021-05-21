@@ -12,8 +12,22 @@ using namespace std;
 
 const string VERSION = "0.7.2";
 
-void printResult(RunResult result) {
-    printf("Result - %s \n\n", ("[" + result.interpreterResult.type + "] " +  result.interpreterResult.repr()).c_str());
+void printResult(RunResult result, bool print_result, bool print_debug) {
+    if(result.makeTokensResult.state == -1) {
+        printf("%s \n\n", result.makeTokensResult.e.as_string().c_str());
+    } else if(result.parserResult.state == -1) {
+        printf("%s \n\n", result.parserResult.e.as_string().c_str());
+    } else if(result.interpreterResult.state == -1) {
+        printf("%s \n", result.interpreterResult.e.as_string().c_str());
+    } else {
+        if(print_debug == true) {
+            printf("Tokens - %s \n", print_tree(result.makeTokensResult.tokens).c_str());
+            printf("Nodes - %s \n", ("(" + print_node(result.parserResult) + ")").c_str());
+        }
+        if(print_result == true) {
+            printf("Result - %s \n\n", ("[" + result.interpreterResult.type + "] " +  result.interpreterResult.repr()).c_str());
+        }
+    }
 }
 
 int main(int argc, char** argv) {
@@ -35,7 +49,7 @@ int main(int argc, char** argv) {
                     string contents = stream.str();
 
                     RunResult result = runner->run("<file>", contents);
-                    printResult(result);
+                    printResult(result, false, debug_mode);
 
                     exit(0);
                 }
@@ -75,20 +89,7 @@ int main(int argc, char** argv) {
         }
         
         RunResult result = runner->run("<stdin>", _s);
-        if(result.makeTokensResult.state == -1) {
-            printf("%s \n\n", result.makeTokensResult.e.as_string().c_str());
-        } else if(result.parserResult.state == -1) {
-            printf("%s \n\n", result.parserResult.e.as_string().c_str());
-        } else if(result.interpreterResult.state == -1) {
-            printf("%s \n", result.interpreterResult.e.as_string().c_str());
-        } else {
-            if(debug_mode == true) {
-                printf("Tokens - %s \n", print_tree(result.makeTokensResult.tokens).c_str());
-                printf("Nodes - %s \n", ("(" + print_node(result.parserResult) + ")").c_str());
-            }
-
-            printResult(result);
-        }
+        printResult(result, true, debug_mode);
     }
 
     exit(0);
