@@ -121,7 +121,7 @@ class InterpreterResult {
         }
 
         InterpreterResult added_to(InterpreterResult _right) {
-            if((type == NODE_STRING && _right.type == NODE_INT) || (type == NODE_INT && _right.type == NODE_STRING) || (type == NODE_STRING && _right.type == NODE_STRING)) {
+            if((type == NODE_STRING && _right.type == NODE_INT) || (type == NODE_INT && _right.type == NODE_STRING) || (type == NODE_STRING && _right.type == NODE_FLOAT) || (type == NODE_FLOAT && _right.type == NODE_STRING) || (type == NODE_STRING && _right.type == NODE_STRING)) {
                 InterpreterResult res;
                 String n_str;
                 n_str.init(get_string_value() + _right.get_string_value());
@@ -328,6 +328,8 @@ class InterpreterResult {
         string get_string_value() {
             if(type == NODE_INT) {
                 return to_string(res_int.value);
+            } else if(type == NODE_FLOAT) {
+                return to_string(res_float.value).substr(0, to_string(res_float.value).find(".")+4);;
             } else if(type == NODE_STRING) {
                 return res_string.value;
             } else {
