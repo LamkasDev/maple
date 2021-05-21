@@ -149,11 +149,11 @@ class Interpreter {
             InterpreterResult right_res;
 
             left_res = visit_node(node->left, context);
-            res.registerResult(left_res);
+            res.register_result(left_res);
             if(res.state == -1) { return res; }
 
             right_res = visit_node(node->right, context);
-            res.registerResult(right_res);
+            res.register_result(right_res);
             if(res.state == -1) { return res; }
 
             res = res.process_binary(left_res, node->token, right_res);
@@ -210,10 +210,10 @@ class Interpreter {
                     continue;
                 }
 
-                cond_res = res.registerResult(visit_node(cond, context));
+                cond_res = res.register_result(visit_node(cond, context));
                 if(res.state == -1) { return res; }
                 if(cond_res.is_true()) {
-                    expr_res = res.registerResult(visit_node(node, context));
+                    expr_res = res.register_result(visit_node(node, context));
                     if(res.state == -1) { break; }
 
                     res.set_from(expr_res);
@@ -223,7 +223,7 @@ class Interpreter {
                 cond = nullptr;
             }
             if(res.type == NODE_UNKNOWN && node->else_result != nullptr) {
-                InterpreterResult else_res = res.registerResult(visit_node(node->else_result, context));
+                InterpreterResult else_res = res.register_result(visit_node(node->else_result, context));
                 if(res.state == -1) { return res; }
                 res.set_from(else_res);
 
@@ -238,14 +238,14 @@ class Interpreter {
             InterpreterResult res;
             res.init(node->start, node->end);
 
-            InterpreterResult start_value = res.registerResult(visit_node(node->for_start_result, context));
+            InterpreterResult start_value = res.register_result(visit_node(node->for_start_result, context));
             if(res.state == -1) { return res; }
-            InterpreterResult end_value = res.registerResult(visit_node(node->for_end_result, context));
+            InterpreterResult end_value = res.register_result(visit_node(node->for_end_result, context));
             if(res.state == -1) { return res; }
 
             InterpreterResult step_value;
             if(node->for_step_result != nullptr) {
-                step_value = res.registerResult(visit_node(node->for_step_result, context));
+                step_value = res.register_result(visit_node(node->for_step_result, context));
                 if(res.state == -1) { return res; }
             } else {
                 IntNumber n_s;
@@ -265,7 +265,7 @@ class Interpreter {
                 context->symbol_table->set(node->token->value_string, container);
                 i += step_value.get_value();
 
-                res.registerResult(visit_node(node->for_expr_result, context));
+                res.register_result(visit_node(node->for_expr_result, context));
                 if(res.state == -1) { break; }
             }
             if(res.state == -1) { return res; }
@@ -278,10 +278,10 @@ class Interpreter {
             res.init(node->start, node->end);
 
             while(true) {
-                InterpreterResult condition = res.registerResult(visit_node(node->while_condition_result, context));
+                InterpreterResult condition = res.register_result(visit_node(node->while_condition_result, context));
                 if(res.state == -1 || condition.is_true() == false) { break; }
 
-                InterpreterResult expr = res.registerResult(visit_node(node->while_expr_result, context));
+                InterpreterResult expr = res.register_result(visit_node(node->while_expr_result, context));
                 if(res.state == -1) { break; }
             }
             if(res.state == -1) { return res; }
@@ -312,7 +312,7 @@ class Interpreter {
             InterpreterResult res;
             res.init(node->start, node->end);
 
-            InterpreterResult expr = res.registerResult(execute(node->func_call_expression_result, node->func_call_argument_nodes_result, context));
+            InterpreterResult expr = res.register_result(execute(node->func_call_expression_result, node->func_call_argument_nodes_result, context));
             if(res.state == -1) { return res; }
 
             res.set_from(expr);
@@ -338,9 +338,9 @@ class Interpreter {
 
                 InterpreterResult expr;
                 if(function.built_in == false) {
-                    expr = res.registerResult(visit_node(function.expression, new_context));
+                    expr = res.register_result(visit_node(function.expression, new_context));
                 } else {
-                    expr = res.registerResult(builtin_runner->run(function, new_context));
+                    expr = res.register_result(builtin_runner->run(function, new_context));
                 }
                 if(res.state == -1) { return res; }
 
@@ -378,7 +378,7 @@ class Interpreter {
         void populate_args(Node* node, Context* context, InterpreterResult res, list<Node*> arguments, Function function) {
             for(Node* arg : arguments) {
                 Token* token = function.arguments.back();
-                InterpreterResult arg_res = res.registerResult(visit_node(arg, context));
+                InterpreterResult arg_res = res.register_result(visit_node(arg, context));
                 if(arg_res.state == -1) { break; }
 
                 save_to_context(token->value_string, arg_res, context);

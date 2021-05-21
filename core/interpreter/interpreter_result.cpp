@@ -23,7 +23,7 @@ class InterpreterResult {
             end = _end;
         }
 
-        InterpreterResult registerResult(InterpreterResult _result) {
+        InterpreterResult register_result(InterpreterResult _result) {
             state = _result.state;
             e = _result.e;
 
