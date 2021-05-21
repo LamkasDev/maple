@@ -69,6 +69,8 @@ class Interpreter {
                 res = visit_func_def_node(node, context);
             } else if(node->type == NODE_STRING) {
                 res = visit_string_node(node, context);
+            } else if(node->type == NODE_STATEMENTS) {
+                res = visit_statements_node(node, context);
             } else {
                 no_visit_method(node->type);
             }
@@ -400,6 +402,17 @@ class Interpreter {
                 value->init(res.res_string.value);
                 context->symbol_table->set(name, value);
             }
+        }
+
+        InterpreterResult visit_statements_node(Node* node, Context* context) {
+            InterpreterResult res;
+            res.init(node->start, node->end);
+
+            for(Node* _node : node->statements_nodes_result) {
+                res.set_from(visit_node(_node, context));
+            }
+
+            return res.success();
         }
 
         void no_visit_method(string type) {

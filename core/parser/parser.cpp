@@ -496,9 +496,92 @@ class Parser {
             node->set_start(current_t->start);
             node->set_type(NODE_IF);
 
-            if(current_t->matches(TT_KEYWORD, KEYWORD_IF) == false) {
+            ParserResult all_cases = result.register_result(if_expr_cases(NODE_IF));
+            if(result.state == -1) { return result; }
+
+            node->set_if_results(all_cases.node->if_results);
+            result.set_node(node);
+
+            return result.success();
+        }
+
+        ParserResult if_expr_b() {
+            return if_expr_cases(KEYWORD_ELIF);
+        }
+
+        ParserResult if_expr_c() {
+            ParserResult result;
+
+            Node* node = new Node();
+            node->set_start(current_t->start);
+            node->set_type(NODE_IF);
+
+            if(current_t->matches(TT_KEYWORD, KEYWORD_ELSE)) {
+                result.register_advance(advance());
+
+                if(current_t->type == TT_NEWLINE) {
+                    result.register_advance(advance());
+
+                    ParserResult all_statements = result.register_result(statements());
+                    if(result.state == -1) { return result; }
+                    node->set_else_result(all_statements.node);
+
+                    if(current_t->matches(TT_KEYWORD, KEYWORD_END)) {
+                        result.register_advance(advance());
+                    } else {
+                        InvalidSyntaxError e;
+                        e.init(current_t->start, current_t->end, "Expected 'END'");
+                        e.extra = 1;
+                        return result.failure(e);
+                    }
+                } else {
+                    ParserResult else_case = result.register_result(expression());
+                    if(result.state == -1) { return result; }
+                    node->set_end(else_case.node->end);
+                    node->set_else_result(else_case.node);
+                }
+            }
+
+            result.set_node(node);
+
+            return result.success();
+        }
+
+        ParserResult if_expr_b_or_c() {
+            ParserResult result;
+            list<Node*> cases;
+
+            Node* node = new Node();
+            node->set_start(current_t->start);
+            node->set_type(NODE_IF);
+
+            if(current_t->matches(TT_KEYWORD, KEYWORD_ELIF)) {
+                ParserResult all_cases = result.register_result(if_expr_b());
+                if(result.state == -1) { return result; }
+                node->set_if_results(all_cases.node->if_results);
+                node->set_else_result(all_cases.node->else_result);
+            } else {
+                ParserResult else_case = result.register_result(if_expr_c());
+                if(result.state == -1) { return result; }
+                node->set_else_result(else_case.node->else_result);
+            }
+
+            result.set_node(node);
+
+            return result;
+        }
+
+        ParserResult if_expr_cases(string type) {
+            ParserResult result;
+            list<Node*> cases;
+
+            Node* node = new Node();
+            node->set_start(current_t->start);
+            node->set_type(NODE_IF);
+
+            if(current_t->matches(TT_KEYWORD, type) == false) {
                 InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected 'IF'");
+                e.init(current_t->start, current_t->end, "Expected '" + type + "'");
                 e.extra = 1;
                 return result.failure(e);
             }
@@ -517,42 +600,33 @@ class Parser {
 
             result.register_advance(advance());
 
-            ParserResult expr = result.register_result(expression());
-            if(result.state == -1) { return result; }
-
-            cases.push_back(condition.node);
-            cases.push_back(expr.node);
-
-            while(current_t->matches(TT_KEYWORD, KEYWORD_ELIF)) {
+            if(current_t->type == TT_NEWLINE) {
                 result.register_advance(advance());
 
-                ParserResult condition_1 = result.register_result(expression());
+                ParserResult all_statements = result.register_result(statements());
                 if(result.state == -1) { return result; }
+                cases.push_back(condition.node);
+                cases.push_back(all_statements.node);
 
-                if(current_t->matches(TT_KEYWORD, KEYWORD_THEN) == false) {
-                    InvalidSyntaxError e;
-                    e.init(current_t->start, current_t->end, "Expected 'THEN'");
-                    e.extra = 1;
-                    return result.failure(e);
+                if(current_t->matches(TT_KEYWORD, KEYWORD_END)) {
+                    result.register_advance(advance());
+                } else {
+                    //TODO: CHECK
+                    ParserResult all_cases = result.register_result(if_expr_b_or_c());
+                    if(result.state == -1) { return result; }
+                    cases.push_back(all_cases.node);
                 }
-
-                result.register_advance(advance());
-
-                ParserResult expr_1 = result.register_result(expression());
+            } else {
+                ParserResult expr = result.register_result(expression());
                 if(result.state == -1) { return result; }
-                
-                node->set_end(expr_1.node->end);
-                cases.push_back(condition_1.node);
-                cases.push_back(expr_1.node);
-            }
 
-            if(current_t->matches(TT_KEYWORD, KEYWORD_ELSE)) {
-                result.register_advance(advance());
+                cases.push_back(condition.node);
+                cases.push_back(expr.node);
 
-                ParserResult else_case = result.register_result(expression());
+                //TODO: CHECK
+                ParserResult all_cases = result.register_result(if_expr_b_or_c());
                 if(result.state == -1) { return result; }
-                node->set_end(else_case.node->end);
-                node->set_else_result(else_case.node);
+                cases.push_back(all_cases.node);
             }
 
             node->set_if_results(cases);
@@ -627,14 +701,34 @@ class Parser {
 
             result.register_advance(advance());
 
-            ParserResult expr = result.register_result(expression());
-            if(result.state == -1) { return result; }
+            if(current_t->type == TT_NEWLINE) {
+                result.register_advance(advance());
 
-            node->set_end(expr.node->end);
+                ParserResult expr = result.register_result(statements());
+                if(result.state == -1) { return result; }
+
+                if(current_t->matches(TT_KEYWORD, KEYWORD_END) == false) {
+                    InvalidSyntaxError e;
+                    e.init(current_t->start, current_t->end, "Expected 'END'");
+                    e.extra = 1;
+                    return result.failure(e);
+                }
+
+                result.register_advance(advance());
+
+                node->set_end(expr.node->end);
+                node->set_for_expr_result(expr.node);
+            } else {
+                ParserResult expr = result.register_result(expression());
+                if(result.state == -1) { return result; }
+
+                node->set_end(expr.node->end);
+                node->set_for_expr_result(expr.node);
+            }
+            
             node->set_token(var_name);
             node->set_for_start_result(start_value.node);
             node->set_for_end_result(end_value.node);
-            node->set_for_expr_result(expr.node);
             result.set_node(node);
 
             return result.success();
@@ -667,12 +761,32 @@ class Parser {
 
             result.register_advance(advance());
 
-            ParserResult expr = result.register_result(expression());
-            if(result.state == -1) { return result; }
+            if(current_t->type == TT_NEWLINE) {
+                result.register_advance(advance());
 
-            node->set_end(expr.node->end);
+                ParserResult expr = result.register_result(statements());
+                if(result.state == -1) { return result; }
+
+                if(current_t->matches(TT_KEYWORD, KEYWORD_END) == false) {
+                    InvalidSyntaxError e;
+                    e.init(current_t->start, current_t->end, "Expected 'END'");
+                    e.extra = 1;
+                    return result.failure(e);
+                }
+
+                result.register_advance(advance());
+
+                node->set_end(expr.node->end);
+                node->set_while_expr_result(expr.node);
+            } else {
+                ParserResult expr = result.register_result(expression());
+                if(result.state == -1) { return result; }
+
+                node->set_end(expr.node->end);
+                node->set_while_expr_result(expr.node);
+            }
+            
             node->set_while_condition_result(condition.node);
-            node->set_while_expr_result(expr.node);
             result.set_node(node);
 
             return result.success();
@@ -756,21 +870,39 @@ class Parser {
 
             result.register_advance(advance());
 
-            if(current_t->type != TT_ARROW) {
+            if(current_t->type == TT_NEWLINE) {
+                result.register_advance(advance());
+
+                ParserResult expr = result.register_result(statements());
+                if(result.state == -1) { return result; }
+
+                if(current_t->matches(TT_KEYWORD, KEYWORD_END) == false) {
+                    InvalidSyntaxError e;
+                    e.init(current_t->start, current_t->end, "Expected 'END'");
+                    e.extra = 1;
+                    return result.failure(e);
+                }
+
+                result.register_advance(advance());
+
+                node->set_end(expr.node->end);
+                node->set_func_def_expression_result(expr.node);
+            } else if(current_t->type == TT_ARROW) {
+                result.register_advance(advance());
+
+                ParserResult expr = result.register_result(expression());
+                if(result.state == -1) { return result; }
+
+                node->set_end(expr.node->end);
+                node->set_func_def_expression_result(expr.node);
+            } else {
                 InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected '->'");
+                e.init(current_t->start, current_t->end, "Expected '->' or NEWLINE");
                 e.extra = 1;
                 return result.failure(e);
             }
 
-            result.register_advance(advance());
-
-            ParserResult expr = result.register_result(expression());
-            if(result.state == -1) { return result; }
-
-            node->set_end(expr.node->end);
             node->set_func_def_argument_tokens_result(arguments);
-            node->set_func_def_expression_result(expr.node);
             result.set_node(node);
 
             return result.success();

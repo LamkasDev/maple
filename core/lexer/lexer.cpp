@@ -140,7 +140,7 @@ class Lexer {
 
                     case '!': {
                         Token* t = make_not_equals();
-                        //RETURN ERROR
+                        //TODO: RETURN ERROR
                         result.tokens.push_back(t);
                         break;
                     }
