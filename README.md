@@ -9,6 +9,11 @@
 <div align="center">
     <h3>A programming language based on C++</h3>
     <p>Extension (.maple)</p>
+    <div align="center">
+        <img src="https://img.shields.io/github/workflow/status/LamkasDev/maple/run-tests" />
+        <img src="https://img.shields.io/github/contributors/LamkasDev/maple" />
+        <img src="https://img.shields.io/bitbucket/issues-raw/LamkasDev/maple" />
+    </div>
 </div>
 
 <div align="center">
