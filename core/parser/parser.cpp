@@ -770,14 +770,14 @@ class Parser {
             }
             result.register_advance(advance());
 
-            if(current_t->type == TT_NEWLINE) {
+            if(current_t->type == TT_LCBRACKET) {
                 result.register_advance(advance());
 
                 ParserResult expr = result.register_result(statements());
                 if(result.state == -1) { return result; }
 
-                if(current_t->matches(TT_KEYWORD, KEYWORD_END) == false) {
-                    return result.failure(create_syntax_error("'END'", 1));
+                if(current_t->type == TT_RCBRACKET) {
+                    return result.failure(create_syntax_error("'}'", 1));
                 }
                 result.register_advance(advance());
 
@@ -792,7 +792,7 @@ class Parser {
                 node->set_end(expr.node->end);
                 node->set_func_def_expression_result(expr.node);
             } else {
-                return result.failure(create_syntax_error("'->' or NEWLINE", 1));
+                return result.failure(create_syntax_error("'->' or '{'", 1));
             }
             node->set_func_def_argument_tokens_result(arguments);
             
