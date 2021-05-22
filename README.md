@@ -32,9 +32,9 @@
         Support for integers, floats and strings<br />
         Variables (<code>VAR</code>)<br />
         Logical operators (<code>==</code>, <code><</code>, <code>></code>, <code><=</code>, <code>>=</code>, <code>AND</code>, <code>OR</code>)<br />
-        Conditional expressions (<code>IF</code>, <code>THEN</code>, <code>ELIF?</code>, <code>ELSE?</code>)<br />
-        For loops (<code>FOR</code>, <code>TO</code>, <code>STEP?</code>, <code>THEN</code>)<br />
-        While loops (<code>WHILE</code>, <code>THEN</code>)<br />
+        Conditional expressions (<code>IF</code>, <code>ELIF?</code>, <code>ELSE?</code>)<br />
+        For loops (<code>FOR</code>, <code>TO</code>, <code>STEP?</code>)<br />
+        While loops (<code>WHILE</code>)<br />
         Functions (<code>FUNC</code>)
     </p>
     <h3>Is that all?</h3>
