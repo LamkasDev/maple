@@ -5,7 +5,7 @@
 #include "error.cpp"
 using namespace std;
 
-const vector<string> KEYWORDS { "VAR", "AND", "OR", "NOT", "IF", "THEN", "ELSE", "ELIF", "FOR", "TO", "STEP", "WHILE", "FUNC", "END" }; 
+const vector<string> KEYWORDS { "VAR", "AND", "OR", "NOT", "IF", "ELSE", "ELIF", "FOR", "TO", "STEP", "WHILE", "FUNC", "END" }; 
 const string LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 const string LETTERS_DIGITS = LETTERS + "0123456789";
 const string DIGITS = "0123456789";
@@ -47,7 +47,6 @@ const string KEYWORD_AND = "AND";
 const string KEYWORD_OR = "OR";
 const string KEYWORD_NOT = "NOT";
 const string KEYWORD_IF = "IF";
-const string KEYWORD_THEN = "THEN";
 const string KEYWORD_ELSE = "ELSE";
 const string KEYWORD_ELIF = "ELIF";
 const string KEYWORD_FOR = "FOR";
