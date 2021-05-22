@@ -32,6 +32,7 @@ class Lexer {
                 switch(current_c) {
                     case ' ':
                     case '\t':
+                    case '\n':
                         advance();
                         break;
 
@@ -129,8 +130,7 @@ class Lexer {
                         break;
                     }
 
-                    case ';': 
-                    case '\n': {
+                    case ';': {
                         Token* t = new Token();
                         t->init(TT_NEWLINE);
                         t->set_start(pos);
