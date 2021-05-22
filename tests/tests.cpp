@@ -92,12 +92,12 @@ bool runTests(Runner* runner) {
     totalTests += 11;
 
     printf("----------\n");
-    passed += runIntegerTest(runner, "Conditional 1 (IF (1) {; 0 })", "IF (1) {; 0 }", 0);
-    passed += runIntegerTest(runner, "Conditional 2 (IF (0) {; 1 } ELSE {; 0 })", "IF (0) {; 1 } ELSE {; 0 }", 0);
-    passed += runIntegerTest(runner, "Conditional 3 (IF (a == 5) {; 1 } ELSE {; 0 })", "IF (a == 5) {; 1 } ELSE {; 0 }", 1);
-    passed += runIntegerTest(runner, "Conditional 4 (IF (a AND b) {; 1 } ELSE {; 0 })", "IF (a AND b) {; 1 } ELSE {; 0 }", 1);
-    passed += runIntegerTest(runner, "Conditional 5 (IF (NOT a) {; 1 } ELIF (NOT b) {; 1 } ELSE {; 0 })", "IF (NOT a) {; 1 } ELIF (NOT b) {; 1 } ELSE {; 0 }", 0);
-    passed += runIntegerTest(runner, "Conditional 6 (IF (1) {; VAR d = 10 } ELSE {; VAR d = 5 })", "IF (1) {; VAR d = 10 } ELSE {; VAR d = 5 }", 10);
+    passed += runIntegerTest(runner, "Conditional 1 (IF (1) { 0 })", "IF (1) { 0 }", 0);
+    passed += runIntegerTest(runner, "Conditional 2 (IF (0) { 1 } ELSE { 0 })", "IF (0) { 1 } ELSE { 0 }", 0);
+    passed += runIntegerTest(runner, "Conditional 3 (IF (a == 5) { 1 } ELSE { 0 })", "IF (a == 5) { 1 } ELSE { 0 }", 1);
+    passed += runIntegerTest(runner, "Conditional 4 (IF (a AND b) { 1 } ELSE { 0 })", "IF (a AND b) { 1 } ELSE { 0 }", 1);
+    passed += runIntegerTest(runner, "Conditional 5 (IF (NOT a) { 1 } ELIF (NOT b) { 1 } ELSE { 0 })", "IF (NOT a) { 1 } ELIF (NOT b) { 1 } ELSE { 0 }", 0);
+    passed += runIntegerTest(runner, "Conditional 6 (IF (1) { VAR d = 10 } ELSE { VAR d = 5 })", "IF (1) { VAR d = 10 } ELSE { VAR d = 5 }", 10);
     totalTests += 6;
 
     printf("----------\n");
@@ -108,7 +108,7 @@ bool runTests(Runner* runner) {
     passed += runIntegerTest(runner, "Loops 5 (FOR (VAR i = -1) TO -6 STEP -1 { VAR l_2 = l_2 * i })", "FOR (VAR i = -1) TO -6 STEP -1 { VAR l_2 = l_2 * i }", 0);
     passed += runIntegerTest(runner, "Loops 6 (l_1)", "l_1", 120);
     passed += runIntegerTest(runner, "Loops 7 (l_2)", "l_2", -120);
-    passed += runIntegerTest(runner, "Loops 8 (WHILE l_3 < 100 {; VAR l_3 = l_3 + 1 })", "WHILE l_3 < 100 {; VAR l_3 = l_3 + 1 }", 0);
+    passed += runIntegerTest(runner, "Loops 8 (WHILE l_3 < 100 { VAR l_3 = l_3 + 1 })", "WHILE l_3 < 100 { VAR l_3 = l_3 + 1 }", 0);
     passed += runIntegerTest(runner, "Loops 9 (l_3)", "l_3", 100);
     totalTests += 9;
 
@@ -129,7 +129,7 @@ bool runTests(Runner* runner) {
     totalTests += 2;
 
     printf("----------\n");
-    passed += runIntegerTest(runner, "Multi-line statements 1 (VAR a = 1; VAR b = 0; IF (a) {; VAR a = 0; VAR b = 1 } ELSE {; VAR a = 1; VAR b = 0 })", "VAR a = 1; VAR b = 0; IF (a) {; VAR a = 0; VAR b = 1 } ELSE {; VAR a = 1; VAR b = 0 }", 1);
+    passed += runIntegerTest(runner, "Multi-line statements 1 (VAR a = 1; VAR b = 0; IF (a) { VAR a = 0; VAR b = 1 } ELSE { VAR a = 1; VAR b = 0 })", "VAR a = 1; VAR b = 0; IF (a) { VAR a = 0; VAR b = 1 } ELSE { VAR a = 1; VAR b = 0 }", 1);
     passed += runIntegerTest(runner, "Multi-line statements 2 (a)", "a", 0);
     passed += runIntegerTest(runner, "Multi-line statements 3 (b)", "b", 1);
     totalTests += 3;

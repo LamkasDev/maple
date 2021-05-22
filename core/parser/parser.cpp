@@ -512,23 +512,14 @@ class Parser {
 
                 result.register_advance(advance());
 
-                if(current_t->type == TT_NEWLINE) {
+                ParserResult all_statements = result.register_result(statements());
+                if(result.state == -1) { return result; }
+                node->set_else_result(all_statements.node);
+
+                if(current_t->type == TT_RCBRACKET) {
                     result.register_advance(advance());
-
-                    ParserResult all_statements = result.register_result(statements());
-                    if(result.state == -1) { return result; }
-                    node->set_else_result(all_statements.node);
-
-                    if(current_t->type == TT_RCBRACKET) {
-                        result.register_advance(advance());
-                    } else {
-                        return result.failure(create_syntax_error("'}'", 1));
-                    }
                 } else {
-                    ParserResult else_case = result.register_result(expression());
-                    if(result.state == -1) { return result; }
-                    node->set_end(else_case.node->end);
-                    node->set_else_result(else_case.node);
+                    return result.failure(create_syntax_error("'}'", 1));
                 }
             }
 
@@ -596,38 +587,18 @@ class Parser {
 
             result.register_advance(advance());
 
-            if(current_t->type == TT_NEWLINE) {
-                result.register_advance(advance());
+            ParserResult all_statements = result.register_result(statements());
+            if(result.state == -1) { return result; }
+            cases.push_back(condition.node);
+            cases.push_back(all_statements.node);
 
-                ParserResult all_statements = result.register_result(statements());
-                if(result.state == -1) { return result; }
-                cases.push_back(condition.node);
-                cases.push_back(all_statements.node);
+            if(current_t->type != TT_RCBRACKET) {
+                return result.failure(create_syntax_error("'}'", 1));
+            }
 
-                if(current_t->type != TT_RCBRACKET) {
-                    return result.failure(create_syntax_error("'}'", 1));
-                }
+            result.register_advance(advance());
 
-                result.register_advance(advance());
-
-                if(current_t->matches(TT_KEYWORD, KEYWORD_ELIF) || current_t->matches(TT_KEYWORD, KEYWORD_ELSE)) {
-                    ParserResult all_cases = result.register_result(if_expr_b_or_c());
-                    if(result.state == -1) { return result; }
-                    for(Node* _node : all_cases.node->if_results) {
-                        cases.push_back(_node);
-                    }
-                    if(all_cases.node->else_result != nullptr) {
-                        node->set_else_result(all_cases.node->else_result);
-                    }
-                }
-            } else {
-                ParserResult expr = result.register_result(expression());
-                if(result.state == -1) { return result; }
-
-                cases.push_back(condition.node);
-                cases.push_back(expr.node);
-
-                //TODO: CHECK
+            if(current_t->matches(TT_KEYWORD, KEYWORD_ELIF) || current_t->matches(TT_KEYWORD, KEYWORD_ELSE)) {
                 ParserResult all_cases = result.register_result(if_expr_b_or_c());
                 if(result.state == -1) { return result; }
                 for(Node* _node : all_cases.node->if_results) {
@@ -697,21 +668,11 @@ class Parser {
 
             result.register_advance(advance());
 
-            if(current_t->type == TT_NEWLINE) {
-                result.register_advance(advance());
+            ParserResult expr = result.register_result(statements());
+            if(result.state == -1) { return result; }
 
-                ParserResult expr = result.register_result(statements());
-                if(result.state == -1) { return result; }
-
-                node->set_end(expr.node->end);
-                node->set_for_expr_result(expr.node);
-            } else {
-                ParserResult expr = result.register_result(expression());
-                if(result.state == -1) { return result; }
-
-                node->set_end(expr.node->end);
-                node->set_for_expr_result(expr.node);
-            }
+            node->set_end(expr.node->end);
+            node->set_for_expr_result(expr.node);
 
             if(current_t->type != TT_RCBRACKET) {
                 return result.failure(create_syntax_error("'}'", 1));
@@ -748,27 +709,17 @@ class Parser {
 
             result.register_advance(advance());
 
-            if(current_t->type == TT_NEWLINE) {
-                result.register_advance(advance());
+            ParserResult expr = result.register_result(statements());
+            if(result.state == -1) { return result; }
 
-                ParserResult expr = result.register_result(statements());
-                if(result.state == -1) { return result; }
-
-                if(current_t->type != TT_RCBRACKET) {
-                    return result.failure(create_syntax_error("'}'", 1));
-                }
-
-                result.register_advance(advance());
-
-                node->set_end(expr.node->end);
-                node->set_while_expr_result(expr.node);
-            } else {
-                ParserResult expr = result.register_result(expression());
-                if(result.state == -1) { return result; }
-
-                node->set_end(expr.node->end);
-                node->set_while_expr_result(expr.node);
+            if(current_t->type != TT_RCBRACKET) {
+                return result.failure(create_syntax_error("'}'", 1));
             }
+
+            result.register_advance(advance());
+
+            node->set_end(expr.node->end);
+            node->set_while_expr_result(expr.node);
             
             node->set_while_condition_result(condition.node);
             result.set_node(node);
