@@ -134,7 +134,7 @@ class Parser {
                 } else {
                     ParserResult arg = result.register_result(expression());
                     if(result.state == -1) {
-                        return result.failure(create_syntax_error("'),' 'VAR', 'IF', 'FOR', 'WHILE', 'FUNC', int/float, identifier, '+', '-' or '(' or 'NOT'"));
+                        return result.failure(create_syntax_error("')', 'VAR', 'IF', 'FOR', 'WHILE', 'FUNC', int/float, identifier, '+', '-' or '(' or 'NOT'"));
                     }
                     arguments.push_back(arg.node);
 
@@ -374,9 +374,9 @@ class Parser {
                 result.register_advance(advance());
             }
 
-            ParserResult expr = result.register_result(expression());
+            ParserResult res_statement = result.register_result(statement());
             if(result.state == -1) { return result; }
-            statements.push_back(expr.node);
+            statements.push_back(res_statement.node);
 
             bool has_more_statements = true;
             while(true) {
@@ -389,21 +389,54 @@ class Parser {
                 if(newlines == 0) { has_more_statements = false; }
                 if(has_more_statements == false) { break; }
 
-                ParserResult statement = result.register_result(expression());
+                ParserResult res_statement = result.register_result(statement());
                 if(result.state == -1) {
                     unadvance(result.reverse_count);
                     has_more_statements = false;
                     continue;
                 }
                 if(result.state == -1) { break; }
-                statements.push_back(statement.node);
-                node->set_end(statement.node->end);
+                statements.push_back(res_statement.node);
+                node->set_end(res_statement.node->end);
             }
             if(result.state == -1) { return result; }
 
             node->set_statements_nodes_result(statements);
             result.set_node(node);
 
+            return result.success();
+        }
+
+        ParserResult statement() {
+            ParserResult result;
+            Node* node = new Node();
+            node->set_start(current_t->start);
+
+            if(current_t->matches(TT_KEYWORD, KEYWORD_RETURN)) {
+                result.register_advance(advance());
+
+                ParserResult expr = result.register_result(expression());
+                if(result.state == -1) {
+                    unadvance(result.reverse_count);
+                }
+                node->set_to_right(expr.node);
+                node->set_type(NODE_RETURN);
+            } else if(current_t->matches(TT_KEYWORD, KEYWORD_CONTINUE)) {
+                result.register_advance(advance());
+                node->set_type(NODE_CONTINUE);
+            } else if(current_t->matches(TT_KEYWORD, KEYWORD_BREAK)) {
+                result.register_advance(advance());
+                node->set_type(NODE_BREAK);
+            } else {
+                ParserResult expr = result.register_result(expression());
+                if(result.state == -1) {
+                    return result.failure(create_syntax_error("')', 'VAR', 'IF', 'FOR', 'WHILE', 'FUNC', int/float, identifier, '+', '-' or '(' or 'NOT'"));
+                }
+
+                node = expr.node;
+            }
+
+            result.set_node(node);
             return result.success();
         }
         
@@ -436,7 +469,7 @@ class Parser {
                 if(result.e.extra == 1) {
                     return result;
                 } else {
-                    return result.failure(create_syntax_error("'VAR', 'IF', 'FOR', 'WHILE', 'FUNC', int/float, identifier, '+', '-' or '(' or 'NOT'"));
+                    return result.failure(create_syntax_error("'RETURN', 'CONTINUE', 'BREAK', 'VAR', 'IF', 'FOR', 'WHILE', 'FUNC', int/float, identifier, '+', '-' or '(' or 'NOT'"));
                 }
             }
 

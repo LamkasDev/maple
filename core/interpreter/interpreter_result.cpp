@@ -18,27 +18,64 @@ class InterpreterResult {
         String res_string;
         Function res_func;
 
+        bool has_return_value = false;
+        bool loop_should_continue = false;
+        bool loop_should_break = false;
+
         void init(Position _start, Position _end) {
             start = _start;
             end = _end;
         }
 
+        void reset() {
+            state = 0;
+            has_return_value = false;
+            loop_should_continue = false;
+            loop_should_break = false;
+        }
+
         InterpreterResult register_result(InterpreterResult _result) {
             state = _result.state;
+            has_return_value = _result.has_return_value;
+            loop_should_continue = _result.loop_should_continue;
+            loop_should_break = _result.loop_should_break;
             e = _result.e;
 
             return _result;
         }
 
         InterpreterResult success() {
-            state = 0;
+            reset();
+            return *this;
+        }
+
+        InterpreterResult success_return() {
+            reset();
+            has_return_value = true;
+            return *this;
+        }
+
+        InterpreterResult success_continue() {
+            reset();
+            loop_should_continue = true;
+            return *this;
+        }
+
+        InterpreterResult success_break() {
+            reset();
+            loop_should_break = true;
             return *this;
         }
 
         InterpreterResult failure(Error _e) {
+            reset();
             state = -1;
             e = _e;
             return *this;
+        }
+
+        bool should_return() {
+            return state == -1 || has_return_value || loop_should_continue || loop_should_break;
         }
 
         void set_from(int _res_int) {

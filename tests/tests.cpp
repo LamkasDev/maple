@@ -135,6 +135,12 @@ bool runTests(Runner* runner) {
     totalTests += 3;
 
     printf("----------\n");
+    passed += runIntegerTest(runner, "Special 1 (RETURN 20)", "RETURN 20", 20);
+    passed += runIntegerTest(runner, "Special 2 (VAR a = 0; FOR (VAR i = 0) TO 11 { IF(i == 5) { BREAK }; VAR a = i }; RETURN a)", "VAR a = 0; FOR (VAR i = 0) TO 11 { IF(i == 5) { BREAK }; VAR a = i }; RETURN a", 4);
+    passed += runIntegerTest(runner, "Special 3 (VAR a = 0; FOR (VAR i = 0) TO 11 { IF(i == 5) { CONTINUE }; VAR a = i }; RETURN a)", "VAR a = 0; FOR (VAR i = 0) TO 11 { IF(i == 5) { CONTINUE }; VAR a = i }; RETURN a", 9);
+    totalTests += 3;
+
+    printf("----------\n");
     printf("%i PASSED, %i FAILED", passed, (totalTests - passed));
     return passed < totalTests;
 }

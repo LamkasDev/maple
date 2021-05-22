@@ -19,6 +19,9 @@ const string NODE_ASSIGNMENT = "ASSIGNMENT";
 const string NODE_IF = "IF";
 const string NODE_FOR = "FOR";
 const string NODE_WHILE = "WHILE";
+const string NODE_RETURN = "RETURN";
+const string NODE_CONTINUE = "CONTINUE";
+const string NODE_BREAK = "BREAK";
 
 const string NODE_FUNC_DEF = "FUNC_DEF";
 const string NODE_FUNC_CALL = "FUNC_CALL";
@@ -202,13 +205,15 @@ class Node {
             } else if(type == NODE_WHILE) {
                 return "(" + type + ":(" + while_condition_result->repr() + "->" + while_expr_result->repr() + ")";
             } else if(type == NODE_FUNC_CALL) {
-                return "(" + type + ":(" + func_call_expression_result->token->value_string + "))";
+                return "(" + type + ":" + func_call_expression_result->token->value_string + ")";
             } else if(type == NODE_FUNC_DEF) {
-                return "(" + type + ":(" + token->value_string + "))";
+                return "(" + type + ":" + token->value_string + ")";
             } else if(type == NODE_STRING) {
                 return "(" + type + ":" + value->value_string + ")";
             } else if(type == NODE_STATEMENTS) {
                 return "(" + type + ":" + to_string(statements_nodes_result.size()) + ")";
+            } else if(type == NODE_RETURN) {
+                return "(" + type + ":" + right->repr() + ")";
             }
 
             return type;

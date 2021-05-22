@@ -71,6 +71,12 @@ class Interpreter {
                 res = visit_string_node(node, context);
             } else if(node->type == NODE_STATEMENTS) {
                 res = visit_statements_node(node, context);
+            } else if(node->type == NODE_RETURN) {
+                res = visit_return_node(node, context);
+            } else if(node->type == NODE_CONTINUE) {
+                res = visit_continue_node(node, context);
+            } else if(node->type == NODE_BREAK) {
+                res = visit_break_node(node, context);
             } else {
                 no_visit_method(node->type);
             }
@@ -120,22 +126,25 @@ class Interpreter {
             InterpreterResult res;
             res.init(node->start, node->end);
 
+            InterpreterResult left = res.register_result(visit_node(node->left, context));
+            if(res.should_return()) { return res; }
+
             if(node->token->type == TT_PLUS) {
-                res.set_from(visit_node(node->left, context));
+                res.set_from(left);
             } else if(node->token->type == TT_MINUS) {
                 Token* n_t = new Token();
                 n_t->init(TT_MUL);
                 InterpreterResult n_m_i;
                 n_m_i.set_from(-1);
 
-                res = res.process_binary(visit_node(node->left, context), n_t, n_m_i);
+                res = res.process_binary(left, n_t, n_m_i);
             } else if(node->token->matches(TT_KEYWORD, KEYWORD_NOT)) {
                 Token* n_t = new Token();
                 n_t->init(TT_EQEQ);
                 InterpreterResult n_m_i;
                 n_m_i.set_from(0);
 
-                res = res.process_binary(visit_node(node->left, context), n_t, n_m_i);
+                res = res.process_binary(left, n_t, n_m_i);
             }
 
             return res.success();
@@ -150,14 +159,14 @@ class Interpreter {
 
             left_res = visit_node(node->left, context);
             res.register_result(left_res);
-            if(res.state == -1) { return res; }
+            if(res.should_return()) { return res; }
 
             right_res = visit_node(node->right, context);
             res.register_result(right_res);
-            if(res.state == -1) { return res; }
+            if(res.should_return()) { return res; }
 
             res = res.process_binary(left_res, node->token, right_res);
-            if(res.state == -1) { return res; }
+            if(res.should_return()) { return res; }
 
             return res.success();
         }
@@ -190,7 +199,7 @@ class Interpreter {
             
             InterpreterResult value_res;
             value_res = visit_node(node->right, context);
-            if(res.state == -1) { return res; }
+            if(res.should_return()) { return res; }
             res.set_from(value_res);
 
             save_to_context(node->token->value_string, res, context);
@@ -211,10 +220,10 @@ class Interpreter {
                 }
 
                 cond_res = res.register_result(visit_node(cond, context));
-                if(res.state == -1) { return res; }
+                if(res.should_return()) { return res; }
                 if(cond_res.is_true()) {
                     expr_res = res.register_result(visit_node(node, context));
-                    if(res.state == -1) { break; }
+                    if(res.should_return()) { break; }
 
                     res.set_from(expr_res);
                     break;
@@ -224,12 +233,12 @@ class Interpreter {
             }
             if(res.type == NODE_UNKNOWN && node->else_result != nullptr) {
                 InterpreterResult else_res = res.register_result(visit_node(node->else_result, context));
-                if(res.state == -1) { return res; }
+                if(res.should_return()) { return res; }
                 res.set_from(else_res);
 
                 return res.success();
             }
-            if(cond_res.state == -1 || expr_res.state == -1) { return res; }
+            if(cond_res.should_return() || expr_res.should_return()) { return res; }
 
             return res.success();
         }
@@ -239,14 +248,14 @@ class Interpreter {
             res.init(node->start, node->end);
 
             InterpreterResult start_value = res.register_result(visit_node(node->for_start_result, context));
-            if(res.state == -1) { return res; }
+            if(res.should_return()) { return res; }
             InterpreterResult end_value = res.register_result(visit_node(node->for_end_result, context));
-            if(res.state == -1) { return res; }
+            if(res.should_return()) { return res; }
 
             InterpreterResult step_value;
             if(node->for_step_result != nullptr) {
                 step_value = res.register_result(visit_node(node->for_step_result, context));
-                if(res.state == -1) { return res; }
+                if(res.should_return()) { return res; }
             } else {
                 IntNumber n_s;
                 n_s.init(1);
@@ -265,10 +274,12 @@ class Interpreter {
                 context->symbol_table->set(node->token->value_string, container);
                 i += step_value.get_value();
 
-                res.register_result(visit_node(node->for_expr_result, context));
-                if(res.state == -1) { break; }
+                InterpreterResult expr = res.register_result(visit_node(node->for_expr_result, context));
+                if(res.should_return() && res.loop_should_continue == false && res.loop_should_break == false) { break; }
+                if(res.loop_should_continue == true) { continue; }
+                if(res.loop_should_break == true) { break; }
             }
-            if(res.state == -1) { return res; }
+            if(res.should_return()) { return res; }
 
             return res.success();
         }
@@ -279,12 +290,14 @@ class Interpreter {
 
             while(true) {
                 InterpreterResult condition = res.register_result(visit_node(node->while_condition_result, context));
-                if(res.state == -1 || condition.is_true() == false) { break; }
+                if(res.should_return() || condition.is_true() == false) { break; }
 
                 InterpreterResult expr = res.register_result(visit_node(node->while_expr_result, context));
-                if(res.state == -1) { break; }
+                if(res.should_return() && res.loop_should_continue == false && res.loop_should_break == false) { break; }
+                if(res.loop_should_continue == true) { continue; }
+                if(res.loop_should_break == true) { break; }
             }
-            if(res.state == -1) { return res; }
+            if(res.should_return()) { return res; }
 
             return res.success();
         }
@@ -313,10 +326,33 @@ class Interpreter {
             res.init(node->start, node->end);
 
             InterpreterResult expr = res.register_result(execute(node->func_call_expression_result, node->func_call_argument_nodes_result, context));
-            if(res.state == -1) { return res; }
+            if(res.should_return()) { return res; }
 
             res.set_from(expr);
             return res.success();
+        }
+
+        InterpreterResult visit_return_node(Node* node, Context* context) {
+            InterpreterResult res;
+            res.init(node->start, node->end);
+
+            InterpreterResult expr = res.register_result(visit_node(node->right, context));
+            if(res.should_return()) { return res; }
+
+            res.set_from(expr);
+            return res.success_return();
+        }
+
+        InterpreterResult visit_continue_node(Node* node, Context* context) {
+            InterpreterResult res;
+            res.init(node->start, node->end);
+            return res.success_continue();
+        }
+
+        InterpreterResult visit_break_node(Node* node, Context* context) {
+            InterpreterResult res;
+            res.init(node->start, node->end);
+            return res.success_break();
         }
 
         InterpreterResult execute(Node* node, list<Node*> arguments, Context* context) {
@@ -331,10 +367,10 @@ class Interpreter {
             try {
                 Function function = functions.at(func_name);
                 check_args(node, new_context, res, arguments, function);
-                if(res.state == -1) { return res; }
+                if(res.should_return()) { return res; }
 
                 populate_args(node, new_context, res, arguments, function);
-                if(res.state == -1) { return res; }
+                if(res.should_return()) { return res; }
 
                 InterpreterResult expr;
                 if(function.built_in == false) {
@@ -342,7 +378,7 @@ class Interpreter {
                 } else {
                     expr = res.register_result(builtin_runner->run(function, new_context));
                 }
-                if(res.state == -1) { return res; }
+                if(res.should_return() && res.has_return_value == false) { return res; }
 
                 res.set_from(expr);
                 return res.success();
@@ -379,7 +415,7 @@ class Interpreter {
             for(Node* arg : arguments) {
                 Token* token = function.arguments.back();
                 InterpreterResult arg_res = res.register_result(visit_node(arg, context));
-                if(arg_res.state == -1) { break; }
+                if(arg_res.should_return()) { break; }
 
                 save_to_context(token->value_string, arg_res, context);
                 function.arguments.pop_back();
@@ -410,8 +446,9 @@ class Interpreter {
 
             for(Node* _node : node->statements_nodes_result) {
                 InterpreterResult expr = res.register_result(visit_node(_node, context));
-                if(res.state == -1) { break; }
                 res.set_from(expr);
+
+                if(res.state == -1) { break; }
             }
             if(res.state == -1) { return res; }
 
