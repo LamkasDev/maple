@@ -98,6 +98,22 @@ class Lexer {
                         break;
                     }
 
+                    case '{': {
+                        Token* t = new Token();
+                        t->init(TT_LCBRACKET);
+                        t->set_start(pos);
+                        result.tokens.push_back(t); advance();
+                        break;
+                    }
+
+                    case '}': {
+                        Token* t = new Token();
+                        t->init(TT_RCBRACKET);
+                        t->set_start(pos);
+                        result.tokens.push_back(t); advance();
+                        break;
+                    }
+
                     case '=': {
                         Token* t = make_equals();
                         result.tokens.push_back(t);
