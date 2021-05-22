@@ -589,8 +589,26 @@ class Parser {
 
             result.register_advance(advance());
 
+            if(current_t->type != TT_LPAREN) {
+                InvalidSyntaxError e;
+                e.init(current_t->start, current_t->end, "Expected '('");
+                e.extra = 1;
+                return result.failure(e);
+            }
+
+            result.register_advance(advance());
+
             ParserResult condition = result.register_result(expression());
             if(result.state == -1) { return result; }
+
+            if(current_t->type != TT_RPAREN) {
+                InvalidSyntaxError e;
+                e.init(current_t->start, current_t->end, "Expected ')'");
+                e.extra = 1;
+                return result.failure(e);
+            }
+
+            result.register_advance(advance());
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_THEN) == false) {
                 InvalidSyntaxError e;
