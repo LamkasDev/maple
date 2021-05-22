@@ -10,7 +10,7 @@
 #include "tests/tests.cpp"
 using namespace std;
 
-const string VERSION = "0.7.2";
+const string VERSION = "0.7.3";
 
 void print_result(RunResult result, bool prints_result, bool prints_debug) {
     if(result.makeTokensResult.state == -1) {
