@@ -150,7 +150,6 @@ class Parser {
                     if(current_t->type != TT_RPAREN) {
                         return result.failure(create_syntax_error("',' or ')'"));
                     }
-
                     result.register_advance(advance());
                 }
 
@@ -185,8 +184,8 @@ class Parser {
                 op->set_to_right(right.node);
             }
             if(result.state == -1) { return result; }
+            
             result.set_node(op);
-
             return result.success();
         }
 
@@ -219,8 +218,8 @@ class Parser {
                 op->set_to_right(right.node);
             }
             if(result.state == -1) { return result; }
+            
             result.set_node(op);
-
             return result.success();
         }
 
@@ -269,8 +268,8 @@ class Parser {
                 op->set_to_right(right.node);
             }
             if(result.state == -1) { return result; }
+            
             result.set_node(op);
-
             return result.success();
         }
 
@@ -303,8 +302,8 @@ class Parser {
                 op->set_to_right(right.node);
             }
             if(result.state == -1) { return result; }
+            
             result.set_node(op);
-
             return result.success();
         }
 
@@ -337,8 +336,8 @@ class Parser {
                 op->set_to_right(right.node);
             }
             if(result.state == -1) { return result; }
+            
             result.set_node(op);
-
             return result.success();
         }
 
@@ -358,12 +357,9 @@ class Parser {
             }
 
             ParserResult arith = result.register_result(arith_expr_pre());
+            if(result.state == -1) { return result.failure(create_syntax_error("int/float, identifier, '+', '-', '(' or 'NOT'")); }
             
-            if(result.state == -1) {
-                return result.failure(create_syntax_error("int/float, identifier, '+', '-', '(' or 'NOT'"));
-            }
             result.set_node(arith.node);
-
             return result.success();
         }
 
@@ -419,21 +415,19 @@ class Parser {
                 if(current_t->type != TT_IDENFIFIER) {
                     return result.failure(create_syntax_error("identifier"));
                 }
-
                 Token* identifier = current_t;
                 result.register_advance(advance());
 
                 if(current_t->type != TT_EQ) {
                     return result.failure(create_syntax_error("'='"));
                 }
-
                 result.register_advance(advance());
+
                 ParserResult expr = result.register_result(expression());
                 if(result.state == -1) { return result; }
-
                 Node* n = new Node(); n->set_pos(identifier->start, expr.node->end); n->set_type(NODE_ASSIGNMENT); n->set_token(identifier); n->set_to_right(expr.node);
-                result.set_node(n);
                 
+                result.set_node(n);
                 return result.success();
             }
 
@@ -469,8 +463,8 @@ class Parser {
                 op->set_to_right(right.node);
             }
             if(result.state == -1) { return result; }
+            
             result.set_node(op);
-
             return result.success();
         }
 
@@ -487,8 +481,8 @@ class Parser {
 
             node->set_if_results(all_cases.node->if_results);
             node->set_else_result(all_cases.node->else_result);
+            
             result.set_node(node);
-
             return result.success();
         }
 
@@ -509,11 +503,11 @@ class Parser {
                 if(current_t->type != TT_LCBRACKET) {
                     return result.failure(create_syntax_error("'{'", 1));
                 }
-
                 result.register_advance(advance());
 
                 ParserResult all_statements = result.register_result(statements());
                 if(result.state == -1) { return result; }
+
                 node->set_else_result(all_statements.node);
 
                 if(current_t->type == TT_RCBRACKET) {
@@ -524,7 +518,6 @@ class Parser {
             }
 
             result.set_node(node);
-
             return result.success();
         }
 
@@ -539,16 +532,17 @@ class Parser {
             if(current_t->matches(TT_KEYWORD, KEYWORD_ELIF)) {
                 ParserResult all_cases = result.register_result(if_expr_b());
                 if(result.state == -1) { return result; }
+
                 node->set_if_results(all_cases.node->if_results);
                 node->set_else_result(all_cases.node->else_result);
             } else {
                 ParserResult else_case = result.register_result(if_expr_c());
                 if(result.state == -1) { return result; }
+
                 node->set_else_result(else_case.node->else_result);
             }
 
             result.set_node(node);
-
             return result;
         }
 
@@ -563,13 +557,11 @@ class Parser {
             if(current_t->matches(TT_KEYWORD, type) == false) {
                 return result.failure(create_syntax_error("'" + type + "'", 1));
             }
-
             result.register_advance(advance());
 
             if(current_t->type != TT_LPAREN) {
                 return result.failure(create_syntax_error("'('", 1));
             }
-
             result.register_advance(advance());
 
             ParserResult condition = result.register_result(expression());
@@ -584,7 +576,6 @@ class Parser {
             if(current_t->type != TT_LCBRACKET) {
                 return result.failure(create_syntax_error("'{'", 1));
             }
-
             result.register_advance(advance());
 
             ParserResult all_statements = result.register_result(statements());
@@ -595,7 +586,6 @@ class Parser {
             if(current_t->type != TT_RCBRACKET) {
                 return result.failure(create_syntax_error("'}'", 1));
             }
-
             result.register_advance(advance());
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_ELIF) || current_t->matches(TT_KEYWORD, KEYWORD_ELSE)) {
@@ -608,10 +598,9 @@ class Parser {
                     node->set_else_result(all_cases.node->else_result);
                 }
             }
-
             node->set_if_results(cases);
-            result.set_node(node);
 
+            result.set_node(node);
             return result.success();
         }
 
@@ -624,13 +613,11 @@ class Parser {
             if(current_t->matches(TT_KEYWORD, KEYWORD_FOR) == false) {
                 return result.failure(create_syntax_error("'FOR'", 1));
             }
-
             result.register_advance(advance());
 
             if(current_t->type != TT_LPAREN) {
                 return result.failure(create_syntax_error("'('", 1));
             }
-
             result.register_advance(advance());
 
             ParserResult start_value = result.register_result(expression());
@@ -642,13 +629,11 @@ class Parser {
             if(current_t->type != TT_RPAREN) {
                 return result.failure(create_syntax_error("')'", 1));
             }
-
             result.register_advance(advance());
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_TO) == false) {
                 return result.failure(create_syntax_error("'TO'", 1));
             }
-
             result.register_advance(advance());
 
             ParserResult end_value = result.register_result(expression());
@@ -665,7 +650,6 @@ class Parser {
             if(current_t->type != TT_LCBRACKET) {
                 return result.failure(create_syntax_error("'{'", 1));
             }
-
             result.register_advance(advance());
 
             ParserResult expr = result.register_result(statements());
@@ -677,14 +661,13 @@ class Parser {
             if(current_t->type != TT_RCBRACKET) {
                 return result.failure(create_syntax_error("'}'", 1));
             }
-
             result.register_advance(advance());
             
             node->set_token(start_value.node->token);
             node->set_for_start_result(start_value.node);
             node->set_for_end_result(end_value.node);
-            result.set_node(node);
 
+            result.set_node(node);
             return result.success();
         }
 
@@ -697,7 +680,6 @@ class Parser {
             if(current_t->matches(TT_KEYWORD, KEYWORD_WHILE) == false) {
                 return result.failure(create_syntax_error("'WHILE'", 1));
             }
-
             result.register_advance(advance());
 
             ParserResult condition = result.register_result(expression());
@@ -706,7 +688,6 @@ class Parser {
             if(current_t->type != TT_LCBRACKET) {
                 return result.failure(create_syntax_error("'{'", 1));
             }
-
             result.register_advance(advance());
 
             ParserResult expr = result.register_result(statements());
@@ -715,15 +696,13 @@ class Parser {
             if(current_t->type != TT_RCBRACKET) {
                 return result.failure(create_syntax_error("'}'", 1));
             }
-
             result.register_advance(advance());
 
             node->set_end(expr.node->end);
             node->set_while_expr_result(expr.node);
-            
             node->set_while_condition_result(condition.node);
-            result.set_node(node);
 
+            result.set_node(node);
             return result.success();
         }
 
@@ -738,7 +717,6 @@ class Parser {
             if(current_t->matches(TT_KEYWORD, KEYWORD_FUNC) == false) {
                 return result.failure(create_syntax_error("'FUNC'", 1));
             }
-
             result.register_advance(advance());
 
             if(current_t->type == TT_IDENFIFIER) {
@@ -790,7 +768,6 @@ class Parser {
             if(identifier_errored_out == true) {
                 return result.failure(id_e);
             }
-
             result.register_advance(advance());
 
             if(current_t->type == TT_NEWLINE) {
@@ -817,10 +794,9 @@ class Parser {
             } else {
                 return result.failure(create_syntax_error("'->' or NEWLINE", 1));
             }
-
             node->set_func_def_argument_tokens_result(arguments);
+            
             result.set_node(node);
-
             return result.success();
         }
 
