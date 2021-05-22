@@ -37,9 +37,7 @@ class Parser {
         ParserResult parse() {
             ParserResult res = statements();
             if(res.state != -1 && current_t->type != TT_EOF) {
-                InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected '+', '-', '*', '/', '^', '==', '!=', '<', '>', '<=', '>=', 'AND' or 'OR'");
-                return res.failure(e);
+                return res.failure(create_syntax_error("'+', '-', '*', '/', '^', '==', '!=', '<', '>', '<=', '>=', 'AND' or 'OR'"));
             }
 
             return res;
@@ -82,9 +80,7 @@ class Parser {
                     result.set_node(n_0.node);
                     return result.success();
                 } else {
-                    InvalidSyntaxError e;
-                    e.init(current_t->start, current_t->end, "Expected ')'");
-                    return result.failure(e);
+                    return result.failure(create_syntax_error("')'"));
                 }
             } else if(t->matches(TT_KEYWORD, KEYWORD_IF)) {
                 ParserResult expr = if_expr();
@@ -112,9 +108,7 @@ class Parser {
                 return result.success();
             }
 
-            InvalidSyntaxError e;
-            e.init(t->start, t->end, "Expected int/float, identifier, '+', '-', '(', 'IF', 'FOR', 'WHILE' or 'FUNC'");
-            return result.failure(e);
+            return result.failure(create_syntax_error("int/float, identifier, '+', '-', '(', 'IF', 'FOR', 'WHILE' or 'FUNC'"));
         }
 
         ParserResult call() {
@@ -136,9 +130,7 @@ class Parser {
                 } else {
                     ParserResult arg = result.register_result(expression());
                     if(result.state == -1) {
-                        InvalidSyntaxError e;
-                        e.init(current_t->start, current_t->end, "Expected '),' 'VAR', 'IF', 'FOR', 'WHILE', 'FUNC', int/float, identifier, '+', '-' or '(' or 'NOT'");
-                        return result.failure(e);
+                        return result.failure(create_syntax_error("'),' 'VAR', 'IF', 'FOR', 'WHILE', 'FUNC', int/float, identifier, '+', '-' or '(' or 'NOT'"));
                     }
                     arguments.push_back(arg.node);
 
@@ -152,9 +144,7 @@ class Parser {
                     if(result.state == -1) { return result; }
 
                     if(current_t->type != TT_RPAREN) {
-                        InvalidSyntaxError e;
-                        e.init(current_t->start, current_t->end, "Expected ',' or ')'");
-                        return result.failure(e);
+                        return result.failure(create_syntax_error("',' or ')'"));
                     }
 
                     result.register_advance(advance());
@@ -366,9 +356,7 @@ class Parser {
             ParserResult arith = result.register_result(arith_expr_pre());
             
             if(result.state == -1) {
-                InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected int/float, identifier, '+', '-', '(' or 'NOT'");
-                return result.failure(e);
+                return result.failure(create_syntax_error("int/float, identifier, '+', '-', '(' or 'NOT'"));
             }
             result.set_node(arith.node);
 
@@ -425,18 +413,14 @@ class Parser {
             if(current_t->matches(TT_KEYWORD, KEYWORD_VAR)) {
                 result.register_advance(advance());
                 if(current_t->type != TT_IDENFIFIER) {
-                    InvalidSyntaxError e;
-                    e.init(current_t->start, current_t->end, "Expected identifier");
-                    return result.failure(e);
+                    return result.failure(create_syntax_error("identifier"));
                 }
 
                 Token* identifier = current_t;
                 result.register_advance(advance());
 
                 if(current_t->type != TT_EQ) {
-                    InvalidSyntaxError e;
-                    e.init(current_t->start, current_t->end, "Expected '='");
-                    return result.failure(e);
+                    return result.failure(create_syntax_error("'='"));
                 }
 
                 result.register_advance(advance());
@@ -454,9 +438,7 @@ class Parser {
                 if(result.e.extra == 1) {
                     return result;
                 } else {
-                    InvalidSyntaxError e;
-                    e.init(current_t->start, current_t->end, "Expected 'VAR', 'IF', 'FOR', 'WHILE', 'FUNC', int/float, identifier, '+', '-' or '(' or 'NOT'");
-                    return result.failure(e);
+                    return result.failure(create_syntax_error("'VAR', 'IF', 'FOR', 'WHILE', 'FUNC', int/float, identifier, '+', '-' or '(' or 'NOT'"));
                 }
             }
 
@@ -530,10 +512,7 @@ class Parser {
                     if(current_t->matches(TT_KEYWORD, KEYWORD_END)) {
                         result.register_advance(advance());
                     } else {
-                        InvalidSyntaxError e;
-                        e.init(current_t->start, current_t->end, "Expected 'END'");
-                        e.extra = 1;
-                        return result.failure(e);
+                        return result.failure(create_syntax_error("'END'", 1));
                     }
                 } else {
                     ParserResult else_case = result.register_result(expression());
@@ -581,19 +560,13 @@ class Parser {
             node->set_type(NODE_IF);
 
             if(current_t->matches(TT_KEYWORD, type) == false) {
-                InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected '" + type + "'");
-                e.extra = 1;
-                return result.failure(e);
+                return result.failure(create_syntax_error("'" + type + "'", 1));
             }
 
             result.register_advance(advance());
 
             if(current_t->type != TT_LPAREN) {
-                InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected '('");
-                e.extra = 1;
-                return result.failure(e);
+                return result.failure(create_syntax_error("'('", 1));
             }
 
             result.register_advance(advance());
@@ -602,19 +575,13 @@ class Parser {
             if(result.state == -1) { return result; }
 
             if(current_t->type != TT_RPAREN) {
-                InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected ')'");
-                e.extra = 1;
-                return result.failure(e);
+                return result.failure(create_syntax_error("')'", 1));
             }
 
             result.register_advance(advance());
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_THEN) == false) {
-                InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected 'THEN'");
-                e.extra = 1;
-                return result.failure(e);
+                return result.failure(create_syntax_error("'THEN'", 1));
             }
 
             result.register_advance(advance());
@@ -671,19 +638,13 @@ class Parser {
             node->set_type(NODE_FOR);
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_FOR) == false) {
-                InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected 'FOR'");
-                e.extra = 1;
-                return result.failure(e);
+                return result.failure(create_syntax_error("'FOR'", 1));
             }
 
             result.register_advance(advance());
 
             if(current_t->type != TT_LPAREN) {
-                InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected '('");
-                e.extra = 1;
-                return result.failure(e);
+                return result.failure(create_syntax_error("'('", 1));
             }
 
             result.register_advance(advance());
@@ -691,26 +652,17 @@ class Parser {
             ParserResult start_value = result.register_result(expression());
             if(result.state == -1) { return result; }
             if(start_value.node->type != NODE_ASSIGNMENT) {
-                InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected assigment");
-                e.extra = 1;
-                return result.failure(e);
+                return result.failure(create_syntax_error("assigment", 1));
             }
 
             if(current_t->type != TT_RPAREN) {
-                InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected ')'");
-                e.extra = 1;
-                return result.failure(e);
+                return result.failure(create_syntax_error("')'", 1));
             }
 
             result.register_advance(advance());
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_TO) == false) {
-                InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected 'TO'");
-                e.extra = 1;
-                return result.failure(e);
+                return result.failure(create_syntax_error("'TO'", 1));
             }
 
             result.register_advance(advance());
@@ -727,10 +679,7 @@ class Parser {
             }
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_THEN) == false) {
-                InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected 'THEN'");
-                e.extra = 1;
-                return result.failure(e);
+                return result.failure(create_syntax_error("'THEN'", 1));
             }
 
             result.register_advance(advance());
@@ -742,10 +691,7 @@ class Parser {
                 if(result.state == -1) { return result; }
 
                 if(current_t->matches(TT_KEYWORD, KEYWORD_END) == false) {
-                    InvalidSyntaxError e;
-                    e.init(current_t->start, current_t->end, "Expected 'END'");
-                    e.extra = 1;
-                    return result.failure(e);
+                    return result.failure(create_syntax_error("'END'", 1));
                 }
 
                 result.register_advance(advance());
@@ -775,10 +721,7 @@ class Parser {
             node->set_type(NODE_WHILE);
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_WHILE) == false) {
-                InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected 'WHILE'");
-                e.extra = 1;
-                return result.failure(e);
+                return result.failure(create_syntax_error("'WHILE'", 1));
             }
 
             result.register_advance(advance());
@@ -787,10 +730,7 @@ class Parser {
             if(result.state == -1) { return result; }
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_THEN) == false) {
-                InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected 'THEN'");
-                e.extra = 1;
-                return result.failure(e);
+                return result.failure(create_syntax_error("'THEN'", 1));
             }
 
             result.register_advance(advance());
@@ -802,10 +742,7 @@ class Parser {
                 if(result.state == -1) { return result; }
 
                 if(current_t->matches(TT_KEYWORD, KEYWORD_END) == false) {
-                    InvalidSyntaxError e;
-                    e.init(current_t->start, current_t->end, "Expected 'END'");
-                    e.extra = 1;
-                    return result.failure(e);
+                    return result.failure(create_syntax_error("'END'", 1));
                 }
 
                 result.register_advance(advance());
@@ -835,10 +772,7 @@ class Parser {
             node->set_type(NODE_FUNC_DEF);
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_FUNC) == false) {
-                InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected 'FUNC'");
-                e.extra = 1;
-                return result.failure(e);
+                return result.failure(create_syntax_error("'FUNC'", 1));
             }
 
             result.register_advance(advance());
@@ -848,19 +782,13 @@ class Parser {
                 result.register_advance(advance());
 
                 if(current_t->type != TT_LPAREN) {
-                    InvalidSyntaxError e;
-                    e.init(current_t->start, current_t->end, "Expected '('");
-                    e.extra = 1;
-                    return result.failure(e);
+                    return result.failure(create_syntax_error("'('", 1));
                 }
 
                 node->set_token(var_name);
             } else {
                 if(current_t->type != TT_LPAREN) {
-                    InvalidSyntaxError e;
-                    e.init(current_t->start, current_t->end, "Expected identifier or '('");
-                    e.extra = 1;
-                    return result.failure(e);
+                    return result.failure(create_syntax_error("identifier or '('", 1));
                 }
             }
 
@@ -876,8 +804,7 @@ class Parser {
                     result.register_advance(advance());
                     
                     if(current_t->type != TT_IDENFIFIER) {
-                        id_e.init(current_t->start, current_t->end, "Expected identifier");
-                        id_e.extra = 1;
+                        id_e = create_syntax_error("identifier", 1);
                         identifier_errored_out = true;
                         break;
                     }
@@ -887,14 +814,12 @@ class Parser {
                 }
 
                 if(identifier_errored_out == false && current_t->type != TT_RPAREN) {
-                    id_e.init(current_t->start, current_t->end, "Expected ',' or ')'");
-                    id_e.extra = 1;
+                    id_e = create_syntax_error("',' or ')'", 1);
                     identifier_errored_out = true;
                 }
             } else {
                 if(current_t->type != TT_RPAREN) {
-                    id_e.init(current_t->start, current_t->end, "Expected identifier or ')'");
-                    id_e.extra = 1;
+                    id_e = create_syntax_error("identifier or ')'", 1);
                     identifier_errored_out = true;
                 }
             }
@@ -911,12 +836,8 @@ class Parser {
                 if(result.state == -1) { return result; }
 
                 if(current_t->matches(TT_KEYWORD, KEYWORD_END) == false) {
-                    InvalidSyntaxError e;
-                    e.init(current_t->start, current_t->end, "Expected 'END'");
-                    e.extra = 1;
-                    return result.failure(e);
+                    return result.failure(create_syntax_error("'END'", 1));
                 }
-
                 result.register_advance(advance());
 
                 node->set_end(expr.node->end);
@@ -930,15 +851,19 @@ class Parser {
                 node->set_end(expr.node->end);
                 node->set_func_def_expression_result(expr.node);
             } else {
-                InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected '->' or NEWLINE");
-                e.extra = 1;
-                return result.failure(e);
+                return result.failure(create_syntax_error("'->' or NEWLINE", 1));
             }
 
             node->set_func_def_argument_tokens_result(arguments);
             result.set_node(node);
 
             return result.success();
+        }
+
+        InvalidSyntaxError create_syntax_error(string exp, int extra = 0) {
+            InvalidSyntaxError e;
+            e.init(current_t->start, current_t->end, "Expected " + exp);
+            e.extra = extra;
+            return e;
         }
 };
