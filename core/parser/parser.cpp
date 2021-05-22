@@ -742,8 +742,8 @@ class Parser {
             ParserResult condition = result.register_result(expression());
             if(result.state == -1) { return result; }
 
-            if(current_t->matches(TT_KEYWORD, KEYWORD_THEN) == false) {
-                return result.failure(create_syntax_error("'THEN'", 1));
+            if(current_t->type != TT_LCBRACKET) {
+                return result.failure(create_syntax_error("'{'", 1));
             }
 
             result.register_advance(advance());
@@ -754,8 +754,8 @@ class Parser {
                 ParserResult expr = result.register_result(statements());
                 if(result.state == -1) { return result; }
 
-                if(current_t->matches(TT_KEYWORD, KEYWORD_END) == false) {
-                    return result.failure(create_syntax_error("'END'", 1));
+                if(current_t->type != TT_RCBRACKET) {
+                    return result.failure(create_syntax_error("'}'", 1));
                 }
 
                 result.register_advance(advance());
