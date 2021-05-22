@@ -104,8 +104,8 @@ bool runTests(Runner* runner) {
     passed += runIntegerTest(runner, "Loops 1 (VAR l_1 = 1)", "VAR l_1 = 1", 1);
     passed += runIntegerTest(runner, "Loops 2 (VAR l_2 = 1)", "VAR l_2 = 1", 1);
     passed += runIntegerTest(runner, "Loops 3 (VAR l_3 = 1)", "VAR l_3 = 1", 1);
-    passed += runIntegerTest(runner, "Loops 4 (FOR i = 1 TO 6 THEN VAR l_1 = l_1 * i)", "FOR i = 1 TO 6 THEN VAR l_1 = l_1 * i", 0);
-    passed += runIntegerTest(runner, "Loops 5 (FOR i = -1 TO -6 STEP -1 THEN VAR l_2 = l_2 * i)", "FOR i = -1 TO -6 STEP -1 THEN VAR l_2 = l_2 * i", 0);
+    passed += runIntegerTest(runner, "Loops 4 (FOR (VAR i = 1) TO 6 THEN VAR l_1 = l_1 * i)", "FOR (VAR i = 1) TO 6 THEN VAR l_1 = l_1 * i", 0);
+    passed += runIntegerTest(runner, "Loops 5 (FOR (VAR i = -1) TO -6 STEP -1 THEN VAR l_2 = l_2 * i)", "FOR (VAR i = -1) TO -6 STEP -1 THEN VAR l_2 = l_2 * i", 0);
     passed += runIntegerTest(runner, "Loops 6 (l_1)", "l_1", 120);
     passed += runIntegerTest(runner, "Loops 7 (l_2)", "l_2", -120);
     passed += runIntegerTest(runner, "Loops 8 (WHILE l_3 < 100 THEN VAR l_3 = l_3 + 1)", "WHILE l_3 < 100 THEN VAR l_3 = l_3 + 1", 0);

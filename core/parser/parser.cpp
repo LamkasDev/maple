@@ -661,19 +661,9 @@ class Parser {
 
             result.register_advance(advance());
 
-            if(current_t->type != TT_IDENFIFIER) {
+            if(current_t->type != TT_LPAREN) {
                 InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected identifier");
-                e.extra = 1;
-                return result.failure(e);
-            }
-
-            Token* var_name = current_t;
-            result.register_advance(advance());
-
-            if(current_t->type != TT_EQ) {
-                InvalidSyntaxError e;
-                e.init(current_t->start, current_t->end, "Expected '='");
+                e.init(current_t->start, current_t->end, "Expected '('");
                 e.extra = 1;
                 return result.failure(e);
             }
@@ -682,6 +672,21 @@ class Parser {
 
             ParserResult start_value = result.register_result(expression());
             if(result.state == -1) { return result; }
+            if(start_value.node->type != NODE_ASSIGNMENT) {
+                InvalidSyntaxError e;
+                e.init(current_t->start, current_t->end, "Expected assigment");
+                e.extra = 1;
+                return result.failure(e);
+            }
+
+            if(current_t->type != TT_RPAREN) {
+                InvalidSyntaxError e;
+                e.init(current_t->start, current_t->end, "Expected ')'");
+                e.extra = 1;
+                return result.failure(e);
+            }
+
+            result.register_advance(advance());
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_TO) == false) {
                 InvalidSyntaxError e;
@@ -737,7 +742,7 @@ class Parser {
                 node->set_for_expr_result(expr.node);
             }
             
-            node->set_token(var_name);
+            node->set_token(start_value.node->token);
             node->set_for_start_result(start_value.node);
             node->set_for_end_result(end_value.node);
             result.set_node(node);
