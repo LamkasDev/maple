@@ -37,7 +37,11 @@ class Parser {
         ParserResult parse() {
             ParserResult res = statements();
             if(res.state != -1 && current_t->type != TT_EOF) {
-                return res.failure(create_syntax_error("'+', '-', '*', '/', '^', '==', '!=', '<', '>', '<=', '>=', 'AND' or 'OR'"));
+                if(res.e.extra == 1) {
+                    return res;
+                } else {
+                    return res.failure(create_syntax_error("'+', '-', '*', '/', '^', '==', '!=', '<', '>', '<=', '>=', 'AND' or 'OR'"));
+                }
             }
 
             return res;
@@ -502,6 +506,12 @@ class Parser {
             if(current_t->matches(TT_KEYWORD, KEYWORD_ELSE)) {
                 result.register_advance(advance());
 
+                if(current_t->type != TT_LCBRACKET) {
+                    return result.failure(create_syntax_error("'{'", 1));
+                }
+
+                result.register_advance(advance());
+
                 if(current_t->type == TT_NEWLINE) {
                     result.register_advance(advance());
 
@@ -509,10 +519,10 @@ class Parser {
                     if(result.state == -1) { return result; }
                     node->set_else_result(all_statements.node);
 
-                    if(current_t->matches(TT_KEYWORD, KEYWORD_END)) {
+                    if(current_t->type == TT_RCBRACKET) {
                         result.register_advance(advance());
                     } else {
-                        return result.failure(create_syntax_error("'END'", 1));
+                        return result.failure(create_syntax_error("'}'", 1));
                     }
                 } else {
                     ParserResult else_case = result.register_result(expression());
@@ -580,8 +590,8 @@ class Parser {
 
             result.register_advance(advance());
 
-            if(current_t->matches(TT_KEYWORD, KEYWORD_THEN) == false) {
-                return result.failure(create_syntax_error("'THEN'", 1));
+            if(current_t->type != TT_LCBRACKET) {
+                return result.failure(create_syntax_error("'{'", 1));
             }
 
             result.register_advance(advance());
@@ -594,10 +604,13 @@ class Parser {
                 cases.push_back(condition.node);
                 cases.push_back(all_statements.node);
 
-                if(current_t->matches(TT_KEYWORD, KEYWORD_END)) {
-                    result.register_advance(advance());
-                } else {
-                    //TODO: CHECK
+                if(current_t->type != TT_RCBRACKET) {
+                    return result.failure(create_syntax_error("'}'", 1));
+                }
+
+                result.register_advance(advance());
+
+                if(current_t->matches(TT_KEYWORD, KEYWORD_ELIF) || current_t->matches(TT_KEYWORD, KEYWORD_ELSE)) {
                     ParserResult all_cases = result.register_result(if_expr_b_or_c());
                     if(result.state == -1) { return result; }
                     for(Node* _node : all_cases.node->if_results) {
