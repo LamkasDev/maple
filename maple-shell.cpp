@@ -12,7 +12,7 @@ using namespace std;
 
 const string VERSION = "0.7.2";
 
-void printResult(RunResult result, bool print_result, bool print_debug) {
+void print_result(RunResult result, bool prints_result, bool prints_debug) {
     if(result.makeTokensResult.state == -1) {
         printf("%s \n\n", result.makeTokensResult.e.as_string().c_str());
     } else if(result.parserResult.state == -1) {
@@ -20,13 +20,30 @@ void printResult(RunResult result, bool print_result, bool print_debug) {
     } else if(result.interpreterResult.state == -1) {
         printf("%s \n", result.interpreterResult.e.as_string().c_str());
     } else {
-        if(print_debug == true) {
+        if(prints_debug == true) {
             printf("Tokens - %s \n", print_tree(result.makeTokensResult.tokens).c_str());
             printf("Nodes - %s \n", ("(" + print_node(result.parserResult) + ")").c_str());
         }
-        if(print_result == true) {
+        if(prints_result == true) {
             printf("Result - %s \n\n", ("[" + result.interpreterResult.type + "] " +  result.interpreterResult.repr()).c_str());
         }
+    }
+}
+
+bool run_file(Runner* runner, string location, bool prints_result, bool prints_debug) {
+    ifstream file;
+    file.open(location);
+    if(!file) {
+        printf("File doesn't exist-");
+        return 1;
+    } else {
+        stringstream stream;
+        stream << file.rdbuf();
+        string contents = stream.str();
+
+        RunResult result = runner->run("<file>", contents);
+        print_result(result, prints_result, prints_debug);
+        return 0;
     }
 }
 
@@ -38,21 +55,7 @@ int main(int argc, char** argv) {
     if(argc >= 2) {
         if(string(argv[1]) == "-run") {
             if(argc >= 3) {
-                ifstream file;
-                file.open(string(argv[2]));
-                if(!file) {
-                    printf("File doesn't exist-");
-                    exit(1);
-                } else {
-                    stringstream stream;
-                    stream << file.rdbuf();
-                    string contents = stream.str();
-
-                    RunResult result = runner->run("<file>", contents);
-                    printResult(result, false, debug_mode);
-
-                    exit(0);
-                }
+                exit(run_file(runner, string(argv[2]), false, false));
             } else {
                 printf("No file name was specified-");
                 exit(1);
@@ -71,25 +74,35 @@ int main(int argc, char** argv) {
     }
 
     printf("[Maple %s] C++ based programming language\n", VERSION.c_str());
-    printf("Commands: exit(), tests()\n");
+    printf("Commands: run(), tests(), exit()\n");
 
-    char s[512];
+    char s[8192];
     string _s;
     while(true) {
         printf("%s", ">>> ");
         scanf("%[^\n]%*c", &s);
         _s = string(s);
 
-        if(_s == "exit()") {
-            printf("Bye bye~");
-            break;
-        } else if(_s == "tests()") {
+        if(_s == "tests()") {
             runTests(runner);
+            break;
+        } else if(_s == "run()") {
+            char s2[1024];
+            string _s2;
+
+            printf("%s", "Enter file location: ");
+            scanf("%[^\n]%*c", &s2);
+            _s2 = string(s2);
+
+            run_file(runner, _s2, true, debug_mode);
+            continue;
+        } else if(_s == "exit()") {
+            printf("Bye bye~");
             break;
         }
         
         RunResult result = runner->run("<stdin>", _s);
-        printResult(result, true, debug_mode);
+        print_result(result, true, debug_mode);
     }
 
     exit(0);
