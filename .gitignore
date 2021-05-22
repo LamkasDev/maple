@@ -1,6 +1,6 @@
 .vscode/
 .VSCodeCounter/
 
-samples/
 maple-shell.exe
 maple-shell.o
+maple-shell
