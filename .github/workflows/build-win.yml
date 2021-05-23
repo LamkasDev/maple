@@ -1,5 +1,5 @@
 name: release-win
-on: []
+on: workflow_dispatch
 jobs:
   release-win:
     runs-on: windows-latest
