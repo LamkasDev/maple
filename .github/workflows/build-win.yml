@@ -1,0 +1,10 @@
+name: release-win
+jobs:
+  release-win:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install tools
+        run: choco install make
+      - name: Compile shell
+        run: make

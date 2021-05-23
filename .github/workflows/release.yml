@@ -1,0 +1,24 @@
+name: release
+on:
+  release:
+    types: [created]
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Compile Shell (Linux)
+        uses: ./.github/workflows/build-ubuntu
+      - name: Upload the artifacts (Linux)
+        uses: skx/github-action-publish-binaries@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: 'maple-shell'
+      - name: Compile Shell (Windows)
+        uses: ./.github/workflows/build-win
+      - name: Upload the artifacts (Windows)
+        uses: skx/github-action-publish-binaries@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: 'maple-shell.exe'
