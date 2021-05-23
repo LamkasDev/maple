@@ -275,9 +275,11 @@ class Interpreter {
                 i += step_value.get_value();
 
                 InterpreterResult expr = res.register_result(visit_node(node->for_expr_result, context));
-                if(res.should_return() && res.loop_should_continue == false && res.loop_should_break == false) { break; }
-                if(res.loop_should_continue == true) { continue; }
-                if(res.loop_should_break == true) { break; }
+
+                if(res.state == -1) { break; }
+                if(res.loop_should_continue == true) { res.reset(); continue; }
+                if(res.loop_should_break == true) { res.reset(); break; }
+                if(res.has_return_value == true) { res.set_from(expr); res.reset(); break; }
             }
             if(res.should_return()) { return res; }
 
@@ -293,9 +295,11 @@ class Interpreter {
                 if(res.should_return() || condition.is_true() == false) { break; }
 
                 InterpreterResult expr = res.register_result(visit_node(node->while_expr_result, context));
-                if(res.should_return() && res.loop_should_continue == false && res.loop_should_break == false) { break; }
-                if(res.loop_should_continue == true) { continue; }
-                if(res.loop_should_break == true) { break; }
+
+                if(res.state == -1) { break; }
+                if(res.loop_should_continue == true) { res.reset(); continue; }
+                if(res.loop_should_break == true) { res.reset(); break; }
+                if(res.has_return_value == true) { res.set_from(expr); res.reset(); break; }
             }
             if(res.should_return()) { return res; }
 
@@ -447,10 +451,9 @@ class Interpreter {
             for(Node* _node : node->statements_nodes_result) {
                 InterpreterResult expr = res.register_result(visit_node(_node, context));
                 res.set_from(expr);
-
-                if(res.state == -1) { break; }
+                if(res.should_return()) { break; }
             }
-            if(res.state == -1) { return res; }
+            if(res.should_return()) { return res; }
 
             return res.success();
         }
