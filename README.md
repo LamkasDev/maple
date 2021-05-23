@@ -36,6 +36,7 @@
         For loops (<code>FOR</code>, <code>TO</code>, <code>STEP?</code>)<br />
         While loops (<code>WHILE</code>)<br />
         Functions (<code>FUNC</code>)
+        Other (<code>RETURN</code>, <code>BREAK</code>, <code>CONTINUE</code>)
     </p>
     <h3>Is that all?</h3>
     <p>
