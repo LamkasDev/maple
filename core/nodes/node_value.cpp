@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 using namespace std;
 
 const string NODE_VALUE_UNKNOWN = "UNKNOWN";

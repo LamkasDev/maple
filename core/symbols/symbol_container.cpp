@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 using namespace std;
 
 const string SYMBOL_UNKNOWN = "UNKNOWN";

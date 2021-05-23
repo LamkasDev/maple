@@ -1,7 +1,4 @@
 #pragma once
-#include <string>
-#include <map>
-#include "../builtin/builtin_runner.cpp"
 using namespace std;
 
 class Interpreter {

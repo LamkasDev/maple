@@ -1,7 +1,4 @@
 #pragma once
-#include <string>
-#include <map>
-#include <stdexcept>
 #include "symbol_container.cpp"
 using namespace std;
 

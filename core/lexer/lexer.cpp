@@ -1,6 +1,6 @@
 #pragma once
-#include <string>
 #include "../utils.cpp"
+#include "../errors/error_types.cpp"
 using namespace std;
 
 class Lexer {

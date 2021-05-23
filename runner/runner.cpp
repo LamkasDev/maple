@@ -1,17 +1,16 @@
 #pragma once
-#include <string>
-#include <iostream>
-#include <list>
 
 #include "runner_result.cpp"
 
 #include "../core/context.cpp"
-#include "../core/error.cpp"
 #include "../core/position.cpp"
 #include "../core/token.cpp"
 #include "../core/utils.cpp"
 
 #include "../core/builtin/builtin_runner.cpp"
+
+#include "../core/errors/error_types.cpp"
+#include "../core/errors/error.cpp"
 
 #include "../core/interpreter/interpreter.cpp"
 #include "../core/interpreter/interpreter_result.cpp"

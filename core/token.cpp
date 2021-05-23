@@ -1,8 +1,5 @@
 #pragma once
-#include <vector>
-#include <string>
-#include <list>
-#include "error.cpp"
+#include "errors/error.cpp"
 using namespace std;
 
 const vector<string> KEYWORDS { "VAR", "AND", "OR", "NOT", "IF", "ELSE", "ELIF", "FOR", "TO", "STEP", "WHILE", "FUNC", "RETURN", "CONTINUE", "BREAK" }; 

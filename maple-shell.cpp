@@ -6,6 +6,12 @@
 #include <sstream>
 #include <string>
 
+#include <algorithm>
+#include <vector>
+#include <list>
+#include <map>
+#include <stdexcept>
+
 #include "runner/runner.cpp"
 #include "tests/tests.cpp"
 using namespace std;

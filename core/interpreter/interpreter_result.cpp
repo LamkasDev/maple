@@ -1,5 +1,5 @@
 #pragma once
-#include <string>
+#include "../errors/error_types.cpp"
 #include "../../structures/number.cpp"
 #include "../../structures/function.cpp"
 #include "../../structures/string.cpp"

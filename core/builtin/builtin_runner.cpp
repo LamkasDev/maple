@@ -1,6 +1,4 @@
 #pragma once
-#include <string>
-#include "../interpreter/interpreter_result.cpp"
 using namespace std;
 
 class BuiltInRunner {

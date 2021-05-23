@@ -1,9 +1,6 @@
 #pragma once
-#include <string>
-#include "../token.cpp"
-#include "../position.cpp"
-#include "../parser/parser_result.cpp"
 #include "node_value.cpp"
+#include "../token.cpp"
 using namespace std;
 
 const string NODE_UNKNOWN = "UNKNOWN";
