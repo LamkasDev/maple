@@ -59,10 +59,8 @@ class Lexer {
                     }
 
                     case '/': {
-                        Token* t = new Token();
-                        t->init(TT_DIV);
-                        t->set_start(pos);
-                        result.tokens.push_back(t); advance();
+                        result = process_slash(result);
+                        if(result.state == -1) { return result; }
                         break;
                     }
 
@@ -155,8 +153,8 @@ class Lexer {
                     }
 
                     case '!': {
-                        Token* t = make_not_equals();
-                        //TODO: RETURN ERROR
+                        Token* t = make_not_equals(result);
+                        if(result.state == -1) { return result; }
                         result.tokens.push_back(t);
                         break;
                     }
@@ -283,7 +281,7 @@ class Lexer {
             return t;
         }
 
-        Token* make_not_equals() {
+        Token* make_not_equals(MakeTokensResult result) {
             string str;
             Token* t = new Token();
             t->set_start(pos.copy());
@@ -296,7 +294,8 @@ class Lexer {
             } else {
                 ExpectedCharacterError e;
                 e.init(pos.copy(), pos.copy(), "'=' (after '!')");
-                //RETURN ERROR
+                result.e = e;
+                result.state = -1;
             }
             
             return t;
@@ -364,5 +363,51 @@ class Lexer {
             }
 
             return t;
+        }
+
+        MakeTokensResult process_slash(MakeTokensResult result) {
+            Token* t = new Token();
+            t->init(TT_DIV);
+            t->set_start(pos.copy());
+            t->set_end(pos.copy());
+
+            advance();
+            if(current_c == '/') {
+                advance();
+                skip_comment();
+                return result;
+            } else if(current_c == '*') {
+                advance();
+                result = skip_long_comment(result);
+                return result;
+            }
+
+            result.tokens.push_back(t);
+            return result;
+        }
+
+        void skip_comment() {
+            while(current_c != '\n') {
+                advance();
+            }
+            advance();
+        }
+
+        MakeTokensResult skip_long_comment(MakeTokensResult result) {
+    	    while(current_c != '*') {
+                advance();
+            }
+            advance();
+
+            if(current_c == '/') {
+                advance();
+            } else {
+                ExpectedCharacterError e;
+                e.init(pos.copy(), pos.copy(), "'/'");
+                result.e = e;
+                result.state = -1;
+            }
+
+            return result;
         }
 };
