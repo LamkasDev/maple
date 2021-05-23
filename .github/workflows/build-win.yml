@@ -1,9 +1,7 @@
-name: release-win
-on:
-  release:
-    types: [created]
+name: build-win
+on: [push, pull_request]
 jobs:
-  release-win:
+  build-win:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -12,6 +10,6 @@ jobs:
       - name: Compile shell
         run: make
       - uses: actions/upload-artifact@v2
-          with:
-            name: maple-shell.exe
-            path: maple-shell.exe
+        with:
+          name: maple-shell.exe
+          path: maple-shell.exe

@@ -1,9 +1,7 @@
-name: release-ubuntu
-on:
-  release:
-    types: [created]
+name: build-ubuntu
+on: [push, pull_request]
 jobs:
-  release-ubuntu:
+  build-ubuntu:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -12,6 +10,6 @@ jobs:
       - name: Compile shell
         run: make
       - uses: actions/upload-artifact@v2
-          with:
-            name: maple-shell
-            path: maple-shell
+        with:
+          name: maple-shell
+          path: maple-shell
