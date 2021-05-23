@@ -11,6 +11,7 @@
     <p>Extension (.maple)</p>
     <div align="center">
         <img src="https://img.shields.io/github/workflow/status/LamkasDev/maple/run-tests" />
+        <img src="https://img.shields.io/github/v/release/LamkasDev/maple" />
         <img src="https://img.shields.io/github/contributors/LamkasDev/maple" />
         <img src="https://img.shields.io/bitbucket/issues-raw/LamkasDev/maple" />
     </div>
@@ -18,18 +19,21 @@
 
 <div align="center">
     <h4>Quick Start</h4>
-    <p>Read <a href="https://github.com/LamkasDev/maple/wiki">here</a> (soon)</p>
-    <h4>Contributing</h4>
-    <p>That's great! Make a <a href="https://github.com/LamkasDev/maple/pulls">pull request</a>~</p>
+    <p>
+        You can grab the latest release <a href="https://github.com/LamkasDev/maple/releases">here</a>~<br />
+        Also check out the guide <a href="https://github.com/LamkasDev/maple/wiki">here</a> (soon)
+    </p>
+    <h4>Want to contribute?</h4>
+    <p>That's great! Make a <a href="https://github.com/LamkasDev/maple/pulls">pull request</a>~
 </div>
 
 <hr />
 
 <div align="center">
-    <h3>🔥 Features</h3>
+    <h3>Features</h3>
     <p>
-        Basic math operations (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>^</code>)<br />
         Support for integers, floats and strings<br />
+        Basic math operations (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>^</code>)<br />
         Variables (<code>VAR</code>)<br />
         Logical operators (<code>==</code>, <code><</code>, <code>></code>, <code><=</code>, <code>>=</code>, <code>AND</code>, <code>OR</code>)<br />
         Conditional expressions (<code>IF</code>, <code>ELIF?</code>, <code>ELSE?</code>)<br />
@@ -42,12 +46,16 @@
     <p>
         For now, yes-
     </p>
+    <h3>Are there some examples?</h3>
+    <p>
+        Yes, examples are in <a href="https://github.com/LamkasDev/maple/tree/master/samples">here</a>, I'll add more once I'm not lazy~
+    </p>
 </div>
 
 <hr />
 
 <div align="center">
-    <h3>Compiling the shell</h3>
+    <h3>Want to compile yourself?</h3>
     <p>
         Requirements: <code>g++</code> 5.1 or later and <code>make</code> 3.81 or later<br />
         After you have all required tools, run <code>make</code><br /><br />
@@ -58,25 +66,14 @@
         g++ and make: Run <code>sudo apt-get install g++ build-essential</code><br /><br />
         <b>(Instructions - macOS)</b><br />
         g++ and make: Run <code>g++ -v</code> (installs automatically)<br />
-        <br />
     </p>
     <hr />
     <h3>Commands</h3>
     <p>
         <code>.\maple-shell</code> - Starts the standard shell to execute Maple code<br />
-        <code>.\maple-shell -d</code> - Starts the standard shell with extra debug info<br />
-        <code>.\maple-shell -tests</code> - Runs the default test suite<br />
+        <code>.\maple-shell -d</code> - Starts the standard shell with extra debug info<br /><br />
         <code>.\maple-shell -v</code> - Shows the current version and information<br />
+        <code>.\maple-shell -tests</code> - Runs the default test suite<br />
         <code>.\maple-shell -run [file_name].maple</code> - Runs a specified <code>.maple</code> file
-    </p>
-    <h3>Changelog</h3>
-    <p>
-        <code>Maple - 0.7</code> - Strings<br />
-        <code>Maple - 0.6</code> - Functions<br />
-        <code>Maple - 0.5</code> - For/While loops<br />
-        <code>Maple - 0.4</code> - Conditional expressions<br />
-        <code>Maple - 0.3</code> - Logical operators<br />
-        <code>Maple - 0.2</code> - Variable accessing/assigning<br />
-        <code>Maple - 0.0.1</code> - First release<br />
     </p>
 </div>
