@@ -1,21 +1,19 @@
-name: release
-on:
-  release:
-    types: [created]
+name: release-publish
+on: workflow_dispatch
 jobs:
-  release:
+  release-publish:
     runs-on: ubuntu-latest
     steps:
-      - name: Compile Shell (Linux)
-        uses: LamkasDev/maple-build-ubuntu@main
+      - name: Download created artifacts (Linux)
+        run: wget -O maple-shell https://lamkas.dev/public/maple/maple-shell
+      - name: Download created artifacts (Windows)
+        run: wget -O maple-shell.exe https://lamkas.dev/public/maple/maple-shell.exe
       - name: Upload the artifacts (Linux)
         uses: skx/github-action-publish-binaries@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           args: 'maple-shell'
-      - name: Compile Shell (Windows)
-        uses: LamkasDev/maple-build-win@main
       - name: Upload the artifacts (Windows)
         uses: skx/github-action-publish-binaries@master
         env:
