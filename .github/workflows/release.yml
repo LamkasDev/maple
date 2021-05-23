@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Compile Shell (Linux)
-        uses: ../.github/workflows/build-ubuntu
+        uses: ./workflows/build-ubuntu
       - name: Upload the artifacts (Linux)
         uses: skx/github-action-publish-binaries@master
         env:
@@ -15,7 +15,7 @@ jobs:
         with:
           args: 'maple-shell'
       - name: Compile Shell (Windows)
-        uses: ../.github/workflows/build-win
+        uses: ./workflows/build-win
       - name: Upload the artifacts (Windows)
         uses: skx/github-action-publish-binaries@master
         env:
