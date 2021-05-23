@@ -35,7 +35,7 @@
         Conditional expressions (<code>IF</code>, <code>ELIF?</code>, <code>ELSE?</code>)<br />
         For loops (<code>FOR</code>, <code>TO</code>, <code>STEP?</code>)<br />
         While loops (<code>WHILE</code>)<br />
-        Functions (<code>FUNC</code>)
+        Functions (<code>FUNC</code>)<br />
         Other (<code>RETURN</code>, <code>BREAK</code>, <code>CONTINUE</code>)
     </p>
     <h3>Is that all?</h3>
