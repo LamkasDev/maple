@@ -1,4 +1,5 @@
 name: release-win
+on: []
 jobs:
   release-win:
     runs-on: windows-latest
