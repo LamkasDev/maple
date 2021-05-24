@@ -413,13 +413,14 @@ class Interpreter {
         }
 
         void populate_args(Node* node, Context* context, InterpreterResult res, list<Node*> arguments, Function function) {
+            int i = 0;
             for(Node* arg : arguments) {
-                Token* token = function.arguments.back();
+                Token* token = function.arguments.at(i);
                 InterpreterResult arg_res = res.register_result(visit_node(arg, context));
                 if(arg_res.should_return()) { break; }
 
                 save_to_context(token->value_string, arg_res, context);
-                function.arguments.pop_back();
+                i++;
             }
         }
 

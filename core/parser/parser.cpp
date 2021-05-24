@@ -739,7 +739,7 @@ class Parser {
 
         ParserResult func_def() {
             ParserResult result;
-            list<Token*> arguments;
+            vector<Token*> arguments;
 
             Node* node = new Node();
             node->set_start(current_t->start);

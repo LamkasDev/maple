@@ -11,7 +11,7 @@ class BuiltInRunner {
             t_name->init(name);
             f.set_name(t_name);
 
-            list<Token*> arguments_tokens;
+            vector<Token*> arguments_tokens;
             for(string argument : arguments) {
                 TokenString* t_argument = new TokenString();
                 t_argument->init(argument);

@@ -9,7 +9,7 @@ class Function {
         Context* context = nullptr;
 
         Token* name = nullptr;
-        list<Token*> arguments;
+        vector<Token*> arguments;
         Node* expression = nullptr;
         bool built_in = false;
 
@@ -26,7 +26,7 @@ class Function {
             name = _name;
         }
 
-        void set_arguments(list<Token*> _arguments) {
+        void set_arguments(vector<Token*> _arguments) {
             arguments = _arguments;
         }
 
