@@ -16,7 +16,7 @@ class InterpreterResult {
         IntNumber res_int;
         FloatNumber res_float;
         String res_string;
-        Function res_func;
+        Function* res_func;
 
         bool has_return_value = false;
         bool loop_should_continue = false;
@@ -100,7 +100,7 @@ class InterpreterResult {
             type = NODE_FLOAT;
         }
 
-        void set_from(Function _res_func) {
+        void set_from(Function* _res_func) {
             res_func = _res_func;
             type = NODE_FUNC_DEF;
         }
@@ -380,7 +380,7 @@ class InterpreterResult {
             } else if(type == NODE_FLOAT) {
                 return res_float.context;
             } else if(type == NODE_FUNC_DEF) {
-                return res_func.context;
+                return res_func->context;
             } else if(type == NODE_STRING) {
                 return res_string.context;
             } else {
@@ -394,7 +394,7 @@ class InterpreterResult {
             } else if(type == NODE_FLOAT) {
                 return res_float.repr();
             } else if(type == NODE_FUNC_DEF) {
-                return res_func.repr();
+                return res_func->repr();
             } else if(type == NODE_STRING) {
                 return res_string.repr();
             } else {

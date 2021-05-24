@@ -3,13 +3,13 @@ using namespace std;
 
 class BuiltInRunner {
     public:
-        Function create_builtin_function(string name, list<string> arguments) {
-            Function f;
-            f.built_in = true;
+        Function* create_builtin_function(string name, list<string> arguments) {
+            Function* f = new Function();
+            f->built_in = true;
 
             TokenString* t_name = new TokenString();
             t_name->init(name);
-            f.set_name(t_name);
+            f->set_name(t_name);
 
             vector<Token*> arguments_tokens;
             for(string argument : arguments) {
@@ -18,21 +18,21 @@ class BuiltInRunner {
                 arguments_tokens.push_back(t_argument);
             }
 
-            f.set_arguments(arguments_tokens);
+            f->set_arguments(arguments_tokens);
             return f;
         }
 
-        InterpreterResult run(Function function, Context* context) {
+        InterpreterResult run(Function* function, Context* context) {
             InterpreterResult res;
-            if(function.name->value_string == "print") {
+            if(function->name->value_string == "print") {
                 res = run_print(res, function, context);
-            } else if(function.name->value_string == "input") {
+            } else if(function->name->value_string == "input") {
                 res = run_input(res, function, context);
-            } else if(function.name->value_string == "is_nan") {
+            } else if(function->name->value_string == "is_nan") {
                 res = run_is_nan(res, function, context);
-            } else if(function.name->value_string == "parse_int") {
+            } else if(function->name->value_string == "parse_int") {
                 res = run_parse_int(res, function, context);
-            } else if(function.name->value_string == "parse_float") {
+            } else if(function->name->value_string == "parse_float") {
                 res = run_parse_float(res, function, context);
             }
             if(res.state == -1) { return res; }
@@ -40,7 +40,7 @@ class BuiltInRunner {
             return res.success();
         }
 
-        InterpreterResult run_print(InterpreterResult res, Function function, Context* context) {
+        InterpreterResult run_print(InterpreterResult res, Function* function, Context* context) {
             SymbolContainer* value = context->symbol_table->get("value");
             if(value->type != SYMBOL_STRING) {
                 RuntimeError e;
@@ -53,7 +53,7 @@ class BuiltInRunner {
             return res.success();
         }
 
-        InterpreterResult run_input(InterpreterResult res, Function function, Context* context) {
+        InterpreterResult run_input(InterpreterResult res, Function* function, Context* context) {
             char value[512];
             scanf("%[^\n]%*c", &value);
             res.set_from(string(value));
@@ -61,14 +61,14 @@ class BuiltInRunner {
             return res.success();
         }
 
-        InterpreterResult run_is_nan(InterpreterResult res, Function function, Context* context) {
+        InterpreterResult run_is_nan(InterpreterResult res, Function* function, Context* context) {
             SymbolContainer* value = context->symbol_table->get("value");
             res.set_from(value->type != SYMBOL_INT && value->type != SYMBOL_FLOAT);
 
             return res.success();
         }
 
-        InterpreterResult run_parse_int(InterpreterResult res, Function function, Context* context) {
+        InterpreterResult run_parse_int(InterpreterResult res, Function* function, Context* context) {
             SymbolContainer* value = context->symbol_table->get("value");
             try {
                 res.set_from(stoi(value->value_string));
@@ -81,7 +81,7 @@ class BuiltInRunner {
             return res.success();
         }
 
-        InterpreterResult run_parse_float(InterpreterResult res, Function function, Context* context) {
+        InterpreterResult run_parse_float(InterpreterResult res, Function* function, Context* context) {
             SymbolContainer* value = context->symbol_table->get("value");
             try {
                 res.set_from(stof(value->value_string));

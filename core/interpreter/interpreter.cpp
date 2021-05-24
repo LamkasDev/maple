@@ -5,7 +5,7 @@ class Interpreter {
     public:
         BuiltInRunner* builtin_runner = nullptr;
         SymbolTable* global_symbol_table = nullptr;
-        map<string, Function> functions;
+        map<string, Function*> functions;
 
         void init() {
             SymbolContainer* sc_null = new SymbolContainer();
@@ -30,14 +30,14 @@ class Interpreter {
 
         void add_builtin_function(string name) {
             list<string> arguments;
-            Function f = builtin_runner->create_builtin_function(name, arguments);
-            functions[f.name->value_string] = f;
+            Function* f = builtin_runner->create_builtin_function(name, arguments);
+            functions[f->name->value_string] = f;
         }
 
         void add_builtin_function(string name, string arg_1) {
             list<string> arguments; arguments.push_back(arg_1);
-            Function f = builtin_runner->create_builtin_function(name, arguments);
-            functions[f.name->value_string] = f;
+            Function* f = builtin_runner->create_builtin_function(name, arguments);
+            functions[f->name->value_string] = f;
         }
 
         InterpreterResult visit_node(Node* node, Context* context) {
@@ -307,12 +307,12 @@ class Interpreter {
             InterpreterResult res;
             res.init(node->start, node->end);
 
-            Function function;
-            function.set_pos(node->start, node->end);
-            function.set_context(context);
-            function.set_name(node->token);
-            function.set_arguments(node->func_def_argument_tokens_result);
-            function.set_expression(node->func_def_expression_result);
+            Function* function = new Function();
+            function->set_pos(node->start, node->end);
+            function->set_context(context);
+            function->set_name(node->token);
+            function->set_arguments(node->func_def_argument_tokens_result);
+            function->set_expression(node->func_def_expression_result);
             res.set_from(function);
 
             if(node->token != nullptr) {
@@ -366,7 +366,7 @@ class Interpreter {
 
             string func_name = node->token->value_string;
             try {
-                Function function = functions.at(func_name);
+                Function* function = functions.at(func_name);
                 check_args(node, new_context, res, arguments, function);
                 if(res.should_return()) { return res; }
 
@@ -374,8 +374,8 @@ class Interpreter {
                 if(res.should_return()) { return res; }
 
                 InterpreterResult expr;
-                if(function.built_in == false) {
-                    expr = res.register_result(visit_node(function.expression, new_context));
+                if(function->built_in == false) {
+                    expr = res.register_result(visit_node(function->expression, new_context));
                 } else {
                     expr = res.register_result(builtin_runner->run(function, new_context));
                 }
@@ -400,14 +400,14 @@ class Interpreter {
             return new_context;
         }
         
-        void check_args(Node* node, Context* context, InterpreterResult res, list<Node*> arguments, Function function) {
-            if(arguments.size() > function.arguments.size()) {
+        void check_args(Node* node, Context* context, InterpreterResult res, list<Node*> arguments, Function* function) {
+            if(arguments.size() > function->arguments.size()) {
                 RuntimeError e;
-                e.init(node->start, node->end, ((arguments.size() - function.arguments.size()) + " too many args passed into " + node->token->value_string), context);
+                e.init(node->start, node->end, ((arguments.size() - function->arguments.size()) + " too many args passed into " + node->token->value_string), context);
                 res.failure(e);
-            } else if(arguments.size() < function.arguments.size()) {
+            } else if(arguments.size() < function->arguments.size()) {
                 RuntimeError e;
-                e.init(node->start, node->end, ((function.arguments.size() - arguments.size()) + " too few args passed into " + node->token->value_string), context);
+                e.init(node->start, node->end, ((function->arguments.size() - arguments.size()) + " too few args passed into " + node->token->value_string), context);
                 res.failure(e);
             }
         }
