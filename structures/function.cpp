@@ -33,4 +33,8 @@ class Function {
         void set_expression(Node* _expression) {
             expression = _expression;
         }
+
+        string repr() {
+            return name->repr() + "()";
+        }
 };

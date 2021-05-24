@@ -382,7 +382,7 @@ class InterpreterResult {
             } else if(type == NODE_FUNC_DEF) {
                 return res_func.context;
             } else if(type == NODE_STRING) {
-                return res_func.context;
+                return res_string.context;
             } else {
                 return nullptr;
             }
@@ -390,13 +390,13 @@ class InterpreterResult {
 
         string repr() {
             if(type == NODE_INT) {
-                return to_string(res_int.value);
+                return res_int.repr();
             } else if(type == NODE_FLOAT) {
-                return to_string(res_float.value);
+                return res_float.repr();
             } else if(type == NODE_FUNC_DEF) {
-                return res_func.name->value_string;
+                return res_func.repr();
             } else if(type == NODE_STRING) {
-                return res_string.value;
+                return res_string.repr();
             } else {
                 return "";
             }
