@@ -6,7 +6,7 @@ class String {
     public:
         Position start;
         Position end;
-        Context* context = nullptr;
+        shared_ptr<Context> context = nullptr;
         string value = "";
 
         void init(string _value) {
@@ -18,7 +18,7 @@ class String {
             end = _end;
         }
 
-        void set_context(Context* _context) {
+        void set_context(shared_ptr<Context> _context) {
             context = _context;
         }
 

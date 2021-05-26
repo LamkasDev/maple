@@ -11,7 +11,7 @@ class Error {
     public:
         Position start;
         Position end;
-        Context* context = nullptr;
+        shared_ptr<Context> context = nullptr;
 
         string type = ERROR_UNKNOWN;
         string name = "";
@@ -41,7 +41,7 @@ class Error {
         string generate_traceback() {
             string res = "";
             Position _start = start;
-            Context* _context = context;
+            shared_ptr<Context> _context = context;
             while(_context != nullptr) {
                 res = "  File " + start.fileName + ", line " + to_string(start.line + 1) + ", index " + to_string(start.index) + "-" + to_string(end.index) + " in " + _context->display_name + "\n" + res;
                 _start = _context->parent_entry_pos;

@@ -28,7 +28,7 @@ class InvalidSyntaxError : public Error {
 
 class RuntimeError : public Error {
     public:
-        void init(Position _start, Position _end, string _details, Context* _context) {
+        void init(Position _start, Position _end, string _details, shared_ptr<Context> _context) {
             start = _start;
             end = _end;
 

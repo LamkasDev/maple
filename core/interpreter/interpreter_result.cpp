@@ -384,7 +384,7 @@ class InterpreterResult {
             }
         }
 
-        Context* get_context() {
+        shared_ptr<Context> get_context() {
             if(type == NODE_INT) {
                 return res_int.context;
             } else if(type == NODE_FLOAT) {

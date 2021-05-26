@@ -64,7 +64,7 @@ class Runner {
                 return result;
             }
 
-            Context* context = new Context();
+            shared_ptr<Context> context = make_shared<Context>();
             context->init(_fileName);
             context->set_symbol_table(interpreter->global_symbol_table);
 

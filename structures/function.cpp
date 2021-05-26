@@ -6,7 +6,7 @@ class Function {
     public:
         Position start;
         Position end;
-        Context* context = nullptr;
+        shared_ptr<Context> context = nullptr;
 
         Token* name = nullptr;
         vector<Token*> arguments;
@@ -18,7 +18,7 @@ class Function {
             end = _end;
         }
 
-        void set_context(Context* _context) {
+        void set_context(shared_ptr<Context> _context) {
             context = _context;
         }
 

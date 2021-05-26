@@ -22,7 +22,7 @@ class BuiltInRunner {
             return f;
         }
 
-        InterpreterResult run(Function* function, Context* context) {
+        InterpreterResult run(Function* function, shared_ptr<Context> context) {
             InterpreterResult res;
             if(function->name->value_string == "print") {
                 res = run_print(res, function, context);
@@ -40,7 +40,7 @@ class BuiltInRunner {
             return res.success();
         }
 
-        InterpreterResult run_print(InterpreterResult res, Function* function, Context* context) {
+        InterpreterResult run_print(InterpreterResult res, Function* function, shared_ptr<Context> context) {
             SymbolContainer* value = context->symbol_table->get("value");
             if(value->type != SYMBOL_STRING) {
                 RuntimeError e;
@@ -53,7 +53,7 @@ class BuiltInRunner {
             return res.success();
         }
 
-        InterpreterResult run_input(InterpreterResult res, Function* function, Context* context) {
+        InterpreterResult run_input(InterpreterResult res, Function* function, shared_ptr<Context> context) {
             char value[512];
             scanf("%[^\n]%*c", &value);
             res.set_from(string(value));
@@ -61,14 +61,14 @@ class BuiltInRunner {
             return res.success();
         }
 
-        InterpreterResult run_is_nan(InterpreterResult res, Function* function, Context* context) {
+        InterpreterResult run_is_nan(InterpreterResult res, Function* function, shared_ptr<Context> context) {
             SymbolContainer* value = context->symbol_table->get("value");
             res.set_from(value->type != SYMBOL_INT && value->type != SYMBOL_FLOAT);
 
             return res.success();
         }
 
-        InterpreterResult run_parse_int(InterpreterResult res, Function* function, Context* context) {
+        InterpreterResult run_parse_int(InterpreterResult res, Function* function, shared_ptr<Context> context) {
             SymbolContainer* value = context->symbol_table->get("value");
             try {
                 res.set_from(stoi(value->value_string));
@@ -81,7 +81,7 @@ class BuiltInRunner {
             return res.success();
         }
 
-        InterpreterResult run_parse_float(InterpreterResult res, Function* function, Context* context) {
+        InterpreterResult run_parse_float(InterpreterResult res, Function* function, shared_ptr<Context> context) {
             SymbolContainer* value = context->symbol_table->get("value");
             try {
                 res.set_from(stof(value->value_string));

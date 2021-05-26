@@ -6,7 +6,7 @@ using namespace std;
 class Context {
     public:
         string display_name = "";
-        Context* parent = nullptr;
+        shared_ptr<Context> parent = nullptr;
         Position parent_entry_pos;
         SymbolTable* symbol_table;
 
@@ -14,7 +14,7 @@ class Context {
             display_name = _display_name;
         }
 
-        void set_parent(Context* _parent) {
+        void set_parent(shared_ptr<Context> _parent) {
             parent = _parent;
         }
 

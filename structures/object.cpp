@@ -6,7 +6,7 @@ class Object {
     public:
         Position start;
         Position end;
-        Context* context = nullptr;
+        shared_ptr<Context> context = nullptr;
         int state = 0;
         
         SymbolTable* symbol_table = nullptr;

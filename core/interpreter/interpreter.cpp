@@ -41,7 +41,7 @@ class Interpreter {
             functions[f->name->value_string] = f;
         }
 
-        InterpreterResult visit_node(Node* node, Context* context) {
+        InterpreterResult visit_node(Node* node, shared_ptr<Context> context) {
             InterpreterResult res;
             if(node->type == NODE_INT) {
                 res = visit_int_node(node, context);
@@ -84,7 +84,7 @@ class Interpreter {
             return res;
         }
 
-        InterpreterResult visit_int_node(Node* node, Context* context) {
+        InterpreterResult visit_int_node(Node* node, shared_ptr<Context> context) {
             IntNumber n;
             n.init(node->value->value_int);
             n.set_pos(node->start, node->end);
@@ -98,7 +98,7 @@ class Interpreter {
             return res.success();
         }
 
-        InterpreterResult visit_float_node(Node* node, Context* context) {
+        InterpreterResult visit_float_node(Node* node, shared_ptr<Context> context) {
             FloatNumber n;
             n.init(node->value->value_float);
             n.set_pos(node->start, node->end);
@@ -110,7 +110,7 @@ class Interpreter {
             return res.success();
         }
 
-        InterpreterResult visit_string_node(Node* node, Context* context) {
+        InterpreterResult visit_string_node(Node* node, shared_ptr<Context> context) {
             String n;
             n.init(node->value->value_string);
             n.set_pos(node->start, node->end);
@@ -122,7 +122,7 @@ class Interpreter {
             return res.success();
         }
 
-        InterpreterResult visit_object_new_node(Node* node, Context* context) {
+        InterpreterResult visit_object_new_node(Node* node, shared_ptr<Context> context) {
             Object* n = new Object();
             n->set_pos(node->start, node->end);
 
@@ -133,7 +133,7 @@ class Interpreter {
             return res.success();
         }
 
-        InterpreterResult visit_unary_node(Node* node, Context* context) {
+        InterpreterResult visit_unary_node(Node* node, shared_ptr<Context> context) {
             InterpreterResult res;
             res.init(node->start, node->end);
 
@@ -161,7 +161,7 @@ class Interpreter {
             return res.success();
         }
 
-        InterpreterResult visit_binary_node(Node* node, Context* context) {
+        InterpreterResult visit_binary_node(Node* node, shared_ptr<Context> context) {
             InterpreterResult res;
             res.init(node->start, node->end);
             
@@ -182,7 +182,7 @@ class Interpreter {
             return res.success();
         }
 
-        InterpreterResult visit_variable_access_node(Node* node, Context* context) {
+        InterpreterResult visit_variable_access_node(Node* node, shared_ptr<Context> context) {
             InterpreterResult res;
             res.init(node->start, node->end);
 
@@ -209,7 +209,7 @@ class Interpreter {
             return res.success();
         }
 
-        InterpreterResult visit_variable_assign(Node* node, Context* context) {
+        InterpreterResult visit_variable_assign(Node* node, shared_ptr<Context> context) {
             InterpreterResult res;
             res.init(node->start, node->end);
             
@@ -222,7 +222,7 @@ class Interpreter {
             return res.success();
         }
 
-        InterpreterResult visit_if_node(Node* node, Context* context) {
+        InterpreterResult visit_if_node(Node* node, shared_ptr<Context> context) {
             InterpreterResult res;
             InterpreterResult cond_res;
             InterpreterResult expr_res;
@@ -259,7 +259,7 @@ class Interpreter {
             return res.success();
         }
 
-        InterpreterResult visit_for_node(Node* node, Context* context) {
+        InterpreterResult visit_for_node(Node* node, shared_ptr<Context> context) {
             InterpreterResult res;
             res.init(node->start, node->end);
 
@@ -302,7 +302,7 @@ class Interpreter {
             return res.success();
         }
 
-        InterpreterResult visit_while_node(Node* node, Context* context) {
+        InterpreterResult visit_while_node(Node* node, shared_ptr<Context> context) {
             InterpreterResult res;
             res.init(node->start, node->end);
 
@@ -322,7 +322,7 @@ class Interpreter {
             return res.success();
         }
 
-        InterpreterResult visit_func_def_node(Node* node, Context* context) {
+        InterpreterResult visit_func_def_node(Node* node, shared_ptr<Context> context) {
             InterpreterResult res;
             res.init(node->start, node->end);
 
@@ -341,7 +341,7 @@ class Interpreter {
             return res.success();
         }
 
-        InterpreterResult visit_func_call_node(Node* node, Context* context) {
+        InterpreterResult visit_func_call_node(Node* node, shared_ptr<Context> context) {
             InterpreterResult res;
             res.init(node->start, node->end);
 
@@ -352,7 +352,7 @@ class Interpreter {
             return res.success();
         }
 
-        InterpreterResult visit_return_node(Node* node, Context* context) {
+        InterpreterResult visit_return_node(Node* node, shared_ptr<Context> context) {
             InterpreterResult res;
             res.init(node->start, node->end);
 
@@ -363,25 +363,25 @@ class Interpreter {
             return res.success_return();
         }
 
-        InterpreterResult visit_continue_node(Node* node, Context* context) {
+        InterpreterResult visit_continue_node(Node* node, shared_ptr<Context> context) {
             InterpreterResult res;
             res.init(node->start, node->end);
             return res.success_continue();
         }
 
-        InterpreterResult visit_break_node(Node* node, Context* context) {
+        InterpreterResult visit_break_node(Node* node, shared_ptr<Context> context) {
             InterpreterResult res;
             res.init(node->start, node->end);
             return res.success_break();
         }
 
-        InterpreterResult execute(Node* node, list<Node*> arguments, Context* context) {
+        InterpreterResult execute(Node* node, list<Node*> arguments, shared_ptr<Context> context) {
             InterpreterResult res;
             res.init(node->start, node->end);
 
             Interpreter* interpreter = new Interpreter();
             interpreter->init();
-            Context* new_context = generate_new_context(node, context);
+            shared_ptr<Context> new_context = generate_new_context(node, context);
 
             string func_name = node->token->value_string;
             try {
@@ -409,8 +409,8 @@ class Interpreter {
             }
         }
 
-        Context* generate_new_context(Node* node, Context* context) {
-            Context* new_context = new Context();
+        shared_ptr<Context> generate_new_context(Node* node, shared_ptr<Context> context) {
+            shared_ptr<Context> new_context = make_shared<Context>();
             new_context->init(node->token->value_string);
             new_context->set_parent(context);
             new_context->set_parent_entry_pos(node->start);
@@ -419,7 +419,7 @@ class Interpreter {
             return new_context;
         }
         
-        void check_args(Node* node, Context* context, InterpreterResult res, list<Node*> arguments, Function* function) {
+        void check_args(Node* node, shared_ptr<Context> context, InterpreterResult res, list<Node*> arguments, Function* function) {
             if(arguments.size() > function->arguments.size()) {
                 RuntimeError e;
                 e.init(node->start, node->end, ((arguments.size() - function->arguments.size()) + " too many args passed into " + node->token->value_string), context);
@@ -431,7 +431,7 @@ class Interpreter {
             }
         }
 
-        void populate_args(Node* node, Context* context, InterpreterResult res, list<Node*> arguments, Function* function) {
+        void populate_args(Node* node, shared_ptr<Context> context, InterpreterResult res, list<Node*> arguments, Function* function) {
             int i = 0;
             for(Node* arg : arguments) {
                 Token* token = function->arguments.at(i);
@@ -443,7 +443,7 @@ class Interpreter {
             }
         }
 
-        void save_to_context(string name, InterpreterResult res, Context* context) {
+        void save_to_context(string name, InterpreterResult res, shared_ptr<Context> context) {
             if(res.type == NODE_INT) {
                 SymbolContainer* value = new SymbolContainer();
                 value->init(res.res_int.value);
@@ -463,7 +463,7 @@ class Interpreter {
             }
         }
 
-        InterpreterResult visit_statements_node(Node* node, Context* context) {
+        InterpreterResult visit_statements_node(Node* node, shared_ptr<Context> context) {
             InterpreterResult res;
             res.init(node->start, node->end);
 
