@@ -3,7 +3,7 @@ using namespace std;
 
 class Interpreter {
     public:
-        BuiltInRunner* builtin_runner = nullptr;
+        shared_ptr<BuiltInRunner> builtin_runner = nullptr;
         shared_ptr<SymbolTable> global_symbol_table = nullptr;
         map<string, shared_ptr<Function>> functions;
         map<string, shared_ptr<Object>> objects;
@@ -21,7 +21,7 @@ class Interpreter {
             global_symbol_table->set("TRUE", sc_true);
             global_symbol_table->set("FALSE", sc_false);
 
-            builtin_runner = new BuiltInRunner();
+            builtin_runner = make_shared<BuiltInRunner>();
             add_builtin_function("print", "value");
             add_builtin_function("input");
             add_builtin_function("is_nan", "value");
