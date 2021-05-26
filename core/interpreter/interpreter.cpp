@@ -6,6 +6,7 @@ class Interpreter {
         BuiltInRunner* builtin_runner = nullptr;
         SymbolTable* global_symbol_table = nullptr;
         map<string, Function*> functions;
+        map<string, Object*> objects;
 
         void init() {
             SymbolContainer* sc_null = new SymbolContainer();
@@ -74,6 +75,8 @@ class Interpreter {
                 res = visit_continue_node(node, context);
             } else if(node->type == NODE_BREAK) {
                 res = visit_break_node(node, context);
+            } else if(node->type == NODE_OBJECT_NEW) {
+                res = visit_object_new_node(node, context);
             } else {
                 no_visit_method(node->type);
             }
@@ -114,6 +117,17 @@ class Interpreter {
 
             InterpreterResult res;
             res.init(n.start, n.end);
+            res.set_from(n);
+
+            return res.success();
+        }
+
+        InterpreterResult visit_object_new_node(Node* node, Context* context) {
+            Object* n = new Object();
+            n->set_pos(node->start, node->end);
+
+            InterpreterResult res;
+            res.init(n->start, n->end);
             res.set_from(n);
 
             return res.success();
@@ -173,17 +187,22 @@ class Interpreter {
             res.init(node->start, node->end);
 
             SymbolContainer value = (*context->symbol_table->get(node->token->value_string));
-            if(value.state == -1) {
-                RuntimeError e;
-                e.init(node->start, node->end, node->token->value_string + " is not defined", context);
-                return res.failure(e);
-            } else {
+            if(value.state == 0) {
                 if(value.type == SYMBOL_INT) {
                     res.set_from(value.value_int);
                 } else if(value.type == SYMBOL_FLOAT) {
                     res.set_from(value.value_float);
                 } else if(value.type == SYMBOL_STRING) {
                     res.set_from(value.value_string);
+                }
+            } else {
+                Object* value_obj = get_obj(node->token->value_string);
+                if(value_obj->state == 0) {
+                    res.set_from(value_obj);
+                } else {
+                    RuntimeError e;
+                    e.init(node->start, node->end, node->token->value_string + " is not defined", context);
+                    return res.failure(e);
                 }
             }
 
@@ -195,7 +214,7 @@ class Interpreter {
             res.init(node->start, node->end);
             
             InterpreterResult value_res;
-            value_res = visit_node(node->right, context);
+            value_res = res.register_result(visit_node(node->right, context));
             if(res.should_return()) { return res; }
             res.set_from(value_res);
 
@@ -439,6 +458,8 @@ class Interpreter {
                 SymbolContainer* value = new SymbolContainer();
                 value->init(res.res_string.value);
                 context->symbol_table->set(name, value);
+            } else if(res.type == NODE_OBJECT_NEW) {
+                objects[name] = res.res_obj;
             }
         }
 
@@ -454,6 +475,17 @@ class Interpreter {
             if(res.should_return()) { return res; }
 
             return res.success();
+        }
+
+        Object* get_obj(string _name) {
+            try {
+                Object* value = objects.at(_name);
+                return value;
+            } catch(out_of_range e) {
+                Object* res_err = new Object();
+                res_err->state = -1;
+                return res_err;
+            }
         }
 
         void no_visit_method(string type) {

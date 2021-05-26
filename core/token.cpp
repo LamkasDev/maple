@@ -2,7 +2,7 @@
 #include "errors/error.cpp"
 using namespace std;
 
-const vector<string> KEYWORDS { "VAR", "AND", "OR", "NOT", "IF", "ELSE", "ELIF", "FOR", "TO", "STEP", "WHILE", "FUNC", "RETURN", "CONTINUE", "BREAK" }; 
+const vector<string> KEYWORDS { "VAR", "AND", "OR", "NOT", "IF", "ELSE", "ELIF", "FOR", "TO", "STEP", "WHILE", "FUNC", "RETURN", "CONTINUE", "BREAK", "NEW", "OBJECT" }; 
 const string LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 const string LETTERS_DIGITS = LETTERS + "0123456789";
 const string DIGITS = "0123456789";
@@ -54,6 +54,8 @@ const string KEYWORD_FUNC = "FUNC";
 const string KEYWORD_RETURN = "RETURN";
 const string KEYWORD_CONTINUE = "CONTINUE";
 const string KEYWORD_BREAK = "BREAK";
+const string KEYWORD_NEW = "NEW";
+const string KEYWORD_OBJECT = "OBJECT";
 
 class Token {
     public:

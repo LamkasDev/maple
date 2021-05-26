@@ -3,6 +3,7 @@
 #include "../../structures/number.cpp"
 #include "../../structures/function.cpp"
 #include "../../structures/string.cpp"
+#include "../../structures/object.cpp"
 using namespace std;
 
 class InterpreterResult {
@@ -17,6 +18,7 @@ class InterpreterResult {
         FloatNumber res_float;
         String res_string;
         Function* res_func;
+        Object* res_obj;
 
         bool has_return_value = false;
         bool loop_should_continue = false;
@@ -105,6 +107,11 @@ class InterpreterResult {
             type = NODE_FUNC_DEF;
         }
 
+        void set_from(Object* _res_obj) {
+            res_obj = _res_obj;
+            type = NODE_OBJECT_NEW;
+        }
+
         void set_from(string _res_string) {
             String _res; _res.init(_res_string);
             res_string = _res;
@@ -129,6 +136,9 @@ class InterpreterResult {
             } else if(_res.type == NODE_STRING) {
                 res_string = _res.res_string;
                 type = NODE_STRING;
+            } else if(_res.type == NODE_OBJECT_NEW) {
+                res_obj = _res.res_obj;
+                type = NODE_OBJECT_NEW;
             }
         }
 
@@ -383,6 +393,8 @@ class InterpreterResult {
                 return res_func->context;
             } else if(type == NODE_STRING) {
                 return res_string.context;
+            } else if(type == NODE_OBJECT_NEW) {
+                return res_obj->context;
             } else {
                 return nullptr;
             }
@@ -397,6 +409,8 @@ class InterpreterResult {
                 return res_func->repr();
             } else if(type == NODE_STRING) {
                 return res_string.repr();
+            } else if(type == NODE_OBJECT_NEW) {
+                return res_obj->repr();
             } else {
                 return "";
             }

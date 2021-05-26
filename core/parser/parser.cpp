@@ -108,6 +108,12 @@ class Parser {
 
                 result.set_node(def.node);
                 return result.success();
+            } else if(t->matches(TT_KEYWORD, KEYWORD_NEW)) {
+                ParserResult def = object_def();
+                if(def.state == -1) { return result.failure(def.e); }
+
+                result.set_node(def.node);
+                return result.success();
             }
 
             return result.failure(create_syntax_error("int/float, identifier, '+', '-', '(', 'IF', 'FOR', 'WHILE' or 'FUNC'"));
@@ -826,6 +832,27 @@ class Parser {
                 return result.failure(create_syntax_error("'->' or '{'", 1));
             }
             node->set_func_def_argument_tokens_result(arguments);
+            
+            result.set_node(node);
+            return result.success();
+        }
+
+        ParserResult object_def() {
+            ParserResult result;
+
+            Node* node = new Node();
+            node->set_start(current_t->start);
+            node->set_type(NODE_OBJECT_NEW);
+
+            if(current_t->matches(TT_KEYWORD, KEYWORD_NEW) == false) {
+                return result.failure(create_syntax_error("'NEW'", 1));
+            }
+            result.register_advance(advance());
+
+            if(current_t->matches(TT_KEYWORD, KEYWORD_OBJECT) == false) {
+                return result.failure(create_syntax_error("'OBJECT'", 1));
+            }
+            result.register_advance(advance());
             
             result.set_node(node);
             return result.success();

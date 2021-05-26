@@ -11,6 +11,7 @@
 #include <list>
 #include <map>
 #include <stdexcept>
+#include <memory>
 
 #include "runner/runner.cpp"
 #include "tests/tests.cpp"
