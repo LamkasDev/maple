@@ -37,7 +37,7 @@ void print_result(RunResult result, bool prints_result, bool prints_debug) {
     }
 }
 
-bool run_file(Runner* runner, string location, bool prints_result, bool prints_debug) {
+bool run_file(Runner runner, string location, bool prints_result, bool prints_debug) {
     ifstream file;
     file.open(location);
     if(!file) {
@@ -48,15 +48,15 @@ bool run_file(Runner* runner, string location, bool prints_result, bool prints_d
         stream << file.rdbuf();
         string contents = stream.str();
 
-        RunResult result = runner->run("<file>", contents);
+        RunResult result = runner.run("<file>", contents);
         print_result(result, prints_result, prints_debug);
         return 0;
     }
 }
 
 int main(int argc, char** argv) {
-    Runner* runner = new Runner();
-    runner->init();
+    Runner runner;
+    runner.init();
 
     bool debug_mode = false;
     if(argc >= 2) {
@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
                 exit(1);
             }
         } else if(string(argv[1]) == "-tests") {
-            exit(runTests(runner));
+            exit(run_tests(runner));
         } else if(string(argv[1]) == "-v") {
             printf("Maple version %s (Built by LamkasDev)-", VERSION.c_str());
             exit(0);
@@ -91,7 +91,7 @@ int main(int argc, char** argv) {
         _s = string(s);
 
         if(_s == "tests()") {
-            runTests(runner);
+            run_tests(runner);
             break;
         } else if(_s == "run()") {
             char s2[1024];
@@ -108,7 +108,7 @@ int main(int argc, char** argv) {
             break;
         }
         
-        RunResult result = runner->run("<stdin>", _s);
+        RunResult result = runner.run("<stdin>", _s);
         print_result(result, true, debug_mode);
     }
 
