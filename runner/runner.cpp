@@ -34,10 +34,10 @@ using namespace std;
 
 class Runner {
     public:
-        Interpreter* interpreter = nullptr;
+        shared_ptr<Interpreter> interpreter;
 
         void init() {
-            interpreter = new Interpreter();
+            interpreter = make_shared<Interpreter>();
             interpreter->init();
         }
 
