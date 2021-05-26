@@ -8,8 +8,8 @@ class Function {
         Position end;
         shared_ptr<Context> context = nullptr;
 
-        Token* name = nullptr;
-        vector<Token*> arguments;
+        shared_ptr<Token> name = nullptr;
+        vector<shared_ptr<Token>> arguments;
         Node* expression = nullptr;
         bool built_in = false;
 
@@ -22,11 +22,11 @@ class Function {
             context = _context;
         }
 
-        void set_name(Token* _name) {
+        void set_name(shared_ptr<Token> _name) {
             name = _name;
         }
 
-        void set_arguments(vector<Token*> _arguments) {
+        void set_arguments(vector<shared_ptr<Token>> _arguments) {
             arguments = _arguments;
         }
 

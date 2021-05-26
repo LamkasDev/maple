@@ -7,9 +7,9 @@ bool in_array(const string &value, const vector<string> &array){
     return find(array.begin(), array.end(), value) != array.end();
 }
 
-string print_tree(list<Token*> tokens) {
+string print_tree(list<shared_ptr<Token>> tokens) {
     string s = "(";
-    for (Token* t : tokens) {
+    for (shared_ptr<Token> t : tokens) {
         s += t->repr() + ", ";
     }
 

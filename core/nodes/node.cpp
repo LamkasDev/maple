@@ -34,7 +34,7 @@ class Node {
         Position end;
 
         NodeValue* value = nullptr;
-        Token* token = nullptr;
+        shared_ptr<Token> token = nullptr;
 
         Node* left = nullptr;
         NodeValue* left_value = nullptr;
@@ -53,7 +53,7 @@ class Node {
         Node* while_condition_result = nullptr;
         Node* while_expr_result = nullptr;
 
-        vector<Token*> func_def_argument_tokens_result;
+        vector<shared_ptr<Token>> func_def_argument_tokens_result;
         Node* func_def_expression_result = nullptr;
 
         list<Node*> func_call_argument_nodes_result;
@@ -95,7 +95,7 @@ class Node {
             right = _node;
         }
 
-        void set_token(Token* _token) {
+        void set_token(shared_ptr<Token> _token) {
             token = _token;
         }
 
@@ -144,7 +144,7 @@ class Node {
             while_expr_result = _while_expr_result;
         }
 
-        void set_func_def_argument_tokens_result(vector<Token*> _func_def_argument_tokens_result) {
+        void set_func_def_argument_tokens_result(vector<shared_ptr<Token>> _func_def_argument_tokens_result) {
             func_def_argument_tokens_result = _func_def_argument_tokens_result;
         }
 

@@ -7,13 +7,13 @@ class BuiltInRunner {
             Function* f = new Function();
             f->built_in = true;
 
-            TokenString* t_name = new TokenString();
+            shared_ptr<TokenString> t_name = make_shared<TokenString>();
             t_name->init(name);
             f->set_name(t_name);
 
-            vector<Token*> arguments_tokens;
+            vector<shared_ptr<Token>> arguments_tokens;
             for(string argument : arguments) {
-                TokenString* t_argument = new TokenString();
+                shared_ptr<TokenString> t_argument = make_shared<TokenString>();
                 t_argument->init(argument);
                 arguments_tokens.push_back(t_argument);
             }

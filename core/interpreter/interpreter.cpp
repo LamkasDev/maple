@@ -143,14 +143,14 @@ class Interpreter {
             if(node->token->type == TT_PLUS) {
                 res.set_from(left);
             } else if(node->token->type == TT_MINUS) {
-                Token* n_t = new Token();
+                shared_ptr<Token> n_t = make_shared<Token>();
                 n_t->init(TT_MUL);
                 InterpreterResult n_m_i;
                 n_m_i.set_from(-1);
 
                 res = res.process_binary(left, n_t, n_m_i);
             } else if(node->token->matches(TT_KEYWORD, KEYWORD_NOT)) {
-                Token* n_t = new Token();
+                shared_ptr<Token> n_t = make_shared<Token>();
                 n_t->init(TT_EQEQ);
                 InterpreterResult n_m_i;
                 n_m_i.set_from(0);
@@ -434,7 +434,7 @@ class Interpreter {
         void populate_args(Node* node, shared_ptr<Context> context, InterpreterResult res, list<Node*> arguments, Function* function) {
             int i = 0;
             for(Node* arg : arguments) {
-                Token* token = function->arguments.at(i);
+                shared_ptr<Token> token = function->arguments.at(i);
                 InterpreterResult arg_res = res.register_result(visit_node(arg, context));
                 if(arg_res.should_return()) { break; }
 

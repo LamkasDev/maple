@@ -84,8 +84,8 @@ class Token {
             return type == _type && value_string == _value;
         }
 
-        Token* copy() {
-            Token* copy = new Token();
+        shared_ptr<Token> copy() {
+            shared_ptr<Token> copy = make_shared<Token>();
             copy->init(type);
             copy->set_start(start);
             copy->set_end(end);
@@ -157,5 +157,5 @@ class MakeTokensResult {
     public:
         int state = 0;
         Error e;
-        list<Token*> tokens;
+        list<shared_ptr<Token>> tokens;
 };

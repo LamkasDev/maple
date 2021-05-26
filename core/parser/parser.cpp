@@ -3,11 +3,11 @@ using namespace std;
 
 class Parser {
     public:
-        list<Token*> tokens;
+        list<shared_ptr<Token>> tokens;
         int index = 0;
-        Token* current_t = nullptr;
+        shared_ptr<Token> current_t = nullptr;
 
-        void init(list<Token*> _tokens) {
+        void init(list<shared_ptr<Token>> _tokens) {
             tokens = _tokens;
             index = 1;
             advance();
@@ -47,7 +47,7 @@ class Parser {
 
         ParserResult atom() {
             ParserResult result;
-            Token* t = current_t;
+            shared_ptr<Token> t = current_t;
             if(t->type == TT_INT) {
                 result.register_advance(advance());
                 Node* n = new Node(); n->set_pos(t->start, t->end); n->set_value(t->value_int);
@@ -171,7 +171,7 @@ class Parser {
             op->set_to_left(left.node);
 
             while(current_t->type == TT_POW) {
-                Token* op_token = current_t;
+                shared_ptr<Token> op_token = current_t;
                 result.register_advance(advance());
 
                 ParserResult right = result.register_result(factor());
@@ -205,7 +205,7 @@ class Parser {
             op->set_to_left(left.node);
 
             while(current_t->type == TT_POW) {
-                Token* op_token = current_t;
+                shared_ptr<Token> op_token = current_t;
                 result.register_advance(advance());
 
                 ParserResult right = result.register_result(factor());
@@ -229,7 +229,7 @@ class Parser {
 
         ParserResult factor() {
             ParserResult result;
-            Token* t = current_t;
+            shared_ptr<Token> t = current_t;
             if(t->type == TT_PLUS || t->type == TT_MINUS) {
                 result.register_advance(advance());
                 ParserResult n_0 = factor();
@@ -255,7 +255,7 @@ class Parser {
             op->set_to_left(left.node);
 
             while(current_t->type == TT_MUL || current_t->type == TT_DIV || current_t->type == TT_MOD) {
-                Token* op_token = current_t;
+                shared_ptr<Token> op_token = current_t;
                 result.register_advance(advance());
 
                 ParserResult right = result.register_result(factor());
@@ -289,7 +289,7 @@ class Parser {
             op->set_to_left(left.node);
 
             while(current_t->type == TT_PLUS || current_t->type == TT_MINUS) {
-                Token* op_token = current_t;
+                shared_ptr<Token> op_token = current_t;
                 result.register_advance(advance());
 
                 ParserResult right = result.register_result(term());
@@ -323,7 +323,7 @@ class Parser {
             op->set_to_left(left.node);
 
             while(current_t->type == TT_EQEQ || current_t->type == TT_NEQ || current_t->type == TT_LTHAN || current_t->type == TT_GTHAN || current_t->type == TT_LTHANEQ || current_t->type == TT_GTHANEQ) {
-                Token* op_token = current_t;
+                shared_ptr<Token> op_token = current_t;
                 result.register_advance(advance());
 
                 ParserResult right = result.register_result(term());
@@ -349,7 +349,7 @@ class Parser {
             ParserResult result;
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_NOT)) {
-                Token* op_token = current_t;
+                shared_ptr<Token> op_token = current_t;
                 result.register_advance(advance());
 
                 ParserResult expr = result.register_result(comp_expr());
@@ -452,7 +452,7 @@ class Parser {
                 if(current_t->type != TT_IDENFIFIER) {
                     return result.failure(create_syntax_error("identifier"));
                 }
-                Token* identifier = current_t;
+                shared_ptr<Token> identifier = current_t;
                 result.register_advance(advance());
 
                 if(current_t->type != TT_EQ) {
@@ -483,7 +483,7 @@ class Parser {
             op->set_to_left(left.node);
             
             while(current_t->matches(TT_KEYWORD, KEYWORD_AND) || current_t->matches(TT_KEYWORD, KEYWORD_OR)) {
-                Token* op_token = current_t;
+                shared_ptr<Token> op_token = current_t;
                 op->set_token(op_token);
                 result.register_advance(advance());
 
@@ -745,7 +745,7 @@ class Parser {
 
         ParserResult func_def() {
             ParserResult result;
-            vector<Token*> arguments;
+            vector<shared_ptr<Token>> arguments;
 
             Node* node = new Node();
             node->set_start(current_t->start);
@@ -757,7 +757,7 @@ class Parser {
             result.register_advance(advance());
 
             if(current_t->type == TT_IDENFIFIER) {
-                Token* var_name = current_t;
+                shared_ptr<Token> var_name = current_t;
                 result.register_advance(advance());
 
                 if(current_t->type != TT_LPAREN) {

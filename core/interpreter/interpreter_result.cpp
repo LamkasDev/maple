@@ -142,7 +142,7 @@ class InterpreterResult {
             }
         }
 
-        InterpreterResult process_binary(InterpreterResult _left, Token* _op, InterpreterResult _right) {
+        InterpreterResult process_binary(InterpreterResult _left, shared_ptr<Token> _op, InterpreterResult _right) {
             if(_op->type == TT_PLUS) {
                 return _left.added_to(_right);
             } else if(_op->type == TT_MINUS) {
@@ -294,7 +294,7 @@ class InterpreterResult {
             return res;
         }
 
-        InterpreterResult get_comparison(Token* _token, InterpreterResult _right) {
+        InterpreterResult get_comparison(shared_ptr<Token> _token, InterpreterResult _right) {
             if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right); }
 
             InterpreterResult res;
