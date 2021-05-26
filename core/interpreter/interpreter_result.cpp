@@ -17,8 +17,8 @@ class InterpreterResult {
         IntNumber res_int;
         FloatNumber res_float;
         String res_string;
-        Function* res_func;
-        Object* res_obj;
+        shared_ptr<Function> res_func;
+        shared_ptr<Object> res_obj;
 
         bool has_return_value = false;
         bool loop_should_continue = false;
@@ -102,12 +102,12 @@ class InterpreterResult {
             type = NODE_FLOAT;
         }
 
-        void set_from(Function* _res_func) {
+        void set_from(shared_ptr<Function> _res_func) {
             res_func = _res_func;
             type = NODE_FUNC_DEF;
         }
 
-        void set_from(Object* _res_obj) {
+        void set_from(shared_ptr<Object> _res_obj) {
             res_obj = _res_obj;
             type = NODE_OBJECT_NEW;
         }

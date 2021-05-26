@@ -5,8 +5,8 @@ class Interpreter {
     public:
         BuiltInRunner* builtin_runner = nullptr;
         shared_ptr<SymbolTable> global_symbol_table = nullptr;
-        map<string, Function*> functions;
-        map<string, Object*> objects;
+        map<string, shared_ptr<Function>> functions;
+        map<string, shared_ptr<Object>> objects;
 
         void init() {
             SymbolContainer sc_null;
@@ -31,13 +31,13 @@ class Interpreter {
 
         void add_builtin_function(string name) {
             list<string> arguments;
-            Function* f = builtin_runner->create_builtin_function(name, arguments);
+            shared_ptr<Function> f = builtin_runner->create_builtin_function(name, arguments);
             functions[f->name->value_string] = f;
         }
 
         void add_builtin_function(string name, string arg_1) {
             list<string> arguments; arguments.push_back(arg_1);
-            Function* f = builtin_runner->create_builtin_function(name, arguments);
+            shared_ptr<Function> f = builtin_runner->create_builtin_function(name, arguments);
             functions[f->name->value_string] = f;
         }
 
@@ -123,7 +123,7 @@ class Interpreter {
         }
 
         InterpreterResult visit_object_new_node(shared_ptr<Node> node, shared_ptr<Context> context) {
-            Object* n = new Object();
+            shared_ptr<Object> n = make_shared<Object>();
             n->set_pos(node->start, node->end);
 
             InterpreterResult res;
@@ -196,7 +196,7 @@ class Interpreter {
                     res.set_from(value.value_string);
                 }
             } else {
-                Object* value_obj = get_obj(node->token->value_string);
+                shared_ptr<Object> value_obj = get_obj(node->token->value_string);
                 if(value_obj->state == 0) {
                     res.set_from(value_obj);
                 } else {
@@ -326,7 +326,7 @@ class Interpreter {
             InterpreterResult res;
             res.init(node->start, node->end);
 
-            Function* function = new Function();
+            shared_ptr<Function> function = make_shared<Function>();
             function->set_pos(node->start, node->end);
             function->set_context(context);
             function->set_name(node->token);
@@ -378,14 +378,11 @@ class Interpreter {
         InterpreterResult execute(shared_ptr<Node> node, list<shared_ptr<Node>> arguments, shared_ptr<Context> context) {
             InterpreterResult res;
             res.init(node->start, node->end);
-
-            Interpreter* interpreter = new Interpreter();
-            interpreter->init();
             shared_ptr<Context> new_context = generate_new_context(node, context);
 
             string func_name = node->token->value_string;
             try {
-                Function* function = functions.at(func_name);
+                shared_ptr<Function> function = functions.at(func_name);
                 check_args(node, new_context, res, arguments, function);
                 if(res.should_return()) { return res; }
 
@@ -419,7 +416,7 @@ class Interpreter {
             return new_context;
         }
         
-        void check_args(shared_ptr<Node> node, shared_ptr<Context> context, InterpreterResult res, list<shared_ptr<Node>> arguments, Function* function) {
+        void check_args(shared_ptr<Node> node, shared_ptr<Context> context, InterpreterResult res, list<shared_ptr<Node>> arguments, shared_ptr<Function> function) {
             if(arguments.size() > function->arguments.size()) {
                 RuntimeError e;
                 e.init(node->start, node->end, ((arguments.size() - function->arguments.size()) + " too many args passed into " + node->token->value_string), context);
@@ -431,7 +428,7 @@ class Interpreter {
             }
         }
 
-        void populate_args(shared_ptr<Node> node, shared_ptr<Context> context, InterpreterResult res, list<shared_ptr<Node>> arguments, Function* function) {
+        void populate_args(shared_ptr<Node> node, shared_ptr<Context> context, InterpreterResult res, list<shared_ptr<Node>> arguments, shared_ptr<Function> function) {
             int i = 0;
             for(shared_ptr<Node> arg : arguments) {
                 shared_ptr<Token> token = function->arguments.at(i);
@@ -477,12 +474,12 @@ class Interpreter {
             return res.success();
         }
 
-        Object* get_obj(string _name) {
+        shared_ptr<Object> get_obj(string _name) {
             try {
-                Object* value = objects.at(_name);
+                shared_ptr<Object> value = objects.at(_name);
                 return value;
             } catch(out_of_range e) {
-                Object* res_err = new Object();
+                shared_ptr<Object> res_err = make_shared<Object>();
                 res_err->state = -1;
                 return res_err;
             }
