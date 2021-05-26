@@ -41,14 +41,14 @@ class BuiltInRunner {
         }
 
         InterpreterResult run_print(InterpreterResult res, Function* function, shared_ptr<Context> context) {
-            SymbolContainer* value = context->symbol_table->get("value");
-            if(value->type != SYMBOL_STRING) {
+            SymbolContainer value = context->symbol_table->get("value");
+            if(value.type != SYMBOL_STRING) {
                 RuntimeError e;
                 e.init(res.start, res.end, "Invalid argument", context);
                 return res.failure(e);
             }
-            printf("%s", value->value_string.c_str());
-            res.set_from(value->value_string.c_str());
+            printf("%s", value.value_string.c_str());
+            res.set_from(value.value_string.c_str());
 
             return res.success();
         }
@@ -62,16 +62,16 @@ class BuiltInRunner {
         }
 
         InterpreterResult run_is_nan(InterpreterResult res, Function* function, shared_ptr<Context> context) {
-            SymbolContainer* value = context->symbol_table->get("value");
-            res.set_from(value->type != SYMBOL_INT && value->type != SYMBOL_FLOAT);
+            SymbolContainer value = context->symbol_table->get("value");
+            res.set_from(value.type != SYMBOL_INT && value.type != SYMBOL_FLOAT);
 
             return res.success();
         }
 
         InterpreterResult run_parse_int(InterpreterResult res, Function* function, shared_ptr<Context> context) {
-            SymbolContainer* value = context->symbol_table->get("value");
+            SymbolContainer value = context->symbol_table->get("value");
             try {
-                res.set_from(stoi(value->value_string));
+                res.set_from(stoi(value.value_string));
             } catch(invalid_argument e_0) {
                 RuntimeError e;
                 e.init(res.start, res.end, "Invalid argument", context);
@@ -82,9 +82,9 @@ class BuiltInRunner {
         }
 
         InterpreterResult run_parse_float(InterpreterResult res, Function* function, shared_ptr<Context> context) {
-            SymbolContainer* value = context->symbol_table->get("value");
+            SymbolContainer value = context->symbol_table->get("value");
             try {
-                res.set_from(stof(value->value_string));
+                res.set_from(stof(value.value_string));
             } catch(invalid_argument e_0) {
                 RuntimeError e;
                 e.init(res.start, res.end, "Invalid argument", context);
