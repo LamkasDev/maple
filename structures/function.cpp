@@ -10,7 +10,7 @@ class Function {
 
         shared_ptr<Token> name = nullptr;
         vector<shared_ptr<Token>> arguments;
-        Node* expression = nullptr;
+        shared_ptr<Node> expression = nullptr;
         bool built_in = false;
 
         void set_pos(Position _start, Position _end) {
@@ -30,7 +30,7 @@ class Function {
             arguments = _arguments;
         }
 
-        void set_expression(Node* _expression) {
+        void set_expression(shared_ptr<Node> _expression) {
             expression = _expression;
         }
 

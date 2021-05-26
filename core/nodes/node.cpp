@@ -36,30 +36,30 @@ class Node {
         NodeValue* value = nullptr;
         shared_ptr<Token> token = nullptr;
 
-        Node* left = nullptr;
+        shared_ptr<Node> left = nullptr;
         NodeValue* left_value = nullptr;
 
-        Node* right = nullptr;
+        shared_ptr<Node> right = nullptr;
         NodeValue* right_value = nullptr;
 
-        list<Node*> if_results;
-        Node* else_result = nullptr;
+        list<shared_ptr<Node>> if_results;
+        shared_ptr<Node> else_result = nullptr;
 
-        Node* for_start_result = nullptr;
-        Node* for_end_result = nullptr;
-        Node* for_step_result = nullptr;
-        Node* for_expr_result = nullptr;
+        shared_ptr<Node> for_start_result = nullptr;
+        shared_ptr<Node> for_end_result = nullptr;
+        shared_ptr<Node> for_step_result = nullptr;
+        shared_ptr<Node> for_expr_result = nullptr;
 
-        Node* while_condition_result = nullptr;
-        Node* while_expr_result = nullptr;
+        shared_ptr<Node> while_condition_result = nullptr;
+        shared_ptr<Node> while_expr_result = nullptr;
 
         vector<shared_ptr<Token>> func_def_argument_tokens_result;
-        Node* func_def_expression_result = nullptr;
+        shared_ptr<Node> func_def_expression_result = nullptr;
 
-        list<Node*> func_call_argument_nodes_result;
-        Node* func_call_expression_result = nullptr;
+        list<shared_ptr<Node>> func_call_argument_nodes_result;
+        shared_ptr<Node> func_call_expression_result = nullptr;
 
-        list<Node*> statements_nodes_result;
+        list<shared_ptr<Node>> statements_nodes_result;
 
         void set_type(string _type) {
             type = _type;
@@ -87,11 +87,11 @@ class Node {
             value = _value;
         }
 
-        void set_to_left(Node* _node) {
+        void set_to_left(shared_ptr<Node> _node) {
             left = _node;
         }
 
-        void set_to_right(Node* _node) {
+        void set_to_right(shared_ptr<Node> _node) {
             right = _node;
         }
 
@@ -112,35 +112,35 @@ class Node {
             end = _end;
         }
 
-        void set_if_results(list<Node*> _if_results) {
+        void set_if_results(list<shared_ptr<Node>> _if_results) {
             if_results = _if_results;
         }
 
-        void set_else_result(Node* _else_result) {
+        void set_else_result(shared_ptr<Node> _else_result) {
             else_result = _else_result;
         }
 
-        void set_for_start_result(Node* _for_start_result) {
+        void set_for_start_result(shared_ptr<Node> _for_start_result) {
             for_start_result = _for_start_result;
         }
 
-        void set_for_end_result(Node* _for_end_result) {
+        void set_for_end_result(shared_ptr<Node> _for_end_result) {
             for_end_result = _for_end_result;
         }
 
-        void set_for_step_result(Node* _for_step_result) {
+        void set_for_step_result(shared_ptr<Node> _for_step_result) {
             for_step_result = _for_step_result;
         }
 
-        void set_for_expr_result(Node* _for_expr_result) {
+        void set_for_expr_result(shared_ptr<Node> _for_expr_result) {
             for_expr_result = _for_expr_result;
         }
 
-        void set_while_condition_result(Node* _while_condition_result) {
+        void set_while_condition_result(shared_ptr<Node> _while_condition_result) {
             while_condition_result = _while_condition_result;
         }
 
-        void set_while_expr_result(Node* _while_expr_result) {
+        void set_while_expr_result(shared_ptr<Node> _while_expr_result) {
             while_expr_result = _while_expr_result;
         }
 
@@ -148,24 +148,24 @@ class Node {
             func_def_argument_tokens_result = _func_def_argument_tokens_result;
         }
 
-        void set_func_def_expression_result(Node* _func_def_expression_result) {
+        void set_func_def_expression_result(shared_ptr<Node> _func_def_expression_result) {
             func_def_expression_result = _func_def_expression_result;
         }
 
-        void set_func_call_argument_nodes_result(list<Node*> _func_call_argument_nodes_result) {
+        void set_func_call_argument_nodes_result(list<shared_ptr<Node>> _func_call_argument_nodes_result) {
             func_call_argument_nodes_result = _func_call_argument_nodes_result;
         }
 
-        void set_func_call_expression_result(Node* _func_call_expression_result) {
+        void set_func_call_expression_result(shared_ptr<Node> _func_call_expression_result) {
             func_call_expression_result = _func_call_expression_result;
         }
 
-        void set_statements_nodes_result(list<Node*> _statements_nodes_result) {
+        void set_statements_nodes_result(list<shared_ptr<Node>> _statements_nodes_result) {
             statements_nodes_result = _statements_nodes_result;
         }
 
-        Node* copy() {
-            Node* copy = new Node();
+        shared_ptr<Node> copy() {
+            shared_ptr<Node> copy = make_shared<Node>();
 
             copy->set_type(type);
             if(value != nullptr) {

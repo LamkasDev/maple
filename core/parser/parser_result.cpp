@@ -9,10 +9,10 @@ class ParserResult {
         int reverse_count = 0;
 
         string node_type = NODE_UNKNOWN;
-        Node* node = nullptr;
+        shared_ptr<Node> node = nullptr;
         Error e;
 
-        void set_node(Node* _node) {
+        void set_node(shared_ptr<Node> _node) {
             if(_node->left != nullptr && _node->right == nullptr && _node->type != NODE_UNARY) {
                 node_type = _node->left->type;
                 node = _node->left;

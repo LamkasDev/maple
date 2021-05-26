@@ -50,25 +50,25 @@ class Parser {
             shared_ptr<Token> t = current_t;
             if(t->type == TT_INT) {
                 result.register_advance(advance());
-                Node* n = new Node(); n->set_pos(t->start, t->end); n->set_value(t->value_int);
+                shared_ptr<Node> n = make_shared<Node>(); n->set_pos(t->start, t->end); n->set_value(t->value_int);
 
                 result.set_node(n);
                 return result.success();
             } else if(t->type == TT_FLOAT) {
                 result.register_advance(advance());
-                Node* n = new Node(); n->set_pos(t->start, t->end); n->set_value(t->value_float);
+                shared_ptr<Node> n = make_shared<Node>(); n->set_pos(t->start, t->end); n->set_value(t->value_float);
 
                 result.set_node(n);
                 return result.success();
             } else if(t->type == TT_STRING) {
                 result.register_advance(advance());
-                Node* n = new Node(); n->set_pos(t->start, t->end); n->set_value(t->value_string);
+                shared_ptr<Node> n = make_shared<Node>(); n->set_pos(t->start, t->end); n->set_value(t->value_string);
 
                 result.set_node(n);
                 return result.success();
             } else if(t->type == TT_IDENFIFIER) {
                 result.register_advance(advance());
-                Node* n = new Node(); n->set_pos(t->start, t->end); n->set_type(NODE_ACCESS); n->set_token(t);
+                shared_ptr<Node> n = make_shared<Node>(); n->set_pos(t->start, t->end); n->set_type(NODE_ACCESS); n->set_token(t);
 
                 result.set_node(n);
                 return result.success();
@@ -126,10 +126,10 @@ class Parser {
             if(result.state == -1) { return result; }
 
             if(current_t->type == TT_LPAREN) {
-                Node* call_node = new Node();
+                shared_ptr<Node> call_node = make_shared<Node>();
                 call_node->set_start(current_t->start);
                 call_node->set_type(NODE_FUNC_CALL);
-                list<Node*> arguments;
+                list<shared_ptr<Node>> arguments;
 
                 result.register_advance(advance());
                 
@@ -165,7 +165,7 @@ class Parser {
                 return result.success();
             }
 
-            Node* op = new Node();
+            shared_ptr<Node> op = make_shared<Node>();
             op->set_pos(left.node->start, left.node->end);
             op->set_type(NODE_BINARY);
             op->set_to_left(left.node);
@@ -180,7 +180,7 @@ class Parser {
                 }
 
                 if(op->right != nullptr) {
-                    Node* copy = op->copy();
+                    shared_ptr<Node> copy = op->copy();
                     op->set_to_left(copy);
                 }
                 op->set_token(op_token);
@@ -199,7 +199,7 @@ class Parser {
             ParserResult left = result.register_result(call());
             if(result.state == -1) { return result; }
 
-            Node* op = new Node();
+            shared_ptr<Node> op = make_shared<Node>();
             op->set_pos(left.node->start, left.node->end);
             op->set_type(NODE_BINARY);
             op->set_to_left(left.node);
@@ -214,7 +214,7 @@ class Parser {
                 }
 
                 if(op->right != nullptr) {
-                    Node* copy = op->copy();
+                    shared_ptr<Node> copy = op->copy();
                     op->set_to_left(copy);
                 }
                 op->set_token(op_token);
@@ -234,7 +234,7 @@ class Parser {
                 result.register_advance(advance());
                 ParserResult n_0 = factor();
                 if(n_0.state == -1) { return result.failure(n_0.e); }
-                Node* n = new Node(); n->set_pos(t->start, n_0.node->end); n->set_type(NODE_UNARY); n->set_token(t); n->set_to_left(n_0.node);
+                shared_ptr<Node> n = make_shared<Node>(); n->set_pos(t->start, n_0.node->end); n->set_type(NODE_UNARY); n->set_token(t); n->set_to_left(n_0.node);
 
                 result.set_node(n);
                 return result.success();
@@ -249,7 +249,7 @@ class Parser {
             ParserResult left = result.register_result(factor());
             if(result.state == -1) { return result; }
 
-            Node* op = new Node();
+            shared_ptr<Node> op = make_shared<Node>();
             op->set_pos(left.node->start, left.node->end);
             op->set_type(NODE_BINARY);
             op->set_to_left(left.node);
@@ -264,7 +264,7 @@ class Parser {
                 }
 
                 if(op->right != nullptr) {
-                    Node* copy = op->copy();
+                    shared_ptr<Node> copy = op->copy();
                     op->set_to_left(copy);
                 }
                 op->set_token(op_token);
@@ -283,7 +283,7 @@ class Parser {
             ParserResult left = result.register_result(term());
             if(result.state == -1) { return result; }
 
-            Node* op = new Node();
+            shared_ptr<Node> op = make_shared<Node>();
             op->set_pos(left.node->start, left.node->end);
             op->set_type(NODE_BINARY);
             op->set_to_left(left.node);
@@ -298,7 +298,7 @@ class Parser {
                 }
 
                 if(op->right != nullptr) {
-                    Node* copy = op->copy();
+                    shared_ptr<Node> copy = op->copy();
                     op->set_to_left(copy);
                 }
                 op->set_token(op_token);
@@ -317,7 +317,7 @@ class Parser {
             ParserResult left = result.register_result(arith_expr());
             if(result.state == -1) { return result; }
 
-            Node* op = new Node();
+            shared_ptr<Node> op = make_shared<Node>();
             op->set_pos(left.node->start, left.node->end);
             op->set_type(NODE_BINARY);
             op->set_to_left(left.node);
@@ -332,7 +332,7 @@ class Parser {
                 }
 
                 if(op->right != nullptr) {
-                    Node* copy = op->copy();
+                    shared_ptr<Node> copy = op->copy();
                     op->set_to_left(copy);
                 }
                 op->set_token(op_token);
@@ -354,7 +354,7 @@ class Parser {
 
                 ParserResult expr = result.register_result(comp_expr());
                 if(result.state == -1) { return result; }
-                Node* n = new Node(); n->set_pos(op_token->start, expr.node->end); n->set_type(NODE_UNARY); n->set_token(op_token); n->set_to_left(expr.node);
+                shared_ptr<Node> n = make_shared<Node>(); n->set_pos(op_token->start, expr.node->end); n->set_type(NODE_UNARY); n->set_token(op_token); n->set_to_left(expr.node);
 
                 result.set_node(n);
                 return result.success();
@@ -369,8 +369,8 @@ class Parser {
 
         ParserResult statements() {
             ParserResult result;
-            list<Node*> statements;
-            Node* node = new Node();
+            list<shared_ptr<Node>> statements;
+            shared_ptr<Node> node = make_shared<Node>();
             node->set_start(current_t->start);
             node->set_type(NODE_STATEMENTS);
 
@@ -413,7 +413,7 @@ class Parser {
 
         ParserResult statement() {
             ParserResult result;
-            Node* node = new Node();
+            shared_ptr<Node> node = make_shared<Node>();
             node->set_start(current_t->start);
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_RETURN)) {
@@ -462,7 +462,7 @@ class Parser {
 
                 ParserResult expr = result.register_result(expression());
                 if(result.state == -1) { return result; }
-                Node* n = new Node(); n->set_pos(identifier->start, expr.node->end); n->set_type(NODE_ASSIGNMENT); n->set_token(identifier); n->set_to_right(expr.node);
+                shared_ptr<Node> n = make_shared<Node>(); n->set_pos(identifier->start, expr.node->end); n->set_type(NODE_ASSIGNMENT); n->set_token(identifier); n->set_to_right(expr.node);
                 
                 result.set_node(n);
                 return result.success();
@@ -477,7 +477,7 @@ class Parser {
                 }
             }
 
-            Node* op = new Node();
+            shared_ptr<Node> op = make_shared<Node>();
             op->set_pos(left.node->start, left.node->end);
             op->set_type(NODE_BINARY);
             op->set_to_left(left.node);
@@ -493,7 +493,7 @@ class Parser {
                 }
 
                 if(op->right != nullptr) {
-                    Node* copy = op->copy();
+                    shared_ptr<Node> copy = op->copy();
                     op->set_to_left(copy);
                 }
                 op->set_end(right.node->end);
@@ -507,9 +507,9 @@ class Parser {
 
         ParserResult if_expr() {
             ParserResult result;
-            list<Node*> cases;
+            list<shared_ptr<Node>> cases;
 
-            Node* node = new Node();
+            shared_ptr<Node> node = make_shared<Node>();
             node->set_start(current_t->start);
             node->set_type(NODE_IF);
 
@@ -530,7 +530,7 @@ class Parser {
         ParserResult if_expr_c() {
             ParserResult result;
 
-            Node* node = new Node();
+            shared_ptr<Node> node = make_shared<Node>();
             node->set_start(current_t->start);
             node->set_type(NODE_IF);
 
@@ -560,9 +560,9 @@ class Parser {
 
         ParserResult if_expr_b_or_c() {
             ParserResult result;
-            list<Node*> cases;
+            list<shared_ptr<Node>> cases;
 
-            Node* node = new Node();
+            shared_ptr<Node> node = make_shared<Node>();
             node->set_start(current_t->start);
             node->set_type(NODE_IF);
 
@@ -585,9 +585,9 @@ class Parser {
 
         ParserResult if_expr_cases(string type) {
             ParserResult result;
-            list<Node*> cases;
+            list<shared_ptr<Node>> cases;
 
-            Node* node = new Node();
+            shared_ptr<Node> node = make_shared<Node>();
             node->set_start(current_t->start);
             node->set_type(NODE_IF);
 
@@ -628,7 +628,7 @@ class Parser {
             if(current_t->matches(TT_KEYWORD, KEYWORD_ELIF) || current_t->matches(TT_KEYWORD, KEYWORD_ELSE)) {
                 ParserResult all_cases = result.register_result(if_expr_b_or_c());
                 if(result.state == -1) { return result; }
-                for(Node* _node : all_cases.node->if_results) {
+                for(shared_ptr<Node> _node : all_cases.node->if_results) {
                     cases.push_back(_node);
                 }
                 if(all_cases.node->else_result != nullptr) {
@@ -643,7 +643,7 @@ class Parser {
 
         ParserResult for_expr() {
             ParserResult result;
-            Node* node = new Node();
+            shared_ptr<Node> node = make_shared<Node>();
             node->set_start(current_t->start);
             node->set_type(NODE_FOR);
 
@@ -710,7 +710,7 @@ class Parser {
 
         ParserResult while_expr() {
             ParserResult result;
-            Node* node = new Node();
+            shared_ptr<Node> node = make_shared<Node>();
             node->set_start(current_t->start);
             node->set_type(NODE_WHILE);
 
@@ -747,7 +747,7 @@ class Parser {
             ParserResult result;
             vector<shared_ptr<Token>> arguments;
 
-            Node* node = new Node();
+            shared_ptr<Node> node = make_shared<Node>();
             node->set_start(current_t->start);
             node->set_type(NODE_FUNC_DEF);
 
@@ -840,7 +840,7 @@ class Parser {
         ParserResult object_def() {
             ParserResult result;
 
-            Node* node = new Node();
+            shared_ptr<Node> node = make_shared<Node>();
             node->set_start(current_t->start);
             node->set_type(NODE_OBJECT_NEW);
 
