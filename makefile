@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-static-libgcc -static-libstdc++
+CFLAGS=-static -static-libgcc -static-libstdc++
 
 output: maple-shell.o
 	$(CC) maple-shell.o -o maple-shell $(CFLAGS)
