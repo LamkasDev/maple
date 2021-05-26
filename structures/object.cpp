@@ -9,7 +9,7 @@ class Object {
         shared_ptr<Context> context = nullptr;
         int state = 0;
         
-        SymbolTable* symbol_table = nullptr;
+        shared_ptr<SymbolTable> symbol_table = nullptr;
         map<string, Function> functions;
 
         void set_pos(Position _start, Position _end) {

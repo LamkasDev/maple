@@ -4,7 +4,7 @@ using namespace std;
 class Interpreter {
     public:
         BuiltInRunner* builtin_runner = nullptr;
-        SymbolTable* global_symbol_table = nullptr;
+        shared_ptr<SymbolTable> global_symbol_table = nullptr;
         map<string, Function*> functions;
         map<string, Object*> objects;
 
@@ -16,7 +16,7 @@ class Interpreter {
             SymbolContainer* sc_false = new SymbolContainer();
             sc_false->init(0);
 
-            global_symbol_table = new SymbolTable();
+            global_symbol_table = make_shared<SymbolTable>();
             global_symbol_table->set("NULL", sc_null);
             global_symbol_table->set("TRUE", sc_true);
             global_symbol_table->set("FALSE", sc_false);

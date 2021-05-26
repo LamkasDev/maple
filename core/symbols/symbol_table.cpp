@@ -4,7 +4,7 @@ using namespace std;
 
 class SymbolTable {
     public:
-        SymbolTable* parent = nullptr;
+        shared_ptr<SymbolTable> parent = nullptr;
         map<string, SymbolContainer*> symbols;
 
         void init() {

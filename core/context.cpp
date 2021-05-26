@@ -8,7 +8,7 @@ class Context {
         string display_name = "";
         shared_ptr<Context> parent = nullptr;
         Position parent_entry_pos;
-        SymbolTable* symbol_table;
+        shared_ptr<SymbolTable> symbol_table;
 
         void init(string _display_name) {
             display_name = _display_name;
@@ -22,7 +22,7 @@ class Context {
             parent_entry_pos = _parent_entry_pos;
         }
 
-        void set_symbol_table(SymbolTable* _symbol_table) {
+        void set_symbol_table(shared_ptr<SymbolTable> _symbol_table) {
             symbol_table = _symbol_table;
         }
 };
