@@ -33,14 +33,14 @@ class Node {
         Position start;
         Position end;
 
-        NodeValue* value = nullptr;
+        NodeValue value;
         shared_ptr<Token> token = nullptr;
 
         shared_ptr<Node> left = nullptr;
-        NodeValue* left_value = nullptr;
+        NodeValue left_value;
 
         shared_ptr<Node> right = nullptr;
-        NodeValue* right_value = nullptr;
+        NodeValue right_value;
 
         list<shared_ptr<Node>> if_results;
         shared_ptr<Node> else_result = nullptr;
@@ -66,24 +66,21 @@ class Node {
         }
 
         void set_value(int _value) {
-            value = new NodeValue();
-            value->init(_value);
+            value.init(_value);
             type = NODE_INT;
         }
 
         void set_value(float _value) {
-            value = new NodeValue();
-            value->init(_value);
+            value.init(_value);
             type = NODE_FLOAT;
         }
 
         void set_value(string _value) {
-            value = new NodeValue();
-            value->init(_value);
+            value.init(_value);
             type = NODE_STRING;
         }
 
-        void set_value(NodeValue* _value) {
+        void set_value(NodeValue _value) {
             value = _value;
         }
 
@@ -168,9 +165,7 @@ class Node {
             shared_ptr<Node> copy = make_shared<Node>();
 
             copy->set_type(type);
-            if(value != nullptr) {
-                copy->set_value(value->copy());
-            }
+            copy->set_value(value.copy());
             if(left != nullptr) {
                 copy->set_to_left(left->copy());
             }
@@ -186,9 +181,9 @@ class Node {
 
         string repr() {
             if(type == NODE_INT) {
-                return "(" + type + ":" + to_string(value->value_int) + ")";
+                return "(" + type + ":" + to_string(value.value_int) + ")";
             } else if(type == NODE_FLOAT) {
-                return "(" + type + ":" + to_string(value->value_float) + ")";
+                return "(" + type + ":" + to_string(value.value_float) + ")";
             } else if(type == NODE_BINARY) {
                 return "(" + type + ":(" + (left != nullptr ? left->repr() : "") + ":" + token->type + ":" + (right != nullptr ? right->repr() : "") + ")";
             } else if(type == NODE_UNARY) {
@@ -208,7 +203,7 @@ class Node {
             } else if(type == NODE_FUNC_DEF) {
                 return "(" + type + ":" + token->value_string + ")";
             } else if(type == NODE_STRING) {
-                return "(" + type + ":" + value->value_string + ")";
+                return "(" + type + ":" + value.value_string + ")";
             } else if(type == NODE_STATEMENTS) {
                 return "(" + type + ":" + to_string(statements_nodes_result.size()) + ")";
             } else if(type == NODE_RETURN) {

@@ -28,14 +28,14 @@ class NodeValue {
             type = NODE_VALUE_STRING;
         }
 
-        NodeValue* copy() {
-            NodeValue* copy = new NodeValue();
+        NodeValue copy() {
+            NodeValue copy;
             if(type == NODE_VALUE_INT) {
-                copy->init(value_int);
+                copy.init(value_int);
             } else if(type == NODE_VALUE_FLOAT) {
-                copy->init(value_float);
+                copy.init(value_float);
             } else if(type == NODE_VALUE_STRING) {
-                copy->init(value_string);
+                copy.init(value_string);
             }
 
             return copy;
