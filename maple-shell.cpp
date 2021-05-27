@@ -17,7 +17,7 @@
 #include "tests/tests.cpp"
 using namespace std;
 
-const string VERSION = "0.8.1";
+const string VERSION = "0.8.2";
 
 void print_result(RunResult result, bool prints_result, bool prints_debug) {
     if(result.makeTokensResult.state == -1) {
