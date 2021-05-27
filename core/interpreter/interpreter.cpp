@@ -9,12 +9,9 @@ class Interpreter {
         map<string, shared_ptr<Object>> objects;
 
         void init() {
-            SymbolContainer sc_null;
-            sc_null.init(0);
-            SymbolContainer sc_true;
-            sc_true.init(1);
-            SymbolContainer sc_false;
-            sc_false.init(0);
+            SymbolContainer sc_null(0);
+            SymbolContainer sc_true(1);
+            SymbolContainer sc_false(0);
 
             global_symbol_table = make_shared<SymbolTable>();
             global_symbol_table->set("NULL", sc_null);
@@ -280,9 +277,7 @@ class Interpreter {
             bool st_dir = step_value.get_value() >= 0 ? true : false;
             int i = start_value.get_value();
             while((st_dir == true && i < end_value.get_value()) || (st_dir == false && i > end_value.get_value())) {
-                SymbolContainer container;
-                container.init(i);
-
+                SymbolContainer container(i);
                 context->symbol_table->set(node->token->value_string, container);
                 i += step_value.get_value();
 
@@ -435,18 +430,15 @@ class Interpreter {
 
         void save_to_context(string name, InterpreterResult res, shared_ptr<Context> context) {
             if(res.type == NODE_INT) {
-                SymbolContainer value;
-                value.init(res.res_int.value);
+                SymbolContainer value(res.res_int.value);
                 context->symbol_table->set(name, value);
             } else if(res.type == NODE_FLOAT) {
-                SymbolContainer value;
-                value.init(res.res_float.value);
+                SymbolContainer value(res.res_float.value);
                 context->symbol_table->set(name, value);
             } else if(res.type == NODE_FUNC_DEF) {
                 functions[name] = res.res_func;
             } else if(res.type == NODE_STRING) {
-                SymbolContainer value;
-                value.init(res.res_string.value);
+                SymbolContainer value(res.res_string.value);
                 context->symbol_table->set(name, value);
             } else if(res.type == NODE_OBJECT_NEW) {
                 objects[name] = res.res_obj;

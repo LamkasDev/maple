@@ -16,17 +16,21 @@ class SymbolContainer {
         float value_float = 0;
         string value_string = "";
 
-        void init(int _value) {
+        SymbolContainer() {
+            
+        }
+
+        SymbolContainer(int _value) {
             type = SYMBOL_INT;
             value_int = _value;
         }
 
-        void init(float _value) {
+        SymbolContainer(float _value) {
             type = SYMBOL_FLOAT;
             value_float = _value;
         }
 
-        void init(string _value) {
+        SymbolContainer(string _value) {
             type = SYMBOL_STRING;
             value_string = _value;
         }
