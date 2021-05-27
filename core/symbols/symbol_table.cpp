@@ -7,10 +7,6 @@ class SymbolTable {
         shared_ptr<SymbolTable> parent = nullptr;
         map<string, SymbolContainer> symbols;
 
-        void init() {
-
-        }
-
         SymbolContainer get(string _name) {
             try {
                 SymbolContainer value = symbols.at(_name);

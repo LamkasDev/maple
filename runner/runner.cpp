@@ -36,17 +36,14 @@ class Runner {
     public:
         shared_ptr<Interpreter> interpreter;
 
-        void init() {
+        Runner() {
             interpreter = make_shared<Interpreter>();
-            interpreter->init();
         }
 
         RunResult run(string _fileName, string _text) {
             RunResult result;
-            result.init();
 
-            Lexer lexer;
-            lexer.init(_fileName, _text);
+            Lexer lexer(_fileName, _text);
             result.set_lexer(lexer);
 
             MakeTokensResult makeTokensResult = lexer.make_tokens();
@@ -55,17 +52,14 @@ class Runner {
                 return result;
             }
 
-            Parser parser;
-            parser.init(makeTokensResult.tokens);
-
+            Parser parser(makeTokensResult.tokens);
             ParserResult parserResult = parser.parse();
             result.set_parser_result(parserResult);
             if(parserResult.state == -1) {
                 return result;
             }
 
-            shared_ptr<Context> context = make_shared<Context>();
-            context->init(_fileName);
+            shared_ptr<Context> context = make_shared<Context>(_fileName);
             context->set_symbol_table(interpreter->global_symbol_table);
 
             InterpreterResult interpreterResult;

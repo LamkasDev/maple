@@ -10,10 +10,6 @@ class RunResult {
         ParserResult parserResult;
         InterpreterResult interpreterResult;
 
-        void init() {
-
-        }
-
         void set_make_tokens_result(MakeTokensResult _makeTokensResult) {
             makeTokensResult = _makeTokensResult;
         }

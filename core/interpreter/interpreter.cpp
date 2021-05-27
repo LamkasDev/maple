@@ -8,7 +8,7 @@ class Interpreter {
         map<string, shared_ptr<Function>> functions;
         map<string, shared_ptr<Object>> objects;
 
-        void init() {
+        Interpreter() {
             SymbolContainer sc_null(0);
             SymbolContainer sc_true(1);
             SymbolContainer sc_false(0);
@@ -397,8 +397,7 @@ class Interpreter {
         }
 
         shared_ptr<Context> generate_new_context(shared_ptr<Node> node, shared_ptr<Context> context) {
-            shared_ptr<Context> new_context = make_shared<Context>();
-            new_context->init(node->token->value_string);
+            shared_ptr<Context> new_context = make_shared<Context>(node->token->value_string);
             new_context->set_parent(context);
             new_context->set_parent_entry_pos(node->start);
             new_context->set_symbol_table(new_context->parent->symbol_table);

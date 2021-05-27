@@ -10,7 +10,11 @@ class Lexer {
         Position pos;
         char current_c;
 
-        void init(string _fileName, string _text) {
+        Lexer() {
+            
+        }
+
+        Lexer(string _fileName, string _text) {
             fileName = _fileName;
             text = _text;
 

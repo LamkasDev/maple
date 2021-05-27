@@ -10,7 +10,7 @@ class Context {
         Position parent_entry_pos;
         shared_ptr<SymbolTable> symbol_table;
 
-        void init(string _display_name) {
+        Context(string _display_name) {
             display_name = _display_name;
         }
 

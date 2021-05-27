@@ -7,7 +7,7 @@ class Parser {
         int index = 0;
         shared_ptr<Token> current_t = nullptr;
 
-        void init(list<shared_ptr<Token>> _tokens) {
+        Parser(list<shared_ptr<Token>> _tokens) {
             tokens = _tokens;
             index = 1;
             advance();

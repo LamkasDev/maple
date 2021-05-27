@@ -56,8 +56,6 @@ bool run_file(Runner runner, string location, bool prints_result, bool prints_de
 
 int main(int argc, char** argv) {
     Runner runner;
-    runner.init();
-
     bool debug_mode = false;
     if(argc >= 2) {
         if(string(argv[1]) == "-run") {
