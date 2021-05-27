@@ -18,7 +18,11 @@ class Error {
         string details = "";
         int extra = 0;
 
-        void init(Position _start, Position _end, string _name, string _details) {
+        Error() {
+            
+        }
+
+        Error(Position _start, Position _end, string _name, string _details) {
             start = _start;
             end = _end;
             name = _name;
