@@ -13,17 +13,17 @@ class NodeValue {
         string value_string = "";
         string type = NODE_VALUE_UNKNOWN;
 
-        void init(int _value) {
+        void set_value(int _value) {
             value_int = _value;
             type = NODE_VALUE_INT;
         }
 
-        void init(float _value) {
+        void set_value(float _value) {
             value_float = _value;
             type = NODE_VALUE_FLOAT;
         }
 
-        void init(string _value) {
+        void set_value(string _value) {
             value_string = _value;
             type = NODE_VALUE_STRING;
         }
@@ -31,11 +31,11 @@ class NodeValue {
         NodeValue copy() {
             NodeValue copy;
             if(type == NODE_VALUE_INT) {
-                copy.init(value_int);
+                copy.set_value(value_int);
             } else if(type == NODE_VALUE_FLOAT) {
-                copy.init(value_float);
+                copy.set_value(value_float);
             } else if(type == NODE_VALUE_STRING) {
-                copy.init(value_string);
+                copy.set_value(value_string);
             }
 
             return copy;

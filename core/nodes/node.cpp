@@ -66,17 +66,17 @@ class Node {
         }
 
         void set_value(int _value) {
-            value.init(_value);
+            value.set_value(_value);
             type = NODE_INT;
         }
 
         void set_value(float _value) {
-            value.init(_value);
+            value.set_value(_value);
             type = NODE_FLOAT;
         }
 
         void set_value(string _value) {
-            value.init(_value);
+            value.set_value(_value);
             type = NODE_STRING;
         }
 
