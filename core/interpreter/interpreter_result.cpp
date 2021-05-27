@@ -239,12 +239,10 @@ class InterpreterResult {
 
             InterpreterResult res;
             if(_right.type == NODE_INT && _right.res_int.value == 0) {
-                RuntimeError e;
-                e.init(_right.start, _right.end, "Division by zero", res_int.context);
+                RuntimeError e(_right.start, _right.end, "Division by zero", res_int.context);
                 return res.failure(e);
             } else if(_right.type == NODE_FLOAT && _right.res_float.value == 0) {
-                RuntimeError e;
-                e.init(_right.start, _right.end, "Division by zero", res_float.context);
+                RuntimeError e(_right.start, _right.end, "Division by zero", res_float.context);
                 return res.failure(e);
             }
 
