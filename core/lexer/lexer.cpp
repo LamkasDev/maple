@@ -11,14 +11,14 @@ class Lexer {
         char current_c;
 
         Lexer() {
-            
+
         }
 
         Lexer(string _fileName, string _text) {
             fileName = _fileName;
             text = _text;
 
-            pos.init(-1, 0, -1, fileName, text);
+            pos.set_location(-1, 0, -1, fileName, text);
             advance();
         }
 

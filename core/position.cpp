@@ -9,7 +9,7 @@ class Position {
         string fileName = "";
         string fileContents = "";
 
-        void init(int _index, int _line, int _column, string _fileName, string _fileContents) {
+        void set_location(int _index, int _line, int _column, string _fileName, string _fileContents) {
             index = _index;
             line = _line;
             column = _column;
@@ -35,7 +35,7 @@ class Position {
 
         Position copy() {
             Position p;
-            p.init(index, line, column, fileName, fileContents);
+            p.set_location(index, line, column, fileName, fileContents);
 
             return p;
         }
