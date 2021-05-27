@@ -85,8 +85,7 @@ class Interpreter {
         }
 
         InterpreterResult visit_int_node(shared_ptr<Node> node, shared_ptr<Context> context) {
-            IntNumber n;
-            n.init(node->value.value_int);
+            IntNumber n(node->value.value_int);
             n.set_pos(node->start, node->end);
             n.set_context(context);
 
@@ -99,8 +98,7 @@ class Interpreter {
         }
 
         InterpreterResult visit_float_node(shared_ptr<Node> node, shared_ptr<Context> context) {
-            FloatNumber n;
-            n.init(node->value.value_float);
+            FloatNumber n(node->value.value_float);
             n.set_pos(node->start, node->end);
 
             InterpreterResult res;
@@ -272,8 +270,7 @@ class Interpreter {
                 step_value = res.register_result(visit_node(node->for_step_result, context));
                 if(res.should_return()) { return res; }
             } else {
-                IntNumber n_s;
-                n_s.init(1);
+                IntNumber n_s(1);
                 InterpreterResult n_s_i;
                 n_s_i.set_from(n_s);
 

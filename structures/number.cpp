@@ -22,7 +22,11 @@ class FloatNumber : public Number {
     public:
         float value = 0;
 
-        void init(float _value) {
+        FloatNumber() {
+
+        }
+
+        FloatNumber(float _value) {
             value = _value;
         }
 
@@ -35,7 +39,11 @@ class IntNumber : public Number {
     public:
         int value = 0;
 
-        void init(int _value) {
+        IntNumber() {
+            
+        }
+
+        IntNumber(int _value) {
             value = _value;
         }
 

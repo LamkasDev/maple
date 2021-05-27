@@ -81,7 +81,7 @@ class InterpreterResult {
         }
 
         void set_from(int _res_int) {
-            IntNumber _res; _res.init(_res_int);
+            IntNumber _res(_res_int);
             res_int = _res;
             type = NODE_INT;
         }
@@ -92,7 +92,7 @@ class InterpreterResult {
         }
 
         void set_from(float _res_float) {
-            FloatNumber _res; _res.init(_res_float);
+            FloatNumber _res(_res_float);
             res_float = _res;
             type = NODE_FLOAT;
         }
@@ -181,14 +181,12 @@ class InterpreterResult {
             if(((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT))) { return illegal_operation(_right); }
 
             InterpreterResult res;
-            IntNumber n_int;
-            FloatNumber n_float;
             if(type == NODE_INT && _right.type == NODE_INT) {
-                n_int.init(res_int.value + _right.res_int.value);
+                IntNumber n_int(res_int.value + _right.res_int.value);
                 n_int.set_context(res_int.context);
                 res.set_from(n_int);
             } else {
-                n_float.init(get_value() + _right.get_value());
+                FloatNumber n_float(get_value() + _right.get_value());
                 n_float.set_context(get_context());
                 res.set_from(n_float);
             }
@@ -200,14 +198,12 @@ class InterpreterResult {
             if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right); }
 
             InterpreterResult res;
-            IntNumber n_int;
-            FloatNumber n_float;
             if(type == NODE_INT && _right.type == NODE_INT) {
-                n_int.init(res_int.value - _right.res_int.value);
+                IntNumber n_int(res_int.value - _right.res_int.value);
                 n_int.set_context(res_int.context);
                 res.set_from(n_int);
             } else {
-                n_float.init(get_value() - _right.get_value());
+                FloatNumber n_float(get_value() - _right.get_value());
                 n_float.set_context(get_context());
                 res.set_from(n_float);
             }
@@ -219,14 +215,12 @@ class InterpreterResult {
             if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right); }
 
             InterpreterResult res;
-            IntNumber n_int;
-            FloatNumber n_float;
             if(type == NODE_INT && _right.type == NODE_INT) {
-                n_int.init(res_int.value * _right.res_int.value);
+                IntNumber n_int(res_int.value * _right.res_int.value);
                 n_int.set_context(res_int.context);
                 res.set_from(n_int);
             } else {
-                n_float.init(get_value() * _right.get_value());
+                FloatNumber n_float(get_value() * _right.get_value());
                 n_float.set_context(get_context());
                 res.set_from(n_float);
             }
@@ -246,8 +240,7 @@ class InterpreterResult {
                 return res.failure(e);
             }
 
-            FloatNumber n_float;
-            n_float.init(get_value() / _right.get_value());
+            FloatNumber n_float(get_value() / _right.get_value());
             n_float.set_context(get_context());
             res.set_from(n_float);
 
@@ -258,14 +251,12 @@ class InterpreterResult {
             if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right); }
 
             InterpreterResult res;
-            IntNumber n_int;
-            FloatNumber n_float;
             if(type == NODE_INT && _right.type == NODE_INT) {
-                n_int.init(pow(res_int.value, _right.res_int.value));
+                IntNumber n_int(pow(res_int.value, _right.res_int.value));
                 n_int.set_context(res_int.context);
                 res.set_from(n_int);
             } else {
-                n_float.init(pow(get_value(), _right.get_value()));
+                FloatNumber n_float(pow(get_value(), _right.get_value()));
                 n_float.set_context(get_context());
                 res.set_from(n_float);
             }
@@ -277,14 +268,12 @@ class InterpreterResult {
             if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right); }
 
             InterpreterResult res;
-            IntNumber n_int;
-            FloatNumber n_float;
             if(type == NODE_INT && _right.type == NODE_INT) {
-                n_int.init(res_int.value % _right.res_int.value);
+                IntNumber n_int(res_int.value % _right.res_int.value);
                 n_int.set_context(res_int.context);
                 res.set_from(n_int);
             } else {
-                n_float.init(fmod(get_value(), _right.get_value()));
+                FloatNumber n_float(fmod(get_value(), _right.get_value()));
                 n_float.set_context(get_context());
                 res.set_from(n_float);
             }
@@ -296,21 +285,21 @@ class InterpreterResult {
             if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right); }
 
             InterpreterResult res;
-            IntNumber n_int;
+            IntNumber n_int(0);
             if(_token->type == TT_EQEQ) {
-                n_int.init(get_value() == _right.get_value());
+                n_int.value = get_value() == _right.get_value();
             } else if(_token->type == TT_EQEQ) {
-                n_int.init(get_value() == _right.get_value());
+                n_int.value = get_value() == _right.get_value();
             } else if(_token->type == TT_NEQ) {
-                n_int.init(get_value() != _right.get_value());
+                n_int.value = get_value() != _right.get_value();
             } else if(_token->type == TT_LTHAN) {
-                n_int.init(get_value() < _right.get_value());
+                n_int.value = get_value() < _right.get_value();
             } else if(_token->type == TT_GTHAN) {
-                n_int.init(get_value() > _right.get_value());
+                n_int.value = get_value() > _right.get_value();
             } else if(_token->type == TT_LTHANEQ) {
-                n_int.init(get_value() <= _right.get_value());
+                n_int.value = get_value() <= _right.get_value();
             } else if(_token->type == TT_GTHANEQ) {
-                n_int.init(get_value() >= _right.get_value());
+                n_int.value = get_value() >= _right.get_value();
             }
             n_int.set_context(get_context());
             res.set_from(n_int);
@@ -322,8 +311,7 @@ class InterpreterResult {
             if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right); }
 
             InterpreterResult res;
-            IntNumber n_int;
-            n_int.init(get_value() && _right.get_value());
+            IntNumber n_int(get_value() && _right.get_value());
             n_int.set_context(get_context());
             res.set_from(n_int);
 
@@ -334,8 +322,7 @@ class InterpreterResult {
             if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right); }
 
             InterpreterResult res;
-            IntNumber n_int;
-            n_int.init(get_value() || _right.get_value());
+            IntNumber n_int(get_value() || _right.get_value());
             n_int.set_context(get_context());
             res.set_from(n_int);
 
