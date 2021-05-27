@@ -24,7 +24,11 @@ class InterpreterResult {
         bool loop_should_continue = false;
         bool loop_should_break = false;
 
-        void init(Position _start, Position _end) {
+        InterpreterResult() {
+            
+        }
+
+        void set_pos(Position _start, Position _end) {
             start = _start;
             end = _end;
         }
