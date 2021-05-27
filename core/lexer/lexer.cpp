@@ -116,6 +116,22 @@ class Lexer {
                         break;
                     }
 
+                    case '[': {
+                        shared_ptr<Token> t = make_shared<Token>();
+                        t->init(TT_LSBRACKET);
+                        t->set_start(pos);
+                        result.tokens.push_back(t); advance();
+                        break;
+                    }
+
+                    case ']': {
+                        shared_ptr<Token> t = make_shared<Token>();
+                        t->init(TT_RSBRACKET);
+                        t->set_start(pos);
+                        result.tokens.push_back(t); advance();
+                        break;
+                    }
+
                     case '=': {
                         shared_ptr<Token> t = make_equals();
                         result.tokens.push_back(t);

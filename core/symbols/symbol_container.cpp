@@ -6,6 +6,7 @@ const string SYMBOL_INT = "INT";
 const string SYMBOL_FLOAT = "FLOAT";
 const string SYMBOL_FUNC = "FUNC";
 const string SYMBOL_STRING = "STRING";
+const string SYMBOL_LIST = "LIST";
 
 class SymbolContainer {
     public:

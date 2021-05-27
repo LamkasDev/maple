@@ -5,6 +5,7 @@ class Interpreter {
     public:
         shared_ptr<BuiltInRunner> builtin_runner = nullptr;
         shared_ptr<SymbolTable> global_symbol_table = nullptr;
+        map<string, shared_ptr<List>> lists;
         map<string, shared_ptr<Function>> functions;
         map<string, shared_ptr<Object>> objects;
 
@@ -64,6 +65,8 @@ class Interpreter {
                 res = visit_func_def_node(node, context);
             } else if(node->type == NODE_STRING) {
                 res = visit_string_node(node, context);
+            } else if(node->type == NODE_LIST) {
+                res = visit_list_node(node, context);
             } else if(node->type == NODE_STATEMENTS) {
                 res = visit_statements_node(node, context);
             } else if(node->type == NODE_RETURN) {
@@ -84,12 +87,10 @@ class Interpreter {
         InterpreterResult visit_int_node(shared_ptr<Node> node, shared_ptr<Context> context) {
             IntNumber n(node->value.value_int);
             n.set_pos(node->start, node->end);
-            n.set_context(context);
 
             InterpreterResult res;
             res.set_pos(n.start, n.end);
             res.set_from(n);
-            n.set_context(context);
 
             return res.success();
         }
@@ -113,6 +114,39 @@ class Interpreter {
             res.set_pos(n.start, n.end);
             res.set_from(n);
 
+            return res.success();
+        }
+
+        InterpreterResult visit_list_node(shared_ptr<Node> node, shared_ptr<Context> context) {
+            shared_ptr<List> n = make_shared<List>();
+            n->set_pos(node->start, node->end);
+
+            InterpreterResult res;
+            res.set_pos(n->start, n->end);
+            for(shared_ptr<Node> _node : node->list_nodes_result) {
+                InterpreterResult value_res = res.register_result(visit_node(_node, context));
+                if(res.should_return()) { break; }
+
+                if(n->type != SYMBOL_LIST_UNKNOWN && n->type != value_res.type) {
+                    RuntimeError e(_node->start, _node->end, "Mixed types in an array are not allowed", context);
+                    res.failure(e);
+                    break;
+                }
+                if(value_res.type == NODE_INT) {
+                    n->add_value(value_res.res_int.value);
+                } else if(value_res.type == NODE_FLOAT) {
+                    n->add_value(value_res.res_float.value);
+                } else if(value_res.type == NODE_STRING) {
+                    n->add_value(value_res.res_string.value);
+                } else {
+                    RuntimeError e(_node->start, _node->end, "Unsupported type in list", context);
+                    res.failure(e);
+                    break;
+                }
+            }
+            if(res.should_return()) { return res; }
+
+            res.set_from(n);
             return res.success();
         }
 
@@ -190,12 +224,17 @@ class Interpreter {
                     res.set_from(value.value_string);
                 }
             } else {
-                shared_ptr<Object> value_obj = get_obj(node->token->value_string);
-                if(value_obj->state == 0) {
-                    res.set_from(value_obj);
+                shared_ptr<List> value_list = get_list(node->token->value_string);
+                if(value_list->state == 0) {
+                    res.set_from(value_list);
                 } else {
-                    RuntimeError e(node->start, node->end, node->token->value_string + " is not defined", context);
-                    return res.failure(e);
+                    shared_ptr<Object> value_obj = get_obj(node->token->value_string);
+                    if(value_obj->state == 0) {
+                        res.set_from(value_obj);
+                    } else {
+                        RuntimeError e(node->start, node->end, node->token->value_string + " is not defined", context);
+                        return res.failure(e);
+                    }
                 }
             }
 
@@ -222,16 +261,16 @@ class Interpreter {
             res.set_pos(node->start, node->end);
             
             shared_ptr<Node> cond = nullptr;
-            for(shared_ptr<Node> node : node->if_results) {
+            for(shared_ptr<Node> _node : node->if_results) {
                 if(cond == nullptr) {
-                    cond = node;
+                    cond = _node;
                     continue;
                 }
 
                 cond_res = res.register_result(visit_node(cond, context));
                 if(res.should_return()) { return res; }
                 if(cond_res.is_true()) {
-                    expr_res = res.register_result(visit_node(node, context));
+                    expr_res = res.register_result(visit_node(_node, context));
                     if(res.should_return()) { break; }
 
                     res.set_from(expr_res);
@@ -438,6 +477,8 @@ class Interpreter {
             } else if(res.type == NODE_STRING) {
                 SymbolContainer value(res.res_string.value);
                 context->symbol_table->set(name, value);
+            } else if(res.type == NODE_LIST) {
+                lists[name] = res.res_list;
             } else if(res.type == NODE_OBJECT_NEW) {
                 objects[name] = res.res_obj;
             }
@@ -455,6 +496,17 @@ class Interpreter {
             if(res.should_return()) { return res; }
 
             return res.success();
+        }
+
+        shared_ptr<List> get_list(string _name) {
+            try {
+                shared_ptr<List> value = lists.at(_name);
+                return value;
+            } catch(out_of_range e) {
+                shared_ptr<List> res_err = make_shared<List>();
+                res_err->state = -1;
+                return res_err;
+            }
         }
 
         shared_ptr<Object> get_obj(string _name) {

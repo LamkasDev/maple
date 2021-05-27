@@ -7,6 +7,7 @@ const string NODE_UNKNOWN = "UNKNOWN";
 const string NODE_INT = "INT";
 const string NODE_FLOAT = "FLOAT";
 const string NODE_STRING = "STRING";
+const string NODE_LIST = "LIST";
 
 const string NODE_BINARY = "BINARY";
 const string NODE_UNARY = "UNARY";
@@ -60,6 +61,8 @@ class Node {
         shared_ptr<Node> func_call_expression_result = nullptr;
 
         list<shared_ptr<Node>> statements_nodes_result;
+
+        list<shared_ptr<Node>> list_nodes_result;
 
         void set_type(string _type) {
             type = _type;
@@ -159,6 +162,10 @@ class Node {
 
         void set_statements_nodes_result(list<shared_ptr<Node>> _statements_nodes_result) {
             statements_nodes_result = _statements_nodes_result;
+        }
+
+        void set_list_nodes_result(list<shared_ptr<Node>> _list_nodes_result) {
+            list_nodes_result = _list_nodes_result;
         }
 
         shared_ptr<Node> copy() {

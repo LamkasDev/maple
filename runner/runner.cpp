@@ -29,6 +29,7 @@
 #include "../structures/function.cpp"
 #include "../structures/string.cpp"
 #include "../structures/object.cpp"
+#include "../structures/list.cpp"
 
 using namespace std;
 

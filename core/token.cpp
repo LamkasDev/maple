@@ -32,6 +32,8 @@ const string TT_MOD = "MOD";
 
 const string TT_LPAREN = "LPAREN";
 const string TT_RPAREN = "RPAREN";
+const string TT_LSBRACKET = "LSBRACKET";
+const string TT_RSBRACKET = "RSBRACKET";
 const string TT_LCBRACKET = "LCBRACKET";
 const string TT_RCBRACKET = "RCBRACKET";
 const string TT_COMMA = "COMMA";

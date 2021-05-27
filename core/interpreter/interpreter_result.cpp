@@ -4,6 +4,7 @@
 #include "../../structures/function.cpp"
 #include "../../structures/string.cpp"
 #include "../../structures/object.cpp"
+#include "../../structures/list.cpp"
 using namespace std;
 
 class InterpreterResult {
@@ -17,6 +18,7 @@ class InterpreterResult {
         IntNumber res_int;
         FloatNumber res_float;
         String res_string;
+        shared_ptr<List> res_list;
         shared_ptr<Function> res_func;
         shared_ptr<Object> res_obj;
 
@@ -127,6 +129,11 @@ class InterpreterResult {
             type = NODE_STRING;
         }
 
+        void set_from(shared_ptr<List> _res_list) {
+            res_list = _res_list;
+            type = NODE_LIST;
+        }
+
         void set_from(InterpreterResult _res) {
             if(_res.type == NODE_INT) {
                 res_int = _res.res_int;
@@ -140,6 +147,9 @@ class InterpreterResult {
             } else if(_res.type == NODE_STRING) {
                 res_string = _res.res_string;
                 type = NODE_STRING;
+            } else if(_res.type == NODE_LIST) {
+                res_list = _res.res_list;
+                type = NODE_LIST;
             } else if(_res.type == NODE_OBJECT_NEW) {
                 res_obj = _res.res_obj;
                 type = NODE_OBJECT_NEW;
@@ -379,6 +389,8 @@ class InterpreterResult {
                 return res_func->context;
             } else if(type == NODE_STRING) {
                 return res_string.context;
+            } else if(type == NODE_LIST) {
+                return res_list->context;
             } else if(type == NODE_OBJECT_NEW) {
                 return res_obj->context;
             } else {
@@ -395,6 +407,8 @@ class InterpreterResult {
                 return res_func->repr();
             } else if(type == NODE_STRING) {
                 return res_string.repr();
+            } else if(type == NODE_LIST) {
+                return res_list->repr();
             } else if(type == NODE_OBJECT_NEW) {
                 return res_obj->repr();
             } else {

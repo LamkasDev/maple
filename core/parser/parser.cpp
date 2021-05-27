@@ -84,6 +84,12 @@ class Parser {
                 } else {
                     return result.failure(create_syntax_error("')'"));
                 }
+            } else if(t->type == TT_LSBRACKET) {
+                ParserResult expr = list_expr();
+                if(expr.state == -1) { return result.failure(expr.e); }
+
+                result.set_node(expr.node);
+                return result.success();
             } else if(t->matches(TT_KEYWORD, KEYWORD_IF)) {
                 ParserResult expr = if_expr();
                 if(expr.state == -1) { return result.failure(expr.e); }
@@ -116,7 +122,7 @@ class Parser {
                 return result.success();
             }
 
-            return result.failure(create_syntax_error("int/float, identifier, '+', '-', '(', 'IF', 'FOR', 'WHILE' or 'FUNC'"));
+            return result.failure(create_syntax_error("int/float, identifier, '+', '-', '[', '(', 'IF', 'FOR', 'WHILE' or 'FUNC'"));
         }
 
         ParserResult call() {
@@ -138,7 +144,7 @@ class Parser {
                 } else {
                     ParserResult arg = result.register_result(expression());
                     if(result.state == -1) {
-                        return result.failure(create_syntax_error("')', 'VAR', 'IF', 'FOR', 'WHILE', 'FUNC', int/float, identifier, '+', '-' or '(' or 'NOT'"));
+                        return result.failure(create_syntax_error("')', 'VAR', 'IF', 'FOR', 'WHILE', 'FUNC', int/float, identifier, '+', '-', '[', '(' or 'NOT'"));
                     }
                     arguments.push_back(arg.node);
 
@@ -361,7 +367,7 @@ class Parser {
             }
 
             ParserResult arith = result.register_result(arith_expr_pre());
-            if(result.state == -1) { return result.failure(create_syntax_error("int/float, identifier, '+', '-', '(' or 'NOT'")); }
+            if(result.state == -1) { return result.failure(create_syntax_error("int/float, identifier, '+', '-', '[', '(' or 'NOT'")); }
             
             result.set_node(arith.node);
             return result.success();
@@ -502,6 +508,48 @@ class Parser {
             if(result.state == -1) { return result; }
             
             result.set_node(op);
+            return result.success();
+        }
+
+        ParserResult list_expr() {
+            ParserResult result;
+            list<shared_ptr<Node>> elements;
+            shared_ptr<Node> node = make_shared<Node>();
+            node->set_start(current_t->start);
+            node->set_type(NODE_LIST);
+
+            if(current_t->type != TT_LSBRACKET) {
+                return result.failure(create_syntax_error("'['", 1));
+            }
+            result.register_advance(advance());
+
+            if(current_t->type == TT_RSBRACKET) {
+                result.register_advance(advance());
+            } else {
+                ParserResult element = result.register_result(expression());
+                if(result.state == -1) {
+                    return result.failure(create_syntax_error("']', 'VAR', 'IF', 'FOR', 'WHILE', 'FUNC', int/float, identifier, '+', '-' or '(' or 'NOT'"));
+                }
+                elements.push_back(element.node);
+
+                while(current_t->type == TT_COMMA) {
+                    result.register_advance(advance());
+
+                    ParserResult element_1 = result.register_result(expression());
+                    if(result.state == -1) { break; }
+                    elements.push_back(element_1.node);
+                }
+                if(result.state == -1) { return result; }
+
+                if(current_t->type != TT_RSBRACKET) {
+                    return result.failure(create_syntax_error("',' or ']'"));
+                }
+                result.register_advance(advance());
+            }
+
+            node->set_list_nodes_result(elements);
+            
+            result.set_node(node);
             return result.success();
         }
 

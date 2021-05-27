@@ -139,6 +139,12 @@ bool run_tests(Runner runner) {
     total_tests += 3;
 
     printf("----------\n");
+    passed += run_integer_test(runner, "Lists 1 (VAR list_a = [1,2,3])", "VAR list_a = [1,2,3]", 0);
+    passed += run_integer_test(runner, "Lists 2 (VAR list_b = [1.2,2.5,3.1])", "VAR list_b = [1.2,2.5,3.1]", 0);
+    passed += run_integer_test(runner, "Lists 3 (VAR list_c = [\"a\",\"b\",\"c\"])", "VAR list_c = [\"a\",\"b\",\"c\"]", 0);
+    total_tests += 3;
+
+    printf("----------\n");
     printf("%i PASSED, %i FAILED", passed, (total_tests - passed));
     return passed < total_tests;
 }
