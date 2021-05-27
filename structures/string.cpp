@@ -9,7 +9,11 @@ class String {
         shared_ptr<Context> context = nullptr;
         string value = "";
 
-        void init(string _value) {
+        String() {
+            
+        }
+
+        String(string _value) {
             value = _value;
         }
 

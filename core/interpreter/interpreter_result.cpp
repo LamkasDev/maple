@@ -117,7 +117,7 @@ class InterpreterResult {
         }
 
         void set_from(string _res_string) {
-            String _res; _res.init(_res_string);
+            String _res(_res_string);
             res_string = _res;
             type = NODE_STRING;
         }
@@ -174,8 +174,7 @@ class InterpreterResult {
         InterpreterResult added_to(InterpreterResult _right) {
             if((type == NODE_STRING && _right.type == NODE_INT) || (type == NODE_INT && _right.type == NODE_STRING) || (type == NODE_STRING && _right.type == NODE_FLOAT) || (type == NODE_FLOAT && _right.type == NODE_STRING) || (type == NODE_STRING && _right.type == NODE_STRING)) {
                 InterpreterResult res;
-                String n_str;
-                n_str.init(get_string_value() + _right.get_string_value());
+                String n_str(get_string_value() + _right.get_string_value());
                 n_str.set_context(get_context());
                 res.set_from(n_str);
 

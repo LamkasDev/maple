@@ -106,8 +106,7 @@ class Interpreter {
         }
 
         InterpreterResult visit_string_node(shared_ptr<Node> node, shared_ptr<Context> context) {
-            String n;
-            n.init(node->value.value_string);
+            String n(node->value.value_string);
             n.set_pos(node->start, node->end);
 
             InterpreterResult res;
