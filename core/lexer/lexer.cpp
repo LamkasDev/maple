@@ -171,8 +171,7 @@ class Lexer {
                             Position start = pos.copy();
                             advance();
 
-                            IllegalCharacterError e;
-                            e.init(start, pos, ("'" + string(1, c) + "'").c_str());
+                            IllegalCharacterError e(start, pos, ("'" + string(1, c) + "'").c_str());
                             result.e = e;
                             result.state = -1;
                             return result;
@@ -292,8 +291,7 @@ class Lexer {
                 advance();
                 t->init(TT_NEQ);
             } else {
-                ExpectedCharacterError e;
-                e.init(pos.copy(), pos.copy(), "'=' (after '!')");
+                ExpectedCharacterError e(pos.copy(), pos.copy(), "'=' (after '!')");
                 result.e = e;
                 result.state = -1;
             }
@@ -402,8 +400,7 @@ class Lexer {
             if(current_c == '/') {
                 advance();
             } else {
-                ExpectedCharacterError e;
-                e.init(pos.copy(), pos.copy(), "'/'");
+                ExpectedCharacterError e(pos.copy(), pos.copy(), "'/'");
                 result.e = e;
                 result.state = -1;
             }

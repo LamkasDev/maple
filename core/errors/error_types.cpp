@@ -4,7 +4,11 @@ using namespace std;
 
 class IllegalCharacterError : public Error {
     public:
-        void init(Position _start, Position _end, string _details) {
+        IllegalCharacterError() {
+            
+        }
+        
+        IllegalCharacterError(Position _start, Position _end, string _details) {
             start = _start;
             end = _end;
 
@@ -16,7 +20,11 @@ class IllegalCharacterError : public Error {
 
 class InvalidSyntaxError : public Error {
     public:
-        void init(Position _start, Position _end, string _details) {
+        InvalidSyntaxError() {
+            
+        }
+
+        InvalidSyntaxError(Position _start, Position _end, string _details) {
             start = _start;
             end = _end;
 
@@ -28,7 +36,11 @@ class InvalidSyntaxError : public Error {
 
 class RuntimeError : public Error {
     public:
-        void init(Position _start, Position _end, string _details, shared_ptr<Context> _context) {
+        RuntimeError() {
+            
+        }
+        
+        RuntimeError(Position _start, Position _end, string _details, shared_ptr<Context> _context) {
             start = _start;
             end = _end;
 
@@ -41,7 +53,11 @@ class RuntimeError : public Error {
 
 class ExpectedCharacterError : public Error {
     public:
-        void init(Position _start, Position _end, string _details) {
+        ExpectedCharacterError() {
+            
+        }
+        
+        ExpectedCharacterError(Position _start, Position _end, string _details) {
             start = _start;
             end = _end;
 

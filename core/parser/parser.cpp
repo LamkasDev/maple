@@ -859,8 +859,7 @@ class Parser {
         }
 
         InvalidSyntaxError create_syntax_error(string exp, int extra = 0) {
-            InvalidSyntaxError e;
-            e.init(current_t->start, current_t->end, "Expected " + exp);
+            InvalidSyntaxError e(current_t->start, current_t->end, "Expected " + exp);
             e.extra = extra;
             return e;
         }

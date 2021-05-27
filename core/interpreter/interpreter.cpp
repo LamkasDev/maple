@@ -400,8 +400,7 @@ class Interpreter {
                 res.set_from(expr);
                 return res.success();
             } catch(out_of_range e_0) {
-                RuntimeError e;
-                e.init(node->start, node->end, "Function '" + func_name + "' does not exist", context);
+                RuntimeError e(node->start, node->end, "Function '" + func_name + "' does not exist", context);
                 return res.failure(e);
             }
         }
@@ -418,12 +417,10 @@ class Interpreter {
         
         void check_args(shared_ptr<Node> node, shared_ptr<Context> context, InterpreterResult res, list<shared_ptr<Node>> arguments, shared_ptr<Function> function) {
             if(arguments.size() > function->arguments.size()) {
-                RuntimeError e;
-                e.init(node->start, node->end, ((arguments.size() - function->arguments.size()) + " too many args passed into " + node->token->value_string), context);
+                RuntimeError e(node->start, node->end, ((arguments.size() - function->arguments.size()) + " too many args passed into " + node->token->value_string), context);
                 res.failure(e);
             } else if(arguments.size() < function->arguments.size()) {
-                RuntimeError e;
-                e.init(node->start, node->end, ((function->arguments.size() - arguments.size()) + " too few args passed into " + node->token->value_string), context);
+                RuntimeError e(node->start, node->end, ((function->arguments.size() - arguments.size()) + " too few args passed into " + node->token->value_string), context);
                 res.failure(e);
             }
         }

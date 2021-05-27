@@ -356,9 +356,7 @@ class InterpreterResult {
 
         InterpreterResult illegal_operation(InterpreterResult _right) {
             InterpreterResult res;
-
-            RuntimeError e;
-            e.init(start, _right.end, "Illegal operation", get_context());
+            RuntimeError e(start, _right.end, "Illegal operation", get_context());
             return res.failure(e);
         }
 

@@ -43,8 +43,7 @@ class BuiltInRunner {
         InterpreterResult run_print(InterpreterResult res, shared_ptr<Function>, shared_ptr<Context> context) {
             SymbolContainer value = context->symbol_table->get("value");
             if(value.type != SYMBOL_STRING) {
-                RuntimeError e;
-                e.init(res.start, res.end, "Invalid argument", context);
+                RuntimeError e(res.start, res.end, "Invalid argument", context);
                 return res.failure(e);
             }
             printf("%s", value.value_string.c_str());
@@ -73,8 +72,7 @@ class BuiltInRunner {
             try {
                 res.set_from(stoi(value.value_string));
             } catch(invalid_argument e_0) {
-                RuntimeError e;
-                e.init(res.start, res.end, "Invalid argument", context);
+                RuntimeError e(res.start, res.end, "Invalid argument", context);
                 return res.failure(e);
             }
             
@@ -86,8 +84,7 @@ class BuiltInRunner {
             try {
                 res.set_from(stof(value.value_string));
             } catch(invalid_argument e_0) {
-                RuntimeError e;
-                e.init(res.start, res.end, "Invalid argument", context);
+                RuntimeError e(res.start, res.end, "Invalid argument", context);
                 return res.failure(e);
             }
 
