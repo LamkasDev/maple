@@ -16,6 +16,7 @@ const string NODE_ASSIGNMENT = "ASSIGNMENT";
 
 const string NODE_IF = "IF";
 const string NODE_FOR = "FOR";
+const string NODE_FOREACH = "FOREACH";
 const string NODE_WHILE = "WHILE";
 const string NODE_RETURN = "RETURN";
 const string NODE_CONTINUE = "CONTINUE";

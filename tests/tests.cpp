@@ -139,10 +139,22 @@ bool run_tests(Runner runner) {
     total_tests += 3;
 
     printf("----------\n");
-    passed += run_integer_test(runner, "Lists 1 (VAR list_a = [1,2,3])", "VAR list_a = [1,2,3]", 0);
-    passed += run_integer_test(runner, "Lists 2 (VAR list_b = [1.2,2.5,3.1])", "VAR list_b = [1.2,2.5,3.1]", 0);
-    passed += run_integer_test(runner, "Lists 3 (VAR list_c = [\"a\",\"b\",\"c\"])", "VAR list_c = [\"a\",\"b\",\"c\"]", 0);
+    passed += run_integer_test(runner, "Lists 4 (VAR list_a = [1,2,3])", "VAR list_a = [1,2,3]", 0);
+    passed += run_integer_test(runner, "Lists 5 (VAR list_b = [1.25,2.5,3.0])", "VAR list_b = [1.25,2.5,3.0]", 0);
+    passed += run_integer_test(runner, "Lists 5 (VAR list_c = [\"b\",\"c\",\"d\"])", "VAR list_c = [\"b\",\"c\",\"d\"]", 0);
     total_tests += 3;
+
+    printf("----------\n");
+    passed += run_integer_test(runner, "List Functions 1 (VAR a = 0)", "VAR a = 0", 0);
+    passed += run_integer_test(runner, "List Functions 2 (VAR b = 0)", "VAR b = 0", 0);
+    passed += run_string_test(runner, "List Functions 3 (VAR c = \"a\")", "VAR c = \"a\"", "a");
+    passed += run_integer_test(runner, "List Functions 4 (FOREACH(el IN list_a) { VAR a = a + el })", "FOREACH(el IN list_a) { VAR a = a + el }", 0);
+    passed += run_integer_test(runner, "List Functions 5 (FOREACH(el IN list_a) { VAR b = b + el })", "FOREACH(el IN list_b) { VAR b = b + el }", 0);
+    passed += run_integer_test(runner, "List Functions 6 (FOREACH(el IN list_a) { VAR c = c + el })", "FOREACH(el IN list_c) { VAR c = c + el }", 0);
+    passed += run_integer_test(runner, "List Functions 7 (a)", "a", 6);
+    passed += run_float_test(runner, "List Functions 8 (b)", "b", 6.75);
+    passed += run_string_test(runner, "List Functions 9 (c)", "c", "abcd");
+    total_tests += 9;
 
     printf("----------\n");
     printf("%i PASSED, %i FAILED", passed, (total_tests - passed));

@@ -2,7 +2,7 @@
 #include "errors/error.cpp"
 using namespace std;
 
-const vector<string> KEYWORDS { "VAR", "AND", "OR", "NOT", "IF", "ELSE", "ELIF", "FOR", "TO", "STEP", "WHILE", "FUNC", "RETURN", "CONTINUE", "BREAK", "NEW", "OBJECT" }; 
+const vector<string> KEYWORDS { "VAR", "AND", "OR", "NOT", "IF", "ELSE", "ELIF", "FOR", "FOREACH", "TO", "STEP", "IN", "WHILE", "FUNC", "RETURN", "CONTINUE", "BREAK", "NEW", "OBJECT" }; 
 const string LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 const string LETTERS_DIGITS = LETTERS + "0123456789";
 const string DIGITS = "0123456789";
@@ -49,8 +49,10 @@ const string KEYWORD_IF = "IF";
 const string KEYWORD_ELSE = "ELSE";
 const string KEYWORD_ELIF = "ELIF";
 const string KEYWORD_FOR = "FOR";
+const string KEYWORD_FOREACH = "FOREACH";
 const string KEYWORD_TO = "TO";
 const string KEYWORD_STEP = "STEP";
+const string KEYWORD_IN = "IN";
 const string KEYWORD_WHILE = "WHILE";
 const string KEYWORD_FUNC = "FUNC";
 const string KEYWORD_RETURN = "RETURN";

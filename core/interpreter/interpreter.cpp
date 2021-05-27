@@ -57,6 +57,8 @@ class Interpreter {
                 res = visit_if_node(node, context);
             } else if(node->type == NODE_FOR) {
                 res = visit_for_node(node, context);
+            } else if(node->type == NODE_FOREACH) {
+                res = visit_foreach_node(node, context);
             } else if(node->type == NODE_WHILE) {
                 res = visit_while_node(node, context);
             } else if(node->type == NODE_FUNC_CALL) {
@@ -325,6 +327,62 @@ class Interpreter {
                 if(res.loop_should_continue == true) { res.reset(); continue; }
                 if(res.loop_should_break == true) { res.reset(); break; }
                 if(res.has_return_value == true) { res.set_from(expr); res.reset(); break; }
+            }
+            if(res.should_return()) { return res; }
+
+            return res.success();
+        }
+
+        InterpreterResult visit_foreach_node(shared_ptr<Node> node, shared_ptr<Context> context) {
+            InterpreterResult res;
+            res.set_pos(node->start, node->end);
+
+            InterpreterResult list = res.register_result(visit_node(node->for_start_result, context));
+            if(res.should_return()) { return res; }
+            if(list.type != NODE_LIST) {
+                RuntimeError e(node->start, node->end, "Foreach must contain a valid list", context);
+                return res.failure(e);
+            }
+
+            if(list.res_list->type == SYMBOL_LIST_INT) {
+                for(int e : list.res_list->list_ints) {
+                    SymbolContainer container(e);
+                    context->symbol_table->set(node->token->value_string, container);
+
+                    InterpreterResult expr = res.register_result(visit_node(node->for_expr_result, context));
+
+                    if(res.state == -1) { break; }
+                    if(res.loop_should_continue == true) { res.reset(); continue; }
+                    if(res.loop_should_break == true) { res.reset(); break; }
+                    if(res.has_return_value == true) { res.set_from(expr); res.reset(); break; }
+                }
+            } else if(list.res_list->type == SYMBOL_LIST_FLOAT) {
+                for(float e : list.res_list->list_floats) {
+                    SymbolContainer container(e);
+                    context->symbol_table->set(node->token->value_string, container);
+
+                    InterpreterResult expr = res.register_result(visit_node(node->for_expr_result, context));
+
+                    if(res.state == -1) { break; }
+                    if(res.loop_should_continue == true) { res.reset(); continue; }
+                    if(res.loop_should_break == true) { res.reset(); break; }
+                    if(res.has_return_value == true) { res.set_from(expr); res.reset(); break; }
+                }
+            } else if(list.res_list->type == SYMBOL_LIST_STRING) {
+                for(string e : list.res_list->list_strings) {
+                    SymbolContainer container(e);
+                    context->symbol_table->set(node->token->value_string, container);
+
+                    InterpreterResult expr = res.register_result(visit_node(node->for_expr_result, context));
+
+                    if(res.state == -1) { break; }
+                    if(res.loop_should_continue == true) { res.reset(); continue; }
+                    if(res.loop_should_break == true) { res.reset(); break; }
+                    if(res.has_return_value == true) { res.set_from(expr); res.reset(); break; }
+                }
+            } else {
+                RuntimeError e(node->start, node->end, "Invalid type to iterate over", context);
+                return res.failure(e);
             }
             if(res.should_return()) { return res; }
 
