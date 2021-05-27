@@ -200,8 +200,7 @@ class Interpreter {
                 if(value_obj->state == 0) {
                     res.set_from(value_obj);
                 } else {
-                    RuntimeError e;
-                    e.init(node->start, node->end, node->token->value_string + " is not defined", context);
+                    RuntimeError e(node->start, node->end, node->token->value_string + " is not defined", context);
                     return res.failure(e);
                 }
             }
