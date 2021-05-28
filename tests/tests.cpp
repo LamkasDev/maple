@@ -139,9 +139,9 @@ bool run_tests(Runner runner) {
     total_tests += 3;
 
     printf("----------\n");
-    passed += run_integer_test(runner, "Lists 4 (VAR list_a = [1,2,3])", "VAR list_a = [1,2,3]", 0);
-    passed += run_integer_test(runner, "Lists 5 (VAR list_b = [1.25,2.5,3.0])", "VAR list_b = [1.25,2.5,3.0]", 0);
-    passed += run_integer_test(runner, "Lists 5 (VAR list_c = [\"b\",\"c\",\"d\"])", "VAR list_c = [\"b\",\"c\",\"d\"]", 0);
+    passed += run_integer_test(runner, "Lists 1 (VAR list_a = [1,2,3])", "VAR list_a = [1,2,3]", 0);
+    passed += run_integer_test(runner, "Lists 2 (VAR list_b = [1.25,2.5,3.0])", "VAR list_b = [1.25,2.5,3.0]", 0);
+    passed += run_integer_test(runner, "Lists 3 (VAR list_c = [\"b\",\"c\",\"d\"])", "VAR list_c = [\"b\",\"c\",\"d\"]", 0);
     total_tests += 3;
 
     printf("----------\n");
@@ -155,6 +155,11 @@ bool run_tests(Runner runner) {
     passed += run_float_test(runner, "List Functions 8 (b)", "b", 6.75);
     passed += run_string_test(runner, "List Functions 9 (c)", "c", "abcd");
     total_tests += 9;
+
+    printf("----------\n");
+    passed += run_integer_test(runner, "Built-in Functions 1 (parse_int(\"100\"))", "parse_int(\"100\")", 100);
+    passed += run_float_test(runner, "Built-in Functions 2 (parse_float(\"100.55\"))", "parse_float(\"100.55\")", 100.55);
+    total_tests += 2;
 
     printf("----------\n");
     printf("%i PASSED, %i FAILED", passed, (total_tests - passed));
