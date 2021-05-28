@@ -41,24 +41,18 @@ class Lexer {
                         break;
 
                     case '+': {
-                        shared_ptr<Token> t = make_shared<Token>();
-                        t->init(TT_PLUS);
-                        t->set_start(pos);
-                        result.tokens.push_back(t); advance();
+                        result = add_generic_token(result, TT_PLUS);
                         break;
                     }
 
                     case '-': {
-                        shared_ptr<Token> t = make_minus();
-                        result.tokens.push_back(t);
+                        result = make_minus(result);
+                        if(result.state == -1) { return result; }
                         break;
                     }
 
                     case '*': {
-                        shared_ptr<Token> t = make_shared<Token>();
-                        t->init(TT_MUL);
-                        t->set_start(pos);
-                        result.tokens.push_back(t); advance();
+                        result = add_generic_token(result, TT_MUL);
                         break;
                     }
 
@@ -69,123 +63,92 @@ class Lexer {
                     }
 
                     case '^': {
-                        shared_ptr<Token> t = make_shared<Token>();
-                        t->init(TT_POW);
-                        t->set_start(pos);
-                        result.tokens.push_back(t); advance();
+                        result = add_generic_token(result, TT_POW);
                         break;
                     }
 
                     case '%': {
-                        shared_ptr<Token> t = make_shared<Token>();
-                        t->init(TT_MOD);
-                        t->set_start(pos);
-                        result.tokens.push_back(t); advance();
+                        result = add_generic_token(result, TT_MOD);
                         break;
                     }
 
                     case '(': {
-                        shared_ptr<Token> t = make_shared<Token>();
-                        t->init(TT_LPAREN);
-                        t->set_start(pos);
-                        result.tokens.push_back(t); advance();
+                        result = add_generic_token(result, TT_LPAREN);
                         break;
                     }
 
                     case ')': {
-                        shared_ptr<Token> t = make_shared<Token>();
-                        t->init(TT_RPAREN);
-                        t->set_start(pos);
-                        result.tokens.push_back(t); advance();
+                        result = add_generic_token(result, TT_RPAREN);
                         break;
                     }
 
                     case '{': {
-                        shared_ptr<Token> t = make_shared<Token>();
-                        t->init(TT_LCBRACKET);
-                        t->set_start(pos);
-                        result.tokens.push_back(t); advance();
+                        result = add_generic_token(result, TT_LCBRACKET);
                         break;
                     }
 
                     case '}': {
-                        shared_ptr<Token> t = make_shared<Token>();
-                        t->init(TT_RCBRACKET);
-                        t->set_start(pos);
-                        result.tokens.push_back(t); advance();
+                        result = add_generic_token(result, TT_RCBRACKET);
                         break;
                     }
 
                     case '[': {
-                        shared_ptr<Token> t = make_shared<Token>();
-                        t->init(TT_LSBRACKET);
-                        t->set_start(pos);
-                        result.tokens.push_back(t); advance();
+                        result = add_generic_token(result, TT_LSBRACKET);
                         break;
                     }
 
                     case ']': {
-                        shared_ptr<Token> t = make_shared<Token>();
-                        t->init(TT_RSBRACKET);
-                        t->set_start(pos);
-                        result.tokens.push_back(t); advance();
+                        result = add_generic_token(result, TT_RSBRACKET);
                         break;
                     }
 
                     case '=': {
-                        shared_ptr<Token> t = make_equals();
-                        result.tokens.push_back(t);
+                        result = make_equals(result);
+                        if(result.state == -1) { return result; }
                         break;
                     }
 
                     case '<': {
-                        shared_ptr<Token> t = make_less_than();
-                        result.tokens.push_back(t);
+                        result = make_less_than(result);
+                        if(result.state == -1) { return result; }
                         break;
                     }
 
                     case '>': {
-                        shared_ptr<Token> t = make_greater_than();
-                        result.tokens.push_back(t);
+                        result = make_greater_than(result);
+                        if(result.state == -1) { return result; }
                         break;
                     }
 
                     case ',': {
-                        shared_ptr<Token> t = make_shared<Token>();
-                        t->init(TT_COMMA);
-                        t->set_start(pos);
-                        result.tokens.push_back(t); advance();
+                        result = add_generic_token(result, TT_COMMA);
                         break;
                     }
 
                     case '"': {
-                        shared_ptr<Token> t = make_string();
-                        result.tokens.push_back(t);
+                        result = make_string(result);
+                        if(result.state == -1) { return result; }
                         break;
                     }
 
                     case ';': {
-                        shared_ptr<Token> t = make_shared<Token>();
-                        t->init(TT_NEWLINE);
-                        t->set_start(pos);
-                        result.tokens.push_back(t); advance();
+                        result = add_generic_token(result, TT_NEWLINE);
                         break;
                     }
 
                     case '!': {
-                        shared_ptr<Token> t = make_not_equals(result);
+                        result = make_not_equals(result);
                         if(result.state == -1) { return result; }
-                        result.tokens.push_back(t);
                         break;
                     }
 
                     default: {
                         if (DIGITS.find(current_c) != string::npos) {
-                            shared_ptr<Token> t = make_number();
-                            result.tokens.push_back(t);
+                            result = make_number(result);
+                            if(result.state == -1) { return result; }
                         } else if (LETTERS.find(current_c) != string::npos) {
-                            shared_ptr<Token> t = make_identifier();
-                            result.tokens.push_back(t);
+                            result = make_identifier(result);
+                            if(result.state == -1) { return result; }
                         } else {
                             char c = current_c;
                             Position start = pos.copy();
@@ -209,7 +172,16 @@ class Lexer {
             return result;
         }
 
-        shared_ptr<Token> make_number() {
+        MakeTokensResult add_generic_token(MakeTokensResult result, string type) {
+            shared_ptr<Token> t = make_shared<Token>();
+            t->init(type);
+            t->set_start(pos);
+            result.tokens.push_back(t); advance();
+
+            return result;
+        }
+
+        MakeTokensResult make_number(MakeTokensResult result) {
             string str;
             int dot = 0;
             while(pos.index < text.length() && (DIGITS + ".").find(current_c) != string::npos) {
@@ -228,18 +200,20 @@ class Lexer {
                 t->set_start(pos.copy());
                 t->set_end(pos.copy());
 
-                return t;
+                result.tokens.push_back(t);
             } else {
                 shared_ptr<TokenFloat> t = make_shared<TokenFloat>();
                 t->init(atof(str.c_str()));
                 t->set_start(pos.copy());
                 t->set_end(pos.copy());
 
-                return t;
+                result.tokens.push_back(t);
             }
+
+            return result;
         }
 
-        shared_ptr<Token> make_identifier() {
+        MakeTokensResult make_identifier(MakeTokensResult result) {
             string str;
             while(pos.index < text.length() && (LETTERS_DIGITS + '_').find(current_c) != string::npos) {
                 str += current_c;
@@ -252,18 +226,20 @@ class Lexer {
                 t->set_start(pos.copy());
                 t->set_end(pos.copy());
 
-                return t;
+                result.tokens.push_back(t);
             } else {
                 shared_ptr<TokenIdentifier> t = make_shared<TokenIdentifier>();
                 t->init(str);
                 t->set_start(pos.copy());
                 t->set_end(pos.copy());
 
-                return t;
+                result.tokens.push_back(t);
             }
+
+            return result;
         }
 
-        shared_ptr<Token> make_string() {
+        MakeTokensResult make_string(MakeTokensResult result) {
             string str;
             bool escaped = false;
             advance();
@@ -297,10 +273,11 @@ class Lexer {
             t->set_start(pos.copy());
             t->set_end(pos.copy());
 
-            return t;
+            result.tokens.push_back(t);
+            return result;
         }
 
-        shared_ptr<Token> make_not_equals(MakeTokensResult result) {
+        MakeTokensResult make_not_equals(MakeTokensResult result) {
             string str;
             shared_ptr<Token> t = make_shared<Token>();
             t->set_start(pos.copy());
@@ -310,16 +287,17 @@ class Lexer {
             if(current_c == '=') {
                 advance();
                 t->init(TT_NEQ);
+                result.tokens.push_back(t);
             } else {
                 ExpectedCharacterError e(pos.copy(), pos.copy(), "'=' (after '!')");
                 result.e = e;
                 result.state = -1;
             }
             
-            return t;
+            return result;
         }
 
-        shared_ptr<Token> make_equals() {
+        MakeTokensResult make_equals(MakeTokensResult result) {
             string str;
             shared_ptr<Token> t = make_shared<Token>();
             t->init(TT_EQ);
@@ -332,10 +310,11 @@ class Lexer {
                 t->init(TT_EQEQ);
             }
 
-            return t;
+            result.tokens.push_back(t);
+            return result;
         }
 
-        shared_ptr<Token> make_less_than() {
+        MakeTokensResult make_less_than(MakeTokensResult result) {
             string str;
             shared_ptr<Token> t = make_shared<Token>();
             t->init(TT_LTHAN);
@@ -348,10 +327,11 @@ class Lexer {
                 t->init(TT_LTHANEQ);
             }
 
-            return t;
+            result.tokens.push_back(t);
+            return result;
         }
 
-        shared_ptr<Token> make_greater_than() {
+        MakeTokensResult make_greater_than(MakeTokensResult result) {
             string str;
             shared_ptr<Token> t = make_shared<Token>();
             t->init(TT_GTHAN);
@@ -364,10 +344,11 @@ class Lexer {
                 t->init(TT_GTHANEQ);
             }
 
-            return t;
+            result.tokens.push_back(t);
+            return result;
         }
 
-        shared_ptr<Token> make_minus() {
+        MakeTokensResult make_minus(MakeTokensResult result) {
             string str;
             shared_ptr<Token> t = make_shared<Token>();
             t->init(TT_MINUS);
@@ -380,7 +361,8 @@ class Lexer {
                 t->init(TT_ARROW);
             }
 
-            return t;
+            result.tokens.push_back(t);
+            return result;
         }
 
         MakeTokensResult process_slash(MakeTokensResult result) {
