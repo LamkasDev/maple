@@ -404,7 +404,7 @@ class Parser {
                     if(current_t == nullptr || current_t->type == TT_RCBRACKET || current_t->type == TT_EOF) {
                         break;
                     }
-                    ParserResult res_statement = result.register_result(statement());
+                    ParserResult res_statement_1 = result.register_result(statement());
                     if(result.state == -1) {
                         unadvance(result.reverse_count);
                         break;
@@ -416,7 +416,7 @@ class Parser {
                     }
 
                     result.register_advance(advance());
-                    statements.push_back(res_statement.node);
+                    statements.push_back(res_statement_1.node);
                 }
             }
 
@@ -566,7 +566,6 @@ class Parser {
 
         ParserResult if_expr() {
             ParserResult result;
-            list<shared_ptr<Node>> cases;
 
             shared_ptr<Node> node = make_shared<Node>();
             node->set_pos(current_t->start, current_t->end);
@@ -622,7 +621,6 @@ class Parser {
 
         ParserResult if_expr_b_or_c() {
             ParserResult result;
-            list<shared_ptr<Node>> cases;
 
             shared_ptr<Node> node = make_shared<Node>();
             node->set_pos(current_t->start, current_t->end);
@@ -692,12 +690,9 @@ class Parser {
             if(current_t->matches(TT_KEYWORD, KEYWORD_ELIF) || current_t->matches(TT_KEYWORD, KEYWORD_ELSE)) {
                 ParserResult all_cases = result.register_result(if_expr_b_or_c());
                 if(result.state == -1) { return result; }
-                for(shared_ptr<Node> _node : all_cases.node->if_results) {
-                    cases.push_back(_node);
-                }
-                if(all_cases.node->else_result != nullptr) {
-                    node->set_else_result(all_cases.node->else_result);
-                }
+                copy(all_cases.node->if_results.begin(), all_cases.node->if_results.end(), back_inserter(cases));
+                
+                node->set_else_result(all_cases.node->else_result);
             }
 
             node->set_end(current_t->start);

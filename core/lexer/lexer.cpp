@@ -278,7 +278,6 @@ class Lexer {
         }
 
         MakeTokensResult make_not_equals(MakeTokensResult result) {
-            string str;
             shared_ptr<Token> t = make_shared<Token>();
             t->set_start(pos.copy());
             t->set_end(pos.copy());
@@ -298,7 +297,6 @@ class Lexer {
         }
 
         MakeTokensResult make_equals(MakeTokensResult result) {
-            string str;
             shared_ptr<Token> t = make_shared<Token>();
             t->init(TT_EQ);
             t->set_start(pos.copy());
@@ -315,7 +313,6 @@ class Lexer {
         }
 
         MakeTokensResult make_less_than(MakeTokensResult result) {
-            string str;
             shared_ptr<Token> t = make_shared<Token>();
             t->init(TT_LTHAN);
             t->set_start(pos.copy());
@@ -332,7 +329,6 @@ class Lexer {
         }
 
         MakeTokensResult make_greater_than(MakeTokensResult result) {
-            string str;
             shared_ptr<Token> t = make_shared<Token>();
             t->init(TT_GTHAN);
             t->set_start(pos.copy());
@@ -349,7 +345,6 @@ class Lexer {
         }
 
         MakeTokensResult make_minus(MakeTokensResult result) {
-            string str;
             shared_ptr<Token> t = make_shared<Token>();
             t->init(TT_MINUS);
             t->set_start(pos.copy());

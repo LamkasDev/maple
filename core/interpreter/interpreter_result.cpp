@@ -246,11 +246,11 @@ class InterpreterResult {
 
             InterpreterResult res;
             if(_right.type == NODE_INT && _right.res_int.value == 0) {
-                RuntimeError e(_right.start, _right.end, "Division by zero", res_int.context);
-                return res.failure(e);
+                RuntimeError e_0(_right.start, _right.end, "Division by zero", res_int.context);
+                return res.failure(e_0);
             } else if(_right.type == NODE_FLOAT && _right.res_float.value == 0) {
-                RuntimeError e(_right.start, _right.end, "Division by zero", res_float.context);
-                return res.failure(e);
+                RuntimeError e_0(_right.start, _right.end, "Division by zero", res_float.context);
+                return res.failure(e_0);
             }
 
             FloatNumber n_float(get_value() / _right.get_value());
@@ -300,8 +300,6 @@ class InterpreterResult {
             InterpreterResult res;
             IntNumber n_int(0);
             if(_token->type == TT_EQEQ) {
-                n_int.value = get_value() == _right.get_value();
-            } else if(_token->type == TT_EQEQ) {
                 n_int.value = get_value() == _right.get_value();
             } else if(_token->type == TT_NEQ) {
                 n_int.value = get_value() != _right.get_value();
@@ -354,8 +352,8 @@ class InterpreterResult {
 
         InterpreterResult illegal_operation(InterpreterResult _right) {
             InterpreterResult res;
-            RuntimeError e(start, _right.end, "Illegal operation", get_context());
-            return res.failure(e);
+            RuntimeError e_0(start, _right.end, "Illegal operation", get_context());
+            return res.failure(e_0);
         }
 
         float get_value() {

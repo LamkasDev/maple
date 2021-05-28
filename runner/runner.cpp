@@ -44,9 +44,11 @@ class Runner {
         RunResult run(string _fileName, string _text) {
             RunResult result;
 
+            shared_ptr<Context> context = make_shared<Context>(_fileName);
+            context->set_symbol_table(interpreter->global_symbol_table);
+
             Lexer lexer(_fileName, _text);
             result.set_lexer(lexer);
-
             MakeTokensResult makeTokensResult = lexer.make_tokens();
             result.set_make_tokens_result(makeTokensResult);
             if(makeTokensResult.state == -1) {
@@ -60,15 +62,12 @@ class Runner {
                 return result;
             }
 
-            shared_ptr<Context> context = make_shared<Context>(_fileName);
-            context->set_symbol_table(interpreter->global_symbol_table);
-
             InterpreterResult interpreterResult;
-            string node_type = parserResult.node_type;
-            //printf("Root Node: %s\n", node_type.c_str());
             interpreterResult = interpreter->visit_node(parserResult.node, context);
-
             result.set_interpreter_result(interpreterResult);
+            if(interpreterResult.state == -1) {
+                return result;
+            }
             
             return result;
         }

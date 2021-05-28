@@ -47,7 +47,7 @@ class Error {
             Position _start = start;
             shared_ptr<Context> _context = context;
             while(_context != nullptr) {
-                res = "  File " + start.fileName + ", line " + to_string(start.line + 1) + ", col " + to_string(start.column) + "-" + to_string(end.column) + " in " + _context->display_name + "\n" + res;
+                res = "  File " + start.fileName + ", line " + to_string(_start.line + 1) + ", col " + to_string(_start.column) + "-" + to_string(end.column) + " in " + _context->display_name + "\n" + res;
                 _start = _context->parent_entry_pos;
                 _context = _context->parent;
             }
@@ -70,8 +70,8 @@ class Error {
                 result += line + "\n";
                 result += string(col_start, ' ') + string(col_end - col_start, '^');
 
-                int idx_start = idx_end;
-                int idx_end = text.find("\n", idx_start + 1);
+                idx_start = idx_end;
+                idx_end = text.find("\n", idx_start + 1);
                 if(idx_end < 0) { idx_end = text.length(); }
             }
             
