@@ -172,25 +172,25 @@ class Interpreter {
             InterpreterResult res;
             res.set_pos(node->start, node->end);
 
-            InterpreterResult left = res.register_result(visit_node(node->left, context));
+            InterpreterResult right = res.register_result(visit_node(node->right, context));
             if(res.should_return()) { return res; }
 
             if(node->token->type == TT_PLUS) {
-                res.set_from(left);
+                res.set_from(right);
             } else if(node->token->type == TT_MINUS) {
                 shared_ptr<Token> n_t = make_shared<Token>();
                 n_t->init(TT_MUL);
                 InterpreterResult n_m_i;
                 n_m_i.set_from(-1);
 
-                res = res.process_binary(left, n_t, n_m_i);
+                res = res.process_binary(right, n_t, n_m_i);
             } else if(node->token->matches(TT_KEYWORD, KEYWORD_NOT)) {
                 shared_ptr<Token> n_t = make_shared<Token>();
                 n_t->init(TT_EQEQ);
                 InterpreterResult n_m_i;
                 n_m_i.set_from(0);
 
-                res = res.process_binary(left, n_t, n_m_i);
+                res = res.process_binary(right, n_t, n_m_i);
             }
 
             return res.success();

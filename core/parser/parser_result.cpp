@@ -13,7 +13,7 @@ class ParserResult {
         Error e;
 
         void set_node(shared_ptr<Node> _node) {
-            if(_node->left != nullptr && _node->right == nullptr && _node->type != NODE_UNARY) {
+            if(_node->left != nullptr && _node->right == nullptr) {
                 node_type = _node->left->type;
                 node = _node->left;
             } else {

@@ -246,7 +246,7 @@ class Parser {
                 result.register_advance(advance());
                 ParserResult n_0 = factor();
                 if(n_0.state == -1) { return result.failure(n_0.e); }
-                shared_ptr<Node> n = make_shared<Node>(); n->set_pos(t->start, n_0.node->end); n->set_type(NODE_UNARY); n->set_token(t); n->set_to_left(n_0.node);
+                shared_ptr<Node> n = make_shared<Node>(); n->set_pos(t->start, n_0.node->end); n->set_type(NODE_UNARY); n->set_token(t); n->set_to_right(n_0.node);
 
                 result.set_node(n);
                 return result.success();
@@ -366,7 +366,7 @@ class Parser {
 
                 ParserResult expr = result.register_result(comp_expr());
                 if(result.state == -1) { return result; }
-                shared_ptr<Node> n = make_shared<Node>(); n->set_pos(op_token->start, expr.node->end); n->set_type(NODE_UNARY); n->set_token(op_token); n->set_to_left(expr.node);
+                shared_ptr<Node> n = make_shared<Node>(); n->set_pos(op_token->start, expr.node->end); n->set_type(NODE_UNARY); n->set_token(op_token); n->set_to_right(expr.node);
 
                 result.set_node(n);
                 return result.success();
