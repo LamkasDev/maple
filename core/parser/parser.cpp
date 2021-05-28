@@ -128,7 +128,7 @@ class Parser {
                 return result.success();
             }
 
-            return result.failure(create_syntax_error("int/float, identifier, '+', '-', '[', '(', 'IF', 'FOR', 'FOREACH', 'WHILE' or 'FUNC'"));
+            return result.failure(create_syntax_error("int, float, string, list, identifier or a keyword"));
         }
 
         ParserResult call() {
@@ -139,7 +139,7 @@ class Parser {
 
             if(current_t->type == TT_LPAREN) {
                 shared_ptr<Node> call_node = make_shared<Node>();
-                call_node->set_start(current_t->start);
+                call_node->set_pos(current_t->start, current_t->end);
                 call_node->set_type(NODE_FUNC_CALL);
                 list<shared_ptr<Node>> arguments;
 
@@ -150,7 +150,7 @@ class Parser {
                 } else {
                     ParserResult arg = result.register_result(expression());
                     if(result.state == -1) {
-                        return result.failure(create_syntax_error("')', 'VAR', 'IF', 'FOR', 'FOREACH', 'WHILE', 'FUNC', int/float, identifier, '+', '-', '[', '(' or 'NOT'"));
+                        return result.failure(create_syntax_error("')' or an argument"));
                     }
                     arguments.push_back(arg.node);
 
@@ -169,9 +169,9 @@ class Parser {
                     result.register_advance(advance());
                 }
 
+                call_node->set_end(current_t->start);
                 call_node->set_func_call_argument_nodes_result(arguments);
                 call_node->set_func_call_expression_result(left.node);
-                call_node->set_end(left.node->end);
                 result.set_node(call_node);
 
                 return result.success();
@@ -196,10 +196,11 @@ class Parser {
                     op->set_to_left(copy);
                 }
                 op->set_token(op_token);
-                op->set_end(right.node->end);
                 op->set_to_right(right.node);
             }
             if(result.state == -1) { return result; }
+
+            op->set_end(current_t->start);
             
             result.set_node(op);
             return result.success();
@@ -230,10 +231,11 @@ class Parser {
                     op->set_to_left(copy);
                 }
                 op->set_token(op_token);
-                op->set_end(right.node->end);
                 op->set_to_right(right.node);
             }
             if(result.state == -1) { return result; }
+
+            op->set_end(current_t->start);
             
             result.set_node(op);
             return result.success();
@@ -280,10 +282,11 @@ class Parser {
                     op->set_to_left(copy);
                 }
                 op->set_token(op_token);
-                op->set_end(right.node->end);
                 op->set_to_right(right.node);
             }
             if(result.state == -1) { return result; }
+
+            op->set_end(current_t->start);
             
             result.set_node(op);
             return result.success();
@@ -314,10 +317,11 @@ class Parser {
                     op->set_to_left(copy);
                 }
                 op->set_token(op_token);
-                op->set_end(right.node->end);
                 op->set_to_right(right.node);
             }
             if(result.state == -1) { return result; }
+
+            op->set_end(current_t->start);
             
             result.set_node(op);
             return result.success();
@@ -348,10 +352,11 @@ class Parser {
                     op->set_to_left(copy);
                 }
                 op->set_token(op_token);
-                op->set_end(right.node->end);
                 op->set_to_right(right.node);
             }
             if(result.state == -1) { return result; }
+
+            op->set_end(current_t->start);
             
             result.set_node(op);
             return result.success();
@@ -373,7 +378,7 @@ class Parser {
             }
 
             ParserResult arith = result.register_result(arith_expr_pre());
-            if(result.state == -1) { return result.failure(create_syntax_error("int/float, identifier, '+', '-', '[', '(' or 'NOT'")); }
+            if(result.state == -1) { return result.failure(create_syntax_error("int, float, string, identifier, list, keyword, comparison, '+', '-' or 'NOT'")); }
             
             result.set_node(arith.node);
             return result.success();
@@ -383,7 +388,7 @@ class Parser {
             ParserResult result;
             list<shared_ptr<Node>> statements;
             shared_ptr<Node> node = make_shared<Node>();
-            node->set_start(current_t->start);
+            node->set_pos(current_t->start, current_t->end);
             node->set_type(NODE_STATEMENTS);
 
             while(current_t->type == TT_NEWLINE) {
@@ -413,20 +418,20 @@ class Parser {
                 }
                 if(result.state == -1) { break; }
                 statements.push_back(res_statement.node);
-                node->set_end(res_statement.node->end);
             }
             if(result.state == -1) { return result; }
 
+            node->set_end(current_t->start);
             node->set_statements_nodes_result(statements);
-            result.set_node(node);
 
+            result.set_node(node);
             return result.success();
         }
 
         ParserResult statement() {
             ParserResult result;
             shared_ptr<Node> node = make_shared<Node>();
-            node->set_start(current_t->start);
+            node->set_pos(current_t->start, current_t->end);
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_RETURN)) {
                 result.register_advance(advance());
@@ -445,10 +450,7 @@ class Parser {
                 node->set_type(NODE_BREAK);
             } else {
                 ParserResult expr = result.register_result(expression());
-                if(result.state == -1) {
-                    return result.failure(create_syntax_error("')', 'VAR', 'IF', 'FOR', 'FOREACH', 'WHILE', 'FUNC', int/float, identifier, '+', '-' or '(' or 'NOT'"));
-                }
-
+                if(result.state == -1) { return result.failure(create_syntax_error("int, float, string, identifier, list, keyword, comparison, '+', '-' or 'NOT'")); }
                 node = expr.node;
             }
 
@@ -462,7 +464,7 @@ class Parser {
             if(current_t->matches(TT_KEYWORD, KEYWORD_VAR)) {
                 result.register_advance(advance());
                 if(current_t->type != TT_IDENFIFIER) {
-                    return result.failure(create_syntax_error("identifier"));
+                    return result.failure(create_syntax_error("an identifier"));
                 }
                 shared_ptr<Token> identifier = current_t;
                 result.register_advance(advance());
@@ -485,7 +487,7 @@ class Parser {
                 if(result.e.extra == 1) {
                     return result;
                 } else {
-                    return result.failure(create_syntax_error("'RETURN', 'CONTINUE', 'BREAK', 'VAR', 'IF', 'FOR', 'FOREACH', 'WHILE', 'FUNC', int/float, identifier, '+', '-' or '(' or 'NOT'"));
+                    return result.failure(create_syntax_error("int, float, string, identifier, list, keyword, comparison, '+', '-' or 'NOT'"));
                 }
             }
 
@@ -508,10 +510,11 @@ class Parser {
                     shared_ptr<Node> copy = op->copy();
                     op->set_to_left(copy);
                 }
-                op->set_end(right.node->end);
                 op->set_to_right(right.node);
             }
             if(result.state == -1) { return result; }
+
+            op->set_end(current_t->start);
             
             result.set_node(op);
             return result.success();
@@ -521,7 +524,7 @@ class Parser {
             ParserResult result;
             list<shared_ptr<Node>> elements;
             shared_ptr<Node> node = make_shared<Node>();
-            node->set_start(current_t->start);
+            node->set_pos(current_t->start, current_t->end);
             node->set_type(NODE_LIST);
 
             if(current_t->type != TT_LSBRACKET) {
@@ -534,7 +537,7 @@ class Parser {
             } else {
                 ParserResult element = result.register_result(expression());
                 if(result.state == -1) {
-                    return result.failure(create_syntax_error("']', 'VAR', 'IF', 'FOR', 'FOREACH', 'WHILE', 'FUNC', int/float, identifier, '+', '-' or '(' or 'NOT'"));
+                    return result.failure(create_syntax_error("int, float, string, identifier, list, keyword, comparison, '+', '-' or 'NOT'"));
                 }
                 elements.push_back(element.node);
 
@@ -553,6 +556,7 @@ class Parser {
                 result.register_advance(advance());
             }
 
+            node->set_end(current_t->start);
             node->set_list_nodes_result(elements);
             
             result.set_node(node);
@@ -564,12 +568,13 @@ class Parser {
             list<shared_ptr<Node>> cases;
 
             shared_ptr<Node> node = make_shared<Node>();
-            node->set_start(current_t->start);
+            node->set_pos(current_t->start, current_t->end);
             node->set_type(NODE_IF);
 
             ParserResult all_cases = result.register_result(if_expr_cases(NODE_IF));
             if(result.state == -1) { return result; }
 
+            node->set_end(current_t->start);
             node->set_if_results(all_cases.node->if_results);
             node->set_else_result(all_cases.node->else_result);
             
@@ -585,7 +590,7 @@ class Parser {
             ParserResult result;
 
             shared_ptr<Node> node = make_shared<Node>();
-            node->set_start(current_t->start);
+            node->set_pos(current_t->start, current_t->end);
             node->set_type(NODE_IF);
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_ELSE)) {
@@ -608,6 +613,8 @@ class Parser {
                 }
             }
 
+            node->set_end(current_t->start);
+
             result.set_node(node);
             return result.success();
         }
@@ -617,7 +624,7 @@ class Parser {
             list<shared_ptr<Node>> cases;
 
             shared_ptr<Node> node = make_shared<Node>();
-            node->set_start(current_t->start);
+            node->set_pos(current_t->start, current_t->end);
             node->set_type(NODE_IF);
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_ELIF)) {
@@ -633,6 +640,8 @@ class Parser {
                 node->set_else_result(else_case.node->else_result);
             }
 
+            node->set_end(current_t->start);
+
             result.set_node(node);
             return result;
         }
@@ -642,7 +651,7 @@ class Parser {
             list<shared_ptr<Node>> cases;
 
             shared_ptr<Node> node = make_shared<Node>();
-            node->set_start(current_t->start);
+            node->set_pos(current_t->start, current_t->end);
             node->set_type(NODE_IF);
 
             if(current_t->matches(TT_KEYWORD, type) == false) {
@@ -689,6 +698,8 @@ class Parser {
                     node->set_else_result(all_cases.node->else_result);
                 }
             }
+
+            node->set_end(current_t->start);
             node->set_if_results(cases);
 
             result.set_node(node);
@@ -698,7 +709,7 @@ class Parser {
         ParserResult for_expr() {
             ParserResult result;
             shared_ptr<Node> node = make_shared<Node>();
-            node->set_start(current_t->start);
+            node->set_pos(current_t->start, current_t->end);
             node->set_type(NODE_FOR);
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_FOR) == false) {
@@ -746,14 +757,14 @@ class Parser {
             ParserResult expr = result.register_result(statements());
             if(result.state == -1) { return result; }
 
-            node->set_end(expr.node->end);
             node->set_for_expr_result(expr.node);
 
             if(current_t->type != TT_RCBRACKET) {
                 return result.failure(create_syntax_error("'}'", 1));
             }
             result.register_advance(advance());
-            
+
+            node->set_end(current_t->start);
             node->set_token(start_value.node->token);
             node->set_for_start_result(start_value.node);
             node->set_for_end_result(end_value.node);
@@ -765,7 +776,7 @@ class Parser {
         ParserResult foreach_expr() {
             ParserResult result;
             shared_ptr<Node> node = make_shared<Node>();
-            node->set_start(current_t->start);
+            node->set_pos(current_t->start, current_t->end);
             node->set_type(NODE_FOREACH);
 
             if(current_t->matches(TT_KEYWORD, NODE_FOREACH) == false) {
@@ -805,14 +816,14 @@ class Parser {
             ParserResult expr = result.register_result(statements());
             if(result.state == -1) { return result; }
 
-            node->set_end(expr.node->end);
             node->set_for_expr_result(expr.node);
 
             if(current_t->type != TT_RCBRACKET) {
                 return result.failure(create_syntax_error("'}'", 1));
             }
             result.register_advance(advance());
-            
+
+            node->set_end(current_t->start);
             node->set_token(id);
             node->set_for_start_result(list.node);
 
@@ -823,7 +834,7 @@ class Parser {
         ParserResult while_expr() {
             ParserResult result;
             shared_ptr<Node> node = make_shared<Node>();
-            node->set_start(current_t->start);
+            node->set_pos(current_t->start, current_t->end);
             node->set_type(NODE_WHILE);
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_WHILE) == false) {
@@ -847,7 +858,7 @@ class Parser {
             }
             result.register_advance(advance());
 
-            node->set_end(expr.node->end);
+            node->set_end(current_t->start);
             node->set_while_expr_result(expr.node);
             node->set_while_condition_result(condition.node);
 
@@ -860,7 +871,7 @@ class Parser {
             vector<shared_ptr<Token>> arguments;
 
             shared_ptr<Node> node = make_shared<Node>();
-            node->set_start(current_t->start);
+            node->set_pos(current_t->start, current_t->end);
             node->set_type(NODE_FUNC_DEF);
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_FUNC) == false) {
@@ -930,7 +941,6 @@ class Parser {
                 }
                 result.register_advance(advance());
 
-                node->set_end(expr.node->end);
                 node->set_func_def_expression_result(expr.node);
             } else if(current_t->type == TT_ARROW) {
                 result.register_advance(advance());
@@ -938,11 +948,12 @@ class Parser {
                 ParserResult expr = result.register_result(expression());
                 if(result.state == -1) { return result; }
 
-                node->set_end(expr.node->end);
                 node->set_func_def_expression_result(expr.node);
             } else {
                 return result.failure(create_syntax_error("'->' or '{'", 1));
             }
+
+            node->set_end(current_t->start);
             node->set_func_def_argument_tokens_result(arguments);
             
             result.set_node(node);
@@ -953,7 +964,7 @@ class Parser {
             ParserResult result;
 
             shared_ptr<Node> node = make_shared<Node>();
-            node->set_start(current_t->start);
+            node->set_pos(current_t->start, current_t->end);
             node->set_type(NODE_OBJECT_NEW);
 
             if(current_t->matches(TT_KEYWORD, KEYWORD_NEW) == false) {
@@ -965,6 +976,8 @@ class Parser {
                 return result.failure(create_syntax_error("'OBJECT'", 1));
             }
             result.register_advance(advance());
+
+            node->set_end(current_t->start);
             
             result.set_node(node);
             return result.success();

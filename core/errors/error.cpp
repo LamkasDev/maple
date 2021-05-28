@@ -32,7 +32,7 @@ class Error {
         string as_string() {
             if(type != ERROR_RUNTIME) {
                 string s = name + ": " + details + "\n";
-                s += "File " + start.fileName + ", line " + to_string(start.line + 1) + ", index " + to_string(start.index) + "-" + to_string(end.index);
+                s += "File " + start.fileName + ", line " + to_string(start.line + 1) + ", col " + to_string(start.column) + "-" + to_string(end.column);
 		        s += "\n\n" + print_error(start.fileContents, start, end);
                 return s;
             } else {
@@ -47,7 +47,7 @@ class Error {
             Position _start = start;
             shared_ptr<Context> _context = context;
             while(_context != nullptr) {
-                res = "  File " + start.fileName + ", line " + to_string(start.line + 1) + ", index " + to_string(start.index) + "-" + to_string(end.index) + " in " + _context->display_name + "\n" + res;
+                res = "  File " + start.fileName + ", line " + to_string(start.line + 1) + ", col " + to_string(start.column) + "-" + to_string(end.column) + " in " + _context->display_name + "\n" + res;
                 _start = _context->parent_entry_pos;
                 _context = _context->parent;
             }
@@ -58,7 +58,7 @@ class Error {
         string print_error(string text, Position pos_start, Position pos_end) {
             string result = "";
 
-            int idx_start = text.rfind("\n", 0, pos_start.index); if(idx_start < 0) { idx_start = 0; }
+            int idx_start = text.rfind("\n", pos_start.index); if(idx_start < 0) { idx_start = 0; }
             int idx_end = text.find('\n', idx_start + 1); if(idx_end < 0) { idx_end = text.length(); }
 
             int line_count = pos_end.line - pos_start.line + 1;
@@ -74,7 +74,8 @@ class Error {
                 int idx_end = text.find("\n", idx_start + 1);
                 if(idx_end < 0) { idx_end = text.length(); }
             }
-
+            
+            result.erase(remove(result.begin(), result.end(), '\t'), result.end());
             return result;
         }
 };
