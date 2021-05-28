@@ -29,6 +29,8 @@ class Parser {
             if(tokens.size() > 0) {
                 current_t = tokens.front();
                 tokens.pop_front();
+            } else {
+                current_t = nullptr;
             }
         }
 
@@ -391,34 +393,33 @@ class Parser {
             node->set_pos(current_t->start, current_t->end);
             node->set_type(NODE_STATEMENTS);
 
-            while(current_t->type == TT_NEWLINE) {
-                result.register_advance(advance());
-            }
-
             ParserResult res_statement = result.register_result(statement());
             if(result.state == -1) { return result; }
             statements.push_back(res_statement.node);
 
-            bool has_more_statements = true;
-            while(true) {
-                int newlines = 0;
-                while(current_t->type == TT_NEWLINE) {
+            if(current_t->type == TT_NEWLINE) {
+                result.register_advance(advance());
+
+                while(true) {
+                    if(current_t == nullptr || current_t->type == TT_RCBRACKET || current_t->type == TT_EOF) {
+                        break;
+                    }
+                    ParserResult res_statement = result.register_result(statement());
+                    if(result.state == -1) {
+                        unadvance(result.reverse_count);
+                        break;
+                    }
+                    if(current_t->type != TT_NEWLINE) {
+                        ExpectedCharacterError e(current_t->start, current_t->end, "Expected ';'");
+                        result.failure(e);
+                        break;
+                    }
+
                     result.register_advance(advance());
-                    newlines++;
+                    statements.push_back(res_statement.node);
                 }
-
-                if(newlines == 0) { has_more_statements = false; }
-                if(has_more_statements == false) { break; }
-
-                ParserResult res_statement = result.register_result(statement());
-                if(result.state == -1) {
-                    unadvance(result.reverse_count);
-                    has_more_statements = false;
-                    continue;
-                }
-                if(result.state == -1) { break; }
-                statements.push_back(res_statement.node);
             }
+
             if(result.state == -1) { return result; }
 
             node->set_end(current_t->start);

@@ -127,15 +127,15 @@ bool run_tests(Runner runner) {
     total_tests += 2;
 
     printf("----------\n");
-    passed += run_integer_test(runner, "Multi-line statements 1 (VAR a = 1; VAR b = 0; IF (a) { VAR a = 0; VAR b = 1 } ELSE { VAR a = 1; VAR b = 0 })", "VAR a = 1; VAR b = 0; IF (a) { VAR a = 0; VAR b = 1 } ELSE { VAR a = 1; VAR b = 0 }", 1);
+    passed += run_integer_test(runner, "Multi-line statements 1 (VAR a = 1; VAR b = 0; IF (a) { VAR a = 0; VAR b = 1; } ELSE { VAR a = 1; VAR b = 0; };)", "VAR a = 1; VAR b = 0; IF (a) { VAR a = 0; VAR b = 1; } ELSE { VAR a = 1; VAR b = 0; };", 1);
     passed += run_integer_test(runner, "Multi-line statements 2 (a)", "a", 0);
     passed += run_integer_test(runner, "Multi-line statements 3 (b)", "b", 1);
     total_tests += 3;
 
     printf("----------\n");
     passed += run_integer_test(runner, "Special 1 (RETURN 20)", "RETURN 20", 20);
-    passed += run_integer_test(runner, "Special 2 (VAR a = 0; FOR (VAR i = 0) TO 10 { IF(i == 4) { BREAK }; VAR a = a + 1 }; RETURN a)", "VAR a = 0; FOR (VAR i = 0) TO 10 { IF(i == 4) { BREAK }; VAR a = a + 1 }; RETURN a", 4);
-    passed += run_integer_test(runner, "Special 3 (VAR a = 0; FOR (VAR i = 0) TO 10 { IF(i == 4) { CONTINUE }; VAR a = a + 1 }; RETURN a)", "VAR a = 0; FOR (VAR i = 0) TO 10 { IF(i == 4) { CONTINUE }; VAR a = a + 1 }; RETURN a", 9);
+    passed += run_integer_test(runner, "Special 2 (VAR a = 0; FOR (VAR i = 0) TO 10 { IF(i == 4) { BREAK; }; VAR a = a + 1; }; RETURN a;)", "VAR a = 0; FOR (VAR i = 0) TO 10 { IF(i == 4) { BREAK; }; VAR a = a + 1; }; RETURN a;", 4);
+    passed += run_integer_test(runner, "Special 3 (VAR a = 0; FOR (VAR i = 0) TO 10 { IF(i == 4) { CONTINUE; }; VAR a = a + 1; }; RETURN a;)", "VAR a = 0; FOR (VAR i = 0) TO 10 { IF(i == 4) { CONTINUE; }; VAR a = a + 1; }; RETURN a;", 9);
     total_tests += 3;
 
     printf("----------\n");
