@@ -20,22 +20,27 @@ class Interpreter {
             global_symbol_table->set("FALSE", sc_false);
 
             builtin_runner = make_shared<BuiltInRunner>();
-            add_builtin_function("print", "value");
-            add_builtin_function("input");
-            add_builtin_function("is_nan", "value");
-            add_builtin_function("parse_int", "value");
-            add_builtin_function("parse_float", "value");
+            function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_print = &BuiltInRunner::run_print;
+            add_builtin_function("print", "value", run_print);
+            function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_input = &BuiltInRunner::run_input;
+            add_builtin_function("input", run_input);
+            function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_is_nan = &BuiltInRunner::run_is_nan;
+            add_builtin_function("is_nan", "value", run_is_nan);
+            function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_parse_int = &BuiltInRunner::run_parse_int;
+            add_builtin_function("parse_int", "value", run_parse_int);
+            function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_parse_float = &BuiltInRunner::run_parse_float;
+            add_builtin_function("parse_float", "value", run_parse_float);
         }
 
-        void add_builtin_function(string name) {
+        void add_builtin_function(string name, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> function) {
             list<string> arguments;
-            shared_ptr<Function> f = builtin_runner->create_builtin_function(name, arguments);
+            shared_ptr<Function> f = builtin_runner->create_builtin_function(name, arguments, function);
             functions[f->name->value_string] = f;
         }
 
-        void add_builtin_function(string name, string arg_1) {
+        void add_builtin_function(string name, string arg_1, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> function) {
             list<string> arguments; arguments.push_back(arg_1);
-            shared_ptr<Function> f = builtin_runner->create_builtin_function(name, arguments);
+            shared_ptr<Function> f = builtin_runner->create_builtin_function(name, arguments, function);
             functions[f->name->value_string] = f;
         }
 

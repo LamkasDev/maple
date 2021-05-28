@@ -12,6 +12,7 @@
 #include <map>
 #include <stdexcept>
 #include <memory>
+#include <functional>
 
 #include "runner/runner.cpp"
 #include "tests/tests.cpp"

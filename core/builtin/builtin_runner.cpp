@@ -3,7 +3,9 @@ using namespace std;
 
 class BuiltInRunner {
     public:
-        shared_ptr<Function> create_builtin_function(string name, list<string> arguments) {
+        map<string, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)>> builtin_functions;
+
+        shared_ptr<Function> create_builtin_function(string name, list<string> arguments, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> function) {
             shared_ptr<Function> f = make_shared<Function>();
             f->built_in = true;
 
@@ -19,28 +21,30 @@ class BuiltInRunner {
             }
 
             f->set_arguments(arguments_tokens);
+            builtin_functions.insert_or_assign(name, function);
             return f;
         }
 
-        InterpreterResult run(shared_ptr<Function> function, shared_ptr<Context> context) {
+        InterpreterResult run(shared_ptr<Function> _function, shared_ptr<Context> _context) {
             InterpreterResult res;
-            if(function->name->value_string == "print") {
-                res = run_print(res, function, context);
-            } else if(function->name->value_string == "input") {
-                res = run_input(res, function, context);
-            } else if(function->name->value_string == "is_nan") {
-                res = run_is_nan(res, function, context);
-            } else if(function->name->value_string == "parse_int") {
-                res = run_parse_int(res, function, context);
-            } else if(function->name->value_string == "parse_float") {
-                res = run_parse_float(res, function, context);
+            try {
+                function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_function = get_function(_function->name->value_string);
+                res = run_function(this, res, _function, _context);
+            } catch(out_of_range e_0) {
+                RuntimeError e(res.start, res.end, "Function doesn't exist", _context);
+                return res.failure(e);
             }
             if(res.state == -1) { return res; }
 
             return res.success();
         }
 
-        InterpreterResult run_print(InterpreterResult res, shared_ptr<Function>, shared_ptr<Context> context) {
+        function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> get_function(string _name) {
+            function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> value = builtin_functions.at(_name);
+            return value;
+        }
+
+        InterpreterResult run_print(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             SymbolContainer value = context->symbol_table->get("value");
             if(value.type != SYMBOL_STRING) {
                 RuntimeError e(res.start, res.end, "Invalid argument", context);
@@ -52,7 +56,7 @@ class BuiltInRunner {
             return res.success();
         }
 
-        InterpreterResult run_input(InterpreterResult res, shared_ptr<Function>, shared_ptr<Context> context) {
+        InterpreterResult run_input(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             char value[512];
             scanf("%[^\n]%*c", &value);
             res.set_from(string(value));
@@ -60,14 +64,14 @@ class BuiltInRunner {
             return res.success();
         }
 
-        InterpreterResult run_is_nan(InterpreterResult res, shared_ptr<Function>, shared_ptr<Context> context) {
+        InterpreterResult run_is_nan(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             SymbolContainer value = context->symbol_table->get("value");
             res.set_from(value.type != SYMBOL_INT && value.type != SYMBOL_FLOAT);
 
             return res.success();
         }
 
-        InterpreterResult run_parse_int(InterpreterResult res, shared_ptr<Function>, shared_ptr<Context> context) {
+        InterpreterResult run_parse_int(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             SymbolContainer value = context->symbol_table->get("value");
             try {
                 res.set_from(stoi(value.value_string));
@@ -79,7 +83,7 @@ class BuiltInRunner {
             return res.success();
         }
 
-        InterpreterResult run_parse_float(InterpreterResult res, shared_ptr<Function>, shared_ptr<Context> context) {
+        InterpreterResult run_parse_float(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             SymbolContainer value = context->symbol_table->get("value");
             try {
                 res.set_from(stof(value.value_string));
