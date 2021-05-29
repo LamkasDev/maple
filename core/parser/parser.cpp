@@ -139,7 +139,23 @@ class Parser {
             ParserResult left = result.register_result(atom());
             if(result.state == -1) { return result; }
 
-            if(current_t->type == TT_LPAREN) {
+            if(current_t->type == TT_DOT) {
+                shared_ptr<Node> chained_node = make_shared<Node>();
+                chained_node->set_pos(current_t->start, current_t->end);
+                chained_node->set_type(NODE_CHAINED);
+
+                result.register_advance(advance());
+
+                ParserResult right = result.register_result(call());
+                if(result.state == -1) { return result; }
+
+                chained_node->set_end(current_t->start);
+                chained_node->set_to_left(left.node);
+                chained_node->set_to_right(right.node);
+                result.set_node(chained_node);
+
+                return result.success();
+            } else if(current_t->type == TT_LPAREN) {
                 shared_ptr<Node> call_node = make_shared<Node>();
                 call_node->set_pos(current_t->start, current_t->end);
                 call_node->set_type(NODE_FUNC_CALL);

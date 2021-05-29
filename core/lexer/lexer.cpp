@@ -125,6 +125,11 @@ class Lexer {
                         break;
                     }
 
+                    case '.': {
+                        result = add_generic_token(result, TT_DOT);
+                        break;
+                    }
+
                     case '"': {
                         result = make_string(result);
                         if(result.state == -1) { return result; }

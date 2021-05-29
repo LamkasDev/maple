@@ -39,6 +39,7 @@ const string TT_RCBRACKET = "RCBRACKET";
 const string TT_COMMA = "COMMA";
 const string TT_ARROW = "ARROW";
 const string TT_NEWLINE = "NEWLINE";
+const string TT_DOT = "DOT";
 const string TT_EOF = "EOF";
 
 const string KEYWORD_VAR = "VAR";

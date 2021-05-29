@@ -25,6 +25,7 @@ const string NODE_BREAK = "BREAK";
 const string NODE_FUNC_DEF = "FUNC_DEF";
 const string NODE_FUNC_CALL = "FUNC_CALL";
 
+const string NODE_CHAINED = "CHAINED";
 const string NODE_OBJECT_NEW = "OBJECT_NEW";
 
 const string NODE_STATEMENTS = "STATEMENTS";
