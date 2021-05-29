@@ -44,9 +44,6 @@ class Runner {
         RunResult run(string _fileName, string _text) {
             RunResult result;
 
-            shared_ptr<Context> context = make_shared<Context>(_fileName);
-            context->set_symbol_table(interpreter->global_symbol_table);
-
             Lexer lexer(_fileName, _text);
             result.set_lexer(lexer);
             MakeTokensResult makeTokensResult = lexer.make_tokens();
@@ -63,7 +60,7 @@ class Runner {
             }
 
             InterpreterResult interpreterResult;
-            interpreterResult = interpreter->visit_node(parserResult.node, context);
+            interpreterResult = interpreter->visit_node(parserResult.node, interpreter->context);
             result.set_interpreter_result(interpreterResult);
             if(interpreterResult.state == -1) {
                 return result;

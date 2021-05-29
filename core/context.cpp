@@ -11,6 +11,7 @@ class Context {
         shared_ptr<SymbolTable> symbol_table;
 
         Context(string _display_name) {
+            symbol_table = make_shared<SymbolTable>();
             display_name = _display_name;
         }
 

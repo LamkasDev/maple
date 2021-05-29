@@ -4,7 +4,7 @@ using namespace std;
 class Interpreter {
     public:
         shared_ptr<BuiltInRunner> builtin_runner = nullptr;
-        shared_ptr<SymbolTable> global_symbol_table = nullptr;
+        shared_ptr<Context> context = nullptr;
         map<string, shared_ptr<List>> lists;
         map<string, shared_ptr<Function>> functions;
         map<string, shared_ptr<Object>> objects;
@@ -13,11 +13,11 @@ class Interpreter {
             SymbolContainer sc_null(0);
             SymbolContainer sc_true(1);
             SymbolContainer sc_false(0);
-
-            global_symbol_table = make_shared<SymbolTable>();
-            global_symbol_table->set("NULL", sc_null);
-            global_symbol_table->set("TRUE", sc_true);
-            global_symbol_table->set("FALSE", sc_false);
+            
+            context = make_shared<Context>("global");
+            context->symbol_table->set("NULL", sc_null);
+            context->symbol_table->set("TRUE", sc_true);
+            context->symbol_table->set("FALSE", sc_false);
 
             builtin_runner = make_shared<BuiltInRunner>();
             function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_print = &BuiltInRunner::run_print;

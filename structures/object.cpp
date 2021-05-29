@@ -6,11 +6,16 @@ class Object {
     public:
         Position start;
         Position end;
-        shared_ptr<Context> context = nullptr;
         int state = 0;
-        
-        shared_ptr<SymbolTable> symbol_table = nullptr;
+
+        vector<shared_ptr<Token>> arguments;
+
+        shared_ptr<Context> context = nullptr;
         map<string, Function> functions;
+
+        Object() {
+            context = make_shared<Context>("obj_context");
+        }
 
         void set_pos(Position _start, Position _end) {
             start = _start;
