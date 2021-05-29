@@ -33,7 +33,7 @@ class Context {
                     return parent->get_list(_name);
                 }
 
-                shared_ptr<List> res_err;
+                shared_ptr<List> res_err = make_shared<List>();
                 res_err->state = -1;
                 return res_err;
             }
@@ -48,7 +48,7 @@ class Context {
                     return parent->get_function(_name);
                 }
 
-                shared_ptr<Function> res_err;
+                shared_ptr<Function> res_err = make_shared<Function>();
                 res_err->state = -1;
                 return res_err;
             }

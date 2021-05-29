@@ -235,7 +235,7 @@ class Interpreter {
                     res.set_from(value.value_string);
                 }
             } else {
-                shared_ptr<List> value_list = get_list(node->token->value_string);
+                shared_ptr<List> value_list = context->get_list(node->token->value_string);
                 if(value_list->state == 0) {
                     res.set_from(value_list);
                 } else {
@@ -475,7 +475,7 @@ class Interpreter {
             res.set_pos(node->start, node->end);
             shared_ptr<Context> new_context = generate_new_context(node, context);
 
-            shared_ptr<Function> function = get_function(node->token->value_string);
+            shared_ptr<Function> function = context->get_function(node->token->value_string);
             if(res.state == -1) {
                 RuntimeError e(node->start, node->end, "Function '" + node->token->value_string + "' does not exist");
                 return res.failure(e);
@@ -497,7 +497,7 @@ class Interpreter {
 
             res.set_from(expr);
             return res.success();
-    }
+        }
 
         shared_ptr<Context> generate_new_context(shared_ptr<Node> node, shared_ptr<Context> context) {
             shared_ptr<Context> new_context = make_shared<Context>(node->token->value_string);
@@ -608,14 +608,6 @@ class Interpreter {
             save_to_context(node->right->token->value_string, expr, left.res_obj->context);
             
             return res.success();
-        }
-
-        shared_ptr<List> get_list(string _name) {
-            return context->get_list(_name);
-        }
-
-        shared_ptr<Function> get_function(string _name) {
-            return context->get_function(_name);
         }
 
         shared_ptr<Object> get_obj(string _name) {
