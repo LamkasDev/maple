@@ -86,6 +86,8 @@ class Interpreter {
                 res = visit_object_new_node(node, context);
             } else if(node->type == NODE_CHAINED) {
                 res = visit_chained_node(node, context);
+            } else if(node->type == NODE_CHAINED_ASSIGNMENT) {
+                res = visit_chained_assignment_node(node, context);
             } else {
                 no_visit_method(node->type);
             }
@@ -543,6 +545,7 @@ class Interpreter {
         }
 
         void save_to_context(string name, InterpreterResult res, shared_ptr<Context> context) {
+
             if(res.type == NODE_INT) {
                 SymbolContainer value(res.res_int.value);
                 context->symbol_table->set(name, value);
@@ -590,6 +593,25 @@ class Interpreter {
             if(res.should_return()) { return res; }
 
             res.set_from(right);
+            return res.success();
+        }
+
+        InterpreterResult visit_chained_assignment_node(shared_ptr<Node> node, shared_ptr<Context> context) {
+            InterpreterResult res;
+            res.set_pos(node->start, node->end);
+
+            InterpreterResult left = res.register_result(visit_node(node->left, context));
+            if(res.should_return()) { return res; }
+            if(left.type != NODE_OBJECT_NEW) {
+                RuntimeError e(node->start, node->end, "Expected object", context);
+                return res.failure(e);
+            }
+
+            InterpreterResult expr = res.register_result(visit_node(node->chained_assigment_result, context));
+            if(res.should_return()) { return res; }
+
+            save_to_context(node->right->token->value_string, expr, left.res_obj->context);
+            
             return res.success();
         }
 

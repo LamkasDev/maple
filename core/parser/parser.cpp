@@ -149,9 +149,20 @@ class Parser {
                 ParserResult right = result.register_result(call());
                 if(result.state == -1) { return result; }
 
-                chained_node->set_end(current_t->start);
                 chained_node->set_to_left(left.node);
                 chained_node->set_to_right(right.node);
+
+                if(current_t->type == TT_EQ) {
+                    result.register_advance(advance());
+
+                    ParserResult expr = result.register_result(expression());
+                    if(result.state == -1) { return result; }
+
+                    chained_node->set_type(NODE_CHAINED_ASSIGNMENT);
+                    chained_node->set_chained_assigment_result(expr.node);
+                }
+
+                chained_node->set_end(current_t->start);
                 result.set_node(chained_node);
 
                 return result.success();
