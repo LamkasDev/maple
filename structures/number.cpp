@@ -5,15 +5,10 @@ class Number {
     public:
         Position start;
         Position end;
-        shared_ptr<Context> context = nullptr;
 
         void set_pos(Position _start, Position _end) {
             start = _start;
             end = _end;
-        }
-
-        void set_context(shared_ptr<Context> _context) {
-            context = _context;
         }
 };
 

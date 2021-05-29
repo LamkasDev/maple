@@ -1,6 +1,5 @@
 #pragma once
-#include "../context.cpp"
-#include "../utils.cpp"
+#include "../position.cpp"
 using namespace std;
 
 const string ERROR_UNKNOWN = "UNKNOWN";
@@ -11,7 +10,6 @@ class Error {
     public:
         Position start;
         Position end;
-        shared_ptr<Context> context = nullptr;
 
         string type = ERROR_UNKNOWN;
         string name = "";
@@ -45,12 +43,12 @@ class Error {
         string generate_traceback() {
             string res = "";
             Position _start = start;
-            shared_ptr<Context> _context = context;
+            /*shared_ptr<Context> _context = context;
             while(_context != nullptr) {
                 res = "  File " + start.fileName + ", line " + to_string(_start.line + 1) + ", col " + to_string(_start.column) + "-" + to_string(end.column) + " in " + _context->display_name + "\n" + res;
                 _start = _context->parent_entry_pos;
                 _context = _context->parent;
-            }
+            }*/
 
             return "Traceback (most recent call last):\n" + res;
         }

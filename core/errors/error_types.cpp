@@ -40,14 +40,13 @@ class RuntimeError : public Error {
             
         }
         
-        RuntimeError(Position _start, Position _end, string _details, shared_ptr<Context> _context) {
+        RuntimeError(Position _start, Position _end, string _details) {
             start = _start;
             end = _end;
 
             type = ERROR_RUNTIME;
             name = "RuntimeError";
             details = _details;
-            context = _context;
         }
 };
 

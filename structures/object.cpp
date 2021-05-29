@@ -1,5 +1,5 @@
 #pragma once
-#include "../core/nodes/node.cpp"
+#include "../core/context.cpp"
 using namespace std;
 
 class Object {
@@ -8,10 +8,8 @@ class Object {
         Position end;
         int state = 0;
 
-        vector<shared_ptr<Token>> arguments;
-
         shared_ptr<Context> context = nullptr;
-        map<string, Function> functions;
+        vector<shared_ptr<Token>> arguments;
 
         Object() {
             context = make_shared<Context>("obj_context");

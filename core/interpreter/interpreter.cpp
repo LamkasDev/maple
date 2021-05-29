@@ -5,8 +5,6 @@ class Interpreter {
     public:
         shared_ptr<BuiltInRunner> builtin_runner = nullptr;
         shared_ptr<Context> context = nullptr;
-        map<string, shared_ptr<List>> lists;
-        map<string, shared_ptr<Function>> functions;
         map<string, shared_ptr<Object>> objects;
 
         Interpreter() {
@@ -35,13 +33,13 @@ class Interpreter {
         void add_builtin_function(string name, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> function) {
             list<string> arguments;
             shared_ptr<Function> f = builtin_runner->create_builtin_function(name, arguments, function);
-            functions[f->name->value_string] = f;
+            context->functions[f->name->value_string] = f;
         }
 
         void add_builtin_function(string name, string arg_1, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> function) {
             list<string> arguments; arguments.push_back(arg_1);
             shared_ptr<Function> f = builtin_runner->create_builtin_function(name, arguments, function);
-            functions[f->name->value_string] = f;
+            context->functions[f->name->value_string] = f;
         }
 
         InterpreterResult visit_node(shared_ptr<Node> node, shared_ptr<Context> context) {
@@ -139,7 +137,7 @@ class Interpreter {
                 if(res.should_return()) { break; }
 
                 if(n->type != SYMBOL_LIST_UNKNOWN && n->type != value_res.type) {
-                    RuntimeError e(_node->start, _node->end, "Mixed types in an array are not allowed", context);
+                    RuntimeError e(_node->start, _node->end, "Mixed types in an array are not allowed");
                     res.failure(e);
                     break;
                 }
@@ -150,7 +148,7 @@ class Interpreter {
                 } else if(value_res.type == NODE_STRING) {
                     n->add_value(value_res.res_string.value);
                 } else {
-                    RuntimeError e(_node->start, _node->end, "Unsupported type in list", context);
+                    RuntimeError e(_node->start, _node->end, "Unsupported type in list");
                     res.failure(e);
                     break;
                 }
@@ -245,7 +243,7 @@ class Interpreter {
                     if(value_obj->state == 0) {
                         res.set_from(value_obj);
                     } else {
-                        RuntimeError e(node->start, node->end, node->token->value_string + " is not defined", context);
+                        RuntimeError e(node->start, node->end, node->token->value_string + " is not defined");
                         return res.failure(e);
                     }
                 }
@@ -351,7 +349,7 @@ class Interpreter {
             InterpreterResult list = res.register_result(visit_node(node->for_start_result, context));
             if(res.should_return()) { return res; }
             if(list.type != NODE_LIST) {
-                RuntimeError e(node->start, node->end, "Foreach must contain a valid list", context);
+                RuntimeError e(node->start, node->end, "Foreach must contain a valid list");
                 return res.failure(e);
             }
 
@@ -392,7 +390,7 @@ class Interpreter {
                     if(res.has_return_value == true) { res.set_from(expr); res.reset(); break; }
                 }
             } else {
-                RuntimeError e(node->start, node->end, "Invalid type to iterate over", context);
+                RuntimeError e(node->start, node->end, "Invalid type to iterate over");
                 return res.failure(e);
             }
             if(res.should_return()) { return res; }
@@ -426,7 +424,6 @@ class Interpreter {
 
             shared_ptr<Function> function = make_shared<Function>();
             function->set_pos(node->start, node->end);
-            function->set_context(context);
             function->set_name(node->token);
             function->set_arguments(node->func_def_argument_tokens_result);
             function->set_expression(node->func_def_expression_result);
@@ -478,30 +475,29 @@ class Interpreter {
             res.set_pos(node->start, node->end);
             shared_ptr<Context> new_context = generate_new_context(node, context);
 
-            string func_name = node->token->value_string;
-            try {
-                shared_ptr<Function> function = functions.at(func_name);
-                check_args(node, new_context, res, arguments, function);
-                if(res.should_return()) { return res; }
-
-                populate_args(node, new_context, res, arguments, function);
-                if(res.should_return()) { return res; }
-
-                InterpreterResult expr;
-                if(function->built_in == false) {
-                    expr = res.register_result(visit_node(function->expression, new_context));
-                } else {
-                    expr = res.register_result(builtin_runner->run(function, new_context));
-                }
-                if(res.should_return() && res.has_return_value == false) { return res; }
-
-                res.set_from(expr);
-                return res.success();
-            } catch(out_of_range e_0) {
-                RuntimeError e(node->start, node->end, "Function '" + func_name + "' does not exist", context);
+            shared_ptr<Function> function = get_function(node->token->value_string);
+            if(res.state == -1) {
+                RuntimeError e(node->start, node->end, "Function '" + node->token->value_string + "' does not exist");
                 return res.failure(e);
             }
-        }
+
+            check_args(node, new_context, res, arguments, function);
+            if(res.should_return()) { return res; }
+
+            populate_args(node, new_context, res, arguments, function);
+            if(res.should_return()) { return res; }
+
+            InterpreterResult expr;
+            if(function->built_in == false) {
+                expr = res.register_result(visit_node(function->expression, new_context));
+            } else {
+                expr = res.register_result(builtin_runner->run(function, new_context));
+            }
+            if(res.should_return() && res.has_return_value == false) { return res; }
+
+            res.set_from(expr);
+            return res.success();
+    }
 
         shared_ptr<Context> generate_new_context(shared_ptr<Node> node, shared_ptr<Context> context) {
             shared_ptr<Context> new_context = make_shared<Context>(node->token->value_string);
@@ -514,20 +510,20 @@ class Interpreter {
         
         void check_args(shared_ptr<Node> node, shared_ptr<Context> context, InterpreterResult res, list<shared_ptr<Node>> arguments, shared_ptr<Function> function) {
             if(arguments.size() > function->arguments.size()) {
-                RuntimeError e(node->start, node->end, ((arguments.size() - function->arguments.size()) + " too many args passed into " + node->token->value_string), context);
+                RuntimeError e(node->start, node->end, ((arguments.size() - function->arguments.size()) + " too many args passed into " + node->token->value_string));
                 res.failure(e);
             } else if(arguments.size() < function->arguments.size()) {
-                RuntimeError e(node->start, node->end, ((function->arguments.size() - arguments.size()) + " too few args passed into " + node->token->value_string), context);
+                RuntimeError e(node->start, node->end, ((function->arguments.size() - arguments.size()) + " too few args passed into " + node->token->value_string));
                 res.failure(e);
             }
         }
         
         void check_args_constructor(shared_ptr<Node> node, shared_ptr<Context> context, InterpreterResult res, list<shared_ptr<Node>> arguments, shared_ptr<Object> object) {
             if(arguments.size() > object->arguments.size()) {
-                RuntimeError e(node->start, node->end, ((arguments.size() - object->arguments.size()) + " too many args passed into " + node->token->value_string), context);
+                RuntimeError e(node->start, node->end, ((arguments.size() - object->arguments.size()) + " too many args passed into " + node->token->value_string));
                 res.failure(e);
             } else if(arguments.size() < object->arguments.size()) {
-                RuntimeError e(node->start, node->end, ((object->arguments.size() - arguments.size()) + " too few args passed into " + node->token->value_string), context);
+                RuntimeError e(node->start, node->end, ((object->arguments.size() - arguments.size()) + " too few args passed into " + node->token->value_string));
                 res.failure(e);
             }
         }
@@ -545,7 +541,6 @@ class Interpreter {
         }
 
         void save_to_context(string name, InterpreterResult res, shared_ptr<Context> context) {
-
             if(res.type == NODE_INT) {
                 SymbolContainer value(res.res_int.value);
                 context->symbol_table->set(name, value);
@@ -553,12 +548,12 @@ class Interpreter {
                 SymbolContainer value(res.res_float.value);
                 context->symbol_table->set(name, value);
             } else if(res.type == NODE_FUNC_DEF) {
-                functions[name] = res.res_func;
+                context->functions[name] = res.res_func;
             } else if(res.type == NODE_STRING) {
                 SymbolContainer value(res.res_string.value);
                 context->symbol_table->set(name, value);
             } else if(res.type == NODE_LIST) {
-                lists[name] = res.res_list;
+                context->lists[name] = res.res_list;
             } else if(res.type == NODE_OBJECT_NEW) {
                 objects[name] = res.res_obj;
             }
@@ -585,7 +580,7 @@ class Interpreter {
             InterpreterResult left = res.register_result(visit_node(node->left, context));
             if(res.should_return()) { return res; }
             if(left.type != NODE_OBJECT_NEW) {
-                RuntimeError e(node->start, node->end, "Expected object", context);
+                RuntimeError e(node->start, node->end, "Expected object");
                 return res.failure(e);
             }
 
@@ -603,7 +598,7 @@ class Interpreter {
             InterpreterResult left = res.register_result(visit_node(node->left, context));
             if(res.should_return()) { return res; }
             if(left.type != NODE_OBJECT_NEW) {
-                RuntimeError e(node->start, node->end, "Expected object", context);
+                RuntimeError e(node->start, node->end, "Expected object");
                 return res.failure(e);
             }
 
@@ -616,14 +611,11 @@ class Interpreter {
         }
 
         shared_ptr<List> get_list(string _name) {
-            try {
-                shared_ptr<List> value = lists.at(_name);
-                return value;
-            } catch(out_of_range e) {
-                shared_ptr<List> res_err = make_shared<List>();
-                res_err->state = -1;
-                return res_err;
-            }
+            return context->get_list(_name);
+        }
+
+        shared_ptr<Function> get_function(string _name) {
+            return context->get_function(_name);
         }
 
         shared_ptr<Object> get_obj(string _name) {

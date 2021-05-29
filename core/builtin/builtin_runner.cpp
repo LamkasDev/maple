@@ -31,7 +31,7 @@ class BuiltInRunner {
                 function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_function = get_function(_function->name->value_string);
                 res = run_function(this, res, _function, _context);
             } catch(out_of_range e_0) {
-                RuntimeError e(res.start, res.end, "Function doesn't exist", _context);
+                RuntimeError e(res.start, res.end, "Function doesn't exist");
                 return res.failure(e);
             }
             if(res.state == -1) { return res; }
@@ -47,7 +47,7 @@ class BuiltInRunner {
         InterpreterResult run_print(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             SymbolContainer value = context->symbol_table->get("value");
             if(value.type != SYMBOL_STRING) {
-                RuntimeError e(res.start, res.end, "Invalid argument", context);
+                RuntimeError e(res.start, res.end, "Invalid argument");
                 return res.failure(e);
             }
             printf("%s", value.value_string.c_str());
@@ -76,7 +76,7 @@ class BuiltInRunner {
             try {
                 res.set_from(stoi(value.value_string));
             } catch(invalid_argument e_0) {
-                RuntimeError e(res.start, res.end, "Invalid argument", context);
+                RuntimeError e(res.start, res.end, "Invalid argument");
                 return res.failure(e);
             }
             
@@ -88,7 +88,7 @@ class BuiltInRunner {
             try {
                 res.set_from(stof(value.value_string));
             } catch(invalid_argument e_0) {
-                RuntimeError e(res.start, res.end, "Invalid argument", context);
+                RuntimeError e(res.start, res.end, "Invalid argument");
                 return res.failure(e);
             }
 
