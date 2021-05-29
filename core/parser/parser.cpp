@@ -973,7 +973,39 @@ class Parser {
             }
             result.register_advance(advance());
 
+            if(current_t->type != TT_LPAREN) {
+                return result.failure(create_syntax_error("'('", 1));
+            }
+            result.register_advance(advance());
+
+            list<shared_ptr<Node>> arguments;
+            
+            if(current_t->type == TT_RPAREN) {
+                result.register_advance(advance());
+            } else {
+                ParserResult arg = result.register_result(expression());
+                if(result.state == -1) {
+                    return result.failure(create_syntax_error("')' or an argument"));
+                }
+                arguments.push_back(arg.node);
+
+                while(current_t->type == TT_COMMA) {
+                    result.register_advance(advance());
+
+                    ParserResult arg_1 = result.register_result(expression());
+                    if(result.state == -1) { break; }
+                    arguments.push_back(arg_1.node);
+                }
+                if(result.state == -1) { return result; }
+
+                if(current_t->type != TT_RPAREN) {
+                    return result.failure(create_syntax_error("',' or ')'"));
+                }
+                result.register_advance(advance());
+            }
+
             node->set_end(current_t->start);
+            node->set_object_argument_nodes_result(arguments);
             
             result.set_node(node);
             return result.success();

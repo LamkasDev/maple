@@ -22,6 +22,10 @@ class Object {
             end = _end;
         }
 
+        void set_arguments(vector<shared_ptr<Token>> _arguments) {
+            arguments = _arguments;
+        }
+
         string repr() {
             return "OBJECT";
         }

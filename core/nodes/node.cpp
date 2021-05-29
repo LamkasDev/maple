@@ -65,6 +65,8 @@ class Node {
 
         list<shared_ptr<Node>> list_nodes_result;
 
+        list<shared_ptr<Node>> object_argument_nodes_result;
+
         void set_type(string _type) {
             type = _type;
         }
@@ -167,6 +169,10 @@ class Node {
 
         void set_list_nodes_result(list<shared_ptr<Node>> _list_nodes_result) {
             list_nodes_result = _list_nodes_result;
+        }
+
+        void set_object_argument_nodes_result(list<shared_ptr<Node>> _object_argument_nodes_result) {
+            object_argument_nodes_result = _object_argument_nodes_result;
         }
 
         shared_ptr<Node> copy() {

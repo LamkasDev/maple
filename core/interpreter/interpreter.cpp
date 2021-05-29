@@ -165,6 +165,8 @@ class Interpreter {
             res.set_pos(n->start, n->end);
             res.set_from(n);
 
+            check_args_constructor(node, context, res, node->object_argument_nodes_result, n);
+
             return res.success();
         }
 
@@ -512,6 +514,16 @@ class Interpreter {
                 res.failure(e);
             } else if(arguments.size() < function->arguments.size()) {
                 RuntimeError e(node->start, node->end, ((function->arguments.size() - arguments.size()) + " too few args passed into " + node->token->value_string), context);
+                res.failure(e);
+            }
+        }
+        
+        void check_args_constructor(shared_ptr<Node> node, shared_ptr<Context> context, InterpreterResult res, list<shared_ptr<Node>> arguments, shared_ptr<Object> object) {
+            if(arguments.size() > object->arguments.size()) {
+                RuntimeError e(node->start, node->end, ((arguments.size() - object->arguments.size()) + " too many args passed into " + node->token->value_string), context);
+                res.failure(e);
+            } else if(arguments.size() < object->arguments.size()) {
+                RuntimeError e(node->start, node->end, ((object->arguments.size() - arguments.size()) + " too few args passed into " + node->token->value_string), context);
                 res.failure(e);
             }
         }
