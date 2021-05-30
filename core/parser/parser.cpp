@@ -4,13 +4,16 @@ using namespace std;
 class Parser {
     public:
         list<shared_ptr<Token>> tokens;
-        int index = 0;
         shared_ptr<Token> current_t = nullptr;
+        vector<string> object_keywords;
+        int index = 0;
 
         Parser(list<shared_ptr<Token>> _tokens) {
             tokens = _tokens;
             index = 1;
             advance();
+
+            object_keywords.push_back("OBJECT");
         }
 
         int advance() {
@@ -995,8 +998,8 @@ class Parser {
             }
             result.register_advance(advance());
 
-            if(current_t->matches(TT_KEYWORD, KEYWORD_OBJECT) == false) {
-                return result.failure(create_syntax_error("'OBJECT'", 1));
+            if(current_t->matches(TT_KEYWORD, object_keywords) == false) {
+                return result.failure(create_syntax_error("a classname", 1));
             }
             result.register_advance(advance());
 
