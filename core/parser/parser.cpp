@@ -959,7 +959,7 @@ class Parser {
                 ParserResult expr = result.register_result(statements());
                 if(result.state == -1) { return result; }
 
-                if(current_t->type == TT_RCBRACKET) {
+                if(current_t->type != TT_RCBRACKET) {
                     return result.failure(create_syntax_error("'}'", 1));
                 }
                 result.register_advance(advance());
