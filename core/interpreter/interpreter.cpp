@@ -8,6 +8,7 @@ class Interpreter {
         shared_ptr<Context> context = nullptr;
         shared_ptr<Object> context_object = nullptr;
         map<string, shared_ptr<Object>> objects;
+        map<string, shared_ptr<ObjectPrototype>> object_prototypes;
 
         Interpreter() {
             SymbolContainer sc_null(0);
@@ -30,6 +31,9 @@ class Interpreter {
             add_builtin_function("parse_int", "value", run_parse_int);
             function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_parse_float = &BuiltInRunner::run_parse_float;
             add_builtin_function("parse_float", "value", run_parse_float);
+
+            shared_ptr<ObjectPrototype> prototype_object = make_shared<ObjectPrototype>();
+            object_prototypes.insert_or_assign("OBJECT", prototype_object);
         }
 
         void add_builtin_function(string name, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> function) {
@@ -163,7 +167,7 @@ class Interpreter {
 
         InterpreterResult visit_object_new_node(shared_ptr<Node> node, shared_ptr<Context> _context) {
             shared_ptr<Context> new_context = generate_new_context("obj_context", context);
-            shared_ptr<Object> n = make_shared<Object>(new_context);
+            shared_ptr<Object> n = make_shared<Object>(object_prototypes.at("OBJECT"), new_context);
             n->set_pos(node->start, node->end);
 
             InterpreterResult res;
@@ -523,11 +527,11 @@ class Interpreter {
         }
         
         void check_args_constructor(shared_ptr<Node> node, shared_ptr<Context> _context, InterpreterResult res, list<shared_ptr<Node>> arguments, shared_ptr<Object> object) {
-            if(arguments.size() > object->arguments.size()) {
-                RuntimeError e(node->start, node->end, ((arguments.size() - object->arguments.size()) + " too many args passed into " + node->token->value_string));
+            if(arguments.size() > object->prototype->arguments.size()) {
+                RuntimeError e(node->start, node->end, ((arguments.size() - object->prototype->arguments.size()) + " too many args passed into " + node->token->value_string));
                 res.failure(e);
-            } else if(arguments.size() < object->arguments.size()) {
-                RuntimeError e(node->start, node->end, ((object->arguments.size() - arguments.size()) + " too few args passed into " + node->token->value_string));
+            } else if(arguments.size() < object->prototype->arguments.size()) {
+                RuntimeError e(node->start, node->end, ((object->prototype->arguments.size() - arguments.size()) + " too few args passed into " + node->token->value_string));
                 res.failure(e);
             }
         }
@@ -632,7 +636,7 @@ class Interpreter {
                     return value;
                 }
             } catch(out_of_range e) {
-                shared_ptr<Object> res_err = make_shared<Object>(context);
+                shared_ptr<Object> res_err = make_shared<Object>(object_prototypes.at("OBJECT"), context);
                 res_err->state = -1;
                 return res_err;
             }

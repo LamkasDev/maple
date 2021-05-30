@@ -1,4 +1,5 @@
 #pragma once
+#include "object_prototype.cpp"
 #include "../core/context.cpp"
 using namespace std;
 
@@ -10,19 +11,16 @@ class Object {
 
         shared_ptr<Context> context = nullptr;
         map<string, shared_ptr<Object>> objects;
-        vector<shared_ptr<Token>> arguments;
+        shared_ptr<ObjectPrototype> prototype = nullptr;
 
-        Object(shared_ptr<Context> _context) {
+        Object(shared_ptr<ObjectPrototype> _prototype, shared_ptr<Context> _context) {
+            prototype = _prototype;
             context = _context;
         }
 
         void set_pos(Position _start, Position _end) {
             start = _start;
             end = _end;
-        }
-
-        void set_arguments(vector<shared_ptr<Token>> _arguments) {
-            arguments = _arguments;
         }
 
         string repr() {
