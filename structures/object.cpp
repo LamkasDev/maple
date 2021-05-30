@@ -12,8 +12,8 @@ class Object {
         map<string, shared_ptr<Object>> objects;
         vector<shared_ptr<Token>> arguments;
 
-        Object() {
-            context = make_shared<Context>("obj_context");
+        Object(shared_ptr<Context> _context) {
+            context = _context;
         }
 
         void set_pos(Position _start, Position _end) {

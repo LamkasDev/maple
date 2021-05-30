@@ -162,7 +162,8 @@ class Interpreter {
         }
 
         InterpreterResult visit_object_new_node(shared_ptr<Node> node, shared_ptr<Context> context) {
-            shared_ptr<Object> n = make_shared<Object>();
+            shared_ptr<Context> new_context = generate_new_context("obj_context", context);
+            shared_ptr<Object> n = make_shared<Object>(new_context);
             n->set_pos(node->start, node->end);
 
             InterpreterResult res;
@@ -475,7 +476,7 @@ class Interpreter {
         InterpreterResult execute(shared_ptr<Node> node, list<shared_ptr<Node>> arguments, shared_ptr<Context> context) {
             InterpreterResult res;
             res.set_pos(node->start, node->end);
-            shared_ptr<Context> new_context = generate_new_context(node, context);
+            shared_ptr<Context> new_context = generate_new_context(node->token->value_string, context);
 
             shared_ptr<Function> function = context->get_function(node->token->value_string);
             if(function->state == -1) {
@@ -501,11 +502,12 @@ class Interpreter {
             return res.success();
         }
 
-        shared_ptr<Context> generate_new_context(shared_ptr<Node> node, shared_ptr<Context> context) {
-            shared_ptr<Context> new_context = make_shared<Context>(node->token->value_string);
+        shared_ptr<Context> generate_new_context(string name, shared_ptr<Context> context) {
+            shared_ptr<Context> new_context = make_shared<Context>(name);
             new_context->set_parent(context);
-            new_context->set_parent_entry_pos(node->start);
-            new_context->set_symbol_table(new_context->parent->symbol_table);
+            new_context->set_symbol_table(context->symbol_table);
+            new_context->set_lists(context->lists);
+            new_context->set_functions(context->functions);
 
             return new_context;
         }
@@ -630,7 +632,7 @@ class Interpreter {
                     return value;
                 }
             } catch(out_of_range e) {
-                shared_ptr<Object> res_err = make_shared<Object>();
+                shared_ptr<Object> res_err = make_shared<Object>(context);
                 res_err->state = -1;
                 return res_err;
             }

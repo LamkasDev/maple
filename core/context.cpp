@@ -9,7 +9,6 @@ class Context {
     public:
         string display_name = "";
         shared_ptr<Context> parent = nullptr;
-        Position parent_entry_pos;
 
         shared_ptr<SymbolTable> symbol_table;
         map<string, shared_ptr<List>> lists;
@@ -58,11 +57,15 @@ class Context {
             parent = _parent;
         }
 
-        void set_parent_entry_pos(Position _parent_entry_pos) {
-            parent_entry_pos = _parent_entry_pos;
-        }
-
         void set_symbol_table(shared_ptr<SymbolTable> _symbol_table) {
             symbol_table = _symbol_table;
+        }
+
+        void set_lists(map<string, shared_ptr<List>> _lists) {
+            lists = _lists;
+        }
+
+        void set_functions(map<string, shared_ptr<Function>> _functions) {
+            functions = _functions;
         }
 };
