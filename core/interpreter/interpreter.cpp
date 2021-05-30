@@ -4,7 +4,9 @@ using namespace std;
 class Interpreter {
     public:
         shared_ptr<BuiltInRunner> builtin_runner = nullptr;
+
         shared_ptr<Context> context = nullptr;
+        shared_ptr<Object> context_object = nullptr;
         map<string, shared_ptr<Object>> objects;
 
         Interpreter() {
@@ -555,7 +557,11 @@ class Interpreter {
             } else if(res.type == NODE_LIST) {
                 context->lists[name] = res.res_list;
             } else if(res.type == NODE_OBJECT_NEW) {
-                objects[name] = res.res_obj;
+                if(context_object == nullptr) {
+                    objects[name] = res.res_obj;
+                } else {
+                    context_object->objects[name] = res.res_obj;
+                }
             }
         }
 
@@ -584,7 +590,9 @@ class Interpreter {
                 return res.failure(e);
             }
 
+            context_object = left.res_obj;
             InterpreterResult right = res.register_result(visit_node(node->right, left.res_obj->context));
+            context_object = nullptr;
             if(res.should_return()) { return res; }
 
             res.set_from(right);
@@ -605,15 +613,22 @@ class Interpreter {
             InterpreterResult expr = res.register_result(visit_node(node->chained_assigment_result, context));
             if(res.should_return()) { return res; }
 
+            context_object = left.res_obj;
             save_to_context(node->right->token->value_string, expr, left.res_obj->context);
+            context_object = nullptr;
             
             return res.success();
         }
 
         shared_ptr<Object> get_obj(string _name) {
             try {
-                shared_ptr<Object> value = objects.at(_name);
-                return value;
+                if(context_object == nullptr) {
+                    shared_ptr<Object> value = objects.at(_name);
+                    return value;
+                } else {
+                    shared_ptr<Object> value = context_object->objects.at(_name);
+                    return value;
+                }
             } catch(out_of_range e) {
                 shared_ptr<Object> res_err = make_shared<Object>();
                 res_err->state = -1;

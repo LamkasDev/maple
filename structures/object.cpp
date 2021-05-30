@@ -9,6 +9,7 @@ class Object {
         int state = 0;
 
         shared_ptr<Context> context = nullptr;
+        map<string, shared_ptr<Object>> objects;
         vector<shared_ptr<Token>> arguments;
 
         Object() {
