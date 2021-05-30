@@ -32,7 +32,7 @@
 <div align="center">
     <h3>Features</h3>
     <p>
-        Support for integers, floats, strings and lists<br />
+        Support for integers, floats, strings, lists and objects<br />
         Basic math operations (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>^</code>)<br />
         Variables (<code>VAR</code>)<br />
         Logical operators (<code>==</code>, <code><</code>, <code>></code>, <code><=</code>, <code>>=</code>, <code>AND</code>, <code>OR</code>)<br />
@@ -41,7 +41,8 @@
         For-each loops (<code>FOREACH</code>, <code>IN</code>)<br />
         While loops (<code>WHILE</code>)<br />
         Functions (<code>FUNC</code>)<br />
-        Other (<code>RETURN</code>, <code>BREAK</code>, <code>CONTINUE</code>)
+        Other (<code>RETURN</code>, <code>BREAK</code>, <code>CONTINUE</code>)<br />
+        Objects (<code>NEW</code>, <code>OBJECT</code>)
     </p>
     <h3>Is that all?</h3>
     <p>
