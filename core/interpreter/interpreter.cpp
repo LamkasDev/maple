@@ -478,7 +478,7 @@ class Interpreter {
             shared_ptr<Context> new_context = generate_new_context(node, context);
 
             shared_ptr<Function> function = context->get_function(node->token->value_string);
-            if(res.state == -1) {
+            if(function->state == -1) {
                 RuntimeError e(node->start, node->end, "Function '" + node->token->value_string + "' does not exist");
                 return res.failure(e);
             }
