@@ -1,5 +1,4 @@
 #pragma once
-#include "../core/context.cpp"
 using namespace std;
 
 class ObjectPrototype {

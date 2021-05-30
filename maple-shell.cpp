@@ -30,7 +30,7 @@ void print_result(RunResult result, bool prints_result, bool prints_debug) {
     } else {
         if(prints_debug == true) {
             printf("Tokens - %s \n", print_tree(result.makeTokensResult.tokens).c_str());
-            printf("Nodes - %s \n", ("(" + print_node(result.parserResult) + ")").c_str());
+            printf("Nodes - %s \n", ("(" + result.parserResult.node->repr() + ")").c_str());
         }
         if(prints_result == true) {
             printf("Result - %s \n\n", ("[" + result.interpreterResult.type + "] " +  result.interpreterResult.repr()).c_str());

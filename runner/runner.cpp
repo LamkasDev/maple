@@ -5,7 +5,6 @@
 #include "../core/context.cpp"
 #include "../core/position.cpp"
 #include "../core/token.cpp"
-#include "../core/utils.cpp"
 
 #include "../core/builtin/builtin_runner.cpp"
 
@@ -24,6 +23,9 @@
 
 #include "../core/symbols/symbol_table.cpp"
 #include "../core/symbols/symbol_container.cpp"
+
+#include "../core/utils/basic_utils.cpp"
+#include "../core/utils/other_utils.cpp"
 
 #include "../structures/number.cpp"
 #include "../structures/function.cpp"

@@ -1,5 +1,5 @@
 #pragma once
-#include "../utils.cpp"
+#include "../token.cpp"
 #include "../errors/error_types.cpp"
 using namespace std;
 

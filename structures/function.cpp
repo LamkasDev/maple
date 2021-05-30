@@ -1,5 +1,4 @@
 #pragma once
-#include "../core/nodes/node.cpp"
 using namespace std;
 
 class Function {

@@ -1,5 +1,6 @@
 #pragma once
 #include "errors/error.cpp"
+#include "utils/basic_utils.cpp"
 using namespace std;
 
 const vector<string> KEYWORDS { "VAR", "AND", "OR", "NOT", "IF", "ELSE", "ELIF", "FOR", "FOREACH", "TO", "STEP", "IN", "WHILE", "FUNC", "RETURN", "CONTINUE", "BREAK", "NEW", "OBJECT" }; 
@@ -60,7 +61,6 @@ const string KEYWORD_RETURN = "RETURN";
 const string KEYWORD_CONTINUE = "CONTINUE";
 const string KEYWORD_BREAK = "BREAK";
 const string KEYWORD_NEW = "NEW";
-const string KEYWORD_OBJECT = "OBJECT";
 
 class Token {
     public:
@@ -87,6 +87,10 @@ class Token {
 
         bool matches(string _type, string _value) {
             return type == _type && value_string == _value;
+        }
+
+        bool matches(string _type, vector<string> _values) {
+            return type == _type && in_array(value_string, _values);
         }
 
         shared_ptr<Token> copy() {
