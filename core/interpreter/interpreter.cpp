@@ -162,7 +162,7 @@ class Interpreter {
         }
 
         InterpreterResult visit_object_new_node(shared_ptr<Node> node, shared_ptr<Context> _context) {
-            shared_ptr<Context> new_context = generate_new_context("obj_context", _context);
+            shared_ptr<Context> new_context = generate_new_context("obj_context", context);
             shared_ptr<Object> n = make_shared<Object>(new_context);
             n->set_pos(node->start, node->end);
 
