@@ -162,6 +162,20 @@ bool run_tests(Runner runner) {
     total_tests += 2;
 
     printf("----------\n");
+    passed += run_integer_test(runner, "Objects 1 (VAR obj = NEW OBJECT())", "VAR obj = NEW OBJECT()", 0);
+    passed += run_integer_test(runner, "Objects 2 (obj.a = 1)", "obj.a = 1", 0);
+    passed += run_integer_test(runner, "Objects 3 (obj.b = \"b\")", "obj.b = \"b\"", 0);
+    passed += run_integer_test(runner, "Objects 4 (obj.c = [1,2,3])", "obj.c = [1,2,3]", 0);
+    passed += run_integer_test(runner, "Objects 5 (obj.d = FUNC d() { RETURN \"d\" })", "obj.d = FUNC d() { RETURN \"d\" }", 0);
+    passed += run_integer_test(runner, "Objects 6 (obj.e = NEW OBJECT())", "obj.e = NEW OBJECT()", 0);
+    passed += run_integer_test(runner, "Objects 7 (obj.e.a = 1)", "obj.e.a = 1", 0);
+    passed += run_integer_test(runner, "Objects 8 (obj.a)", "obj.a", 1);
+    passed += run_string_test(runner, "Objects 9 (obj.b)", "obj.b", "b");
+    passed += run_string_test(runner, "Objects 10 (obj.d())", "obj.d()", "d");
+    passed += run_integer_test(runner, "Objects 11 (obj.e.a)", "obj.e.a", 1);
+    total_tests += 11;
+
+    printf("----------\n");
     printf("%i PASSED, %i FAILED", passed, (total_tests - passed));
     return passed < total_tests;
 }
