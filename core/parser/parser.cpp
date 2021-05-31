@@ -8,12 +8,11 @@ class Parser {
         vector<string> object_keywords;
         int index = 0;
 
-        Parser(list<shared_ptr<Token>> _tokens) {
+        Parser(vector<string> _object_keywords, list<shared_ptr<Token>> _tokens) {
+            object_keywords = _object_keywords;
             tokens = _tokens;
             index = 1;
             advance();
-
-            object_keywords.push_back("OBJECT");
         }
 
         int advance() {
@@ -127,6 +126,12 @@ class Parser {
                 return result.success();
             } else if(t->matches(TT_KEYWORD, KEYWORD_NEW)) {
                 ParserResult def = object_def();
+                if(def.state == -1) { return result.failure(def.e); }
+
+                result.set_node(def.node);
+                return result.success();
+            } else if(t->matches(TT_KEYWORD, KEYWORD_CLASS)) {
+                ParserResult def = class_def();
                 if(def.state == -1) { return result.failure(def.e); }
 
                 result.set_node(def.node);
@@ -986,6 +991,48 @@ class Parser {
             return result.success();
         }
 
+        ParserResult class_def() {
+            ParserResult result;
+
+            shared_ptr<Node> node = make_shared<Node>();
+            node->set_pos(current_t->start, current_t->end);
+            node->set_type(NODE_CLASS_DEF);
+
+            if(current_t->matches(TT_KEYWORD, KEYWORD_CLASS) == false) {
+                return result.failure(create_syntax_error("'CLASS'", 1));
+            }
+            result.register_advance(advance());
+
+            if(current_t->matches(TT_KEYWORD, object_keywords)) {
+                shared_ptr<Token> var_name = current_t;
+                result.register_advance(advance());
+                node->set_token(var_name);
+            } else {
+                return result.failure(create_syntax_error("identifier", 1));
+            }
+
+            if(current_t->type == TT_LCBRACKET) {
+                result.register_advance(advance());
+
+                ParserResult expr = result.register_result(statements());
+                if(result.state == -1) { return result; }
+
+                if(current_t->type != TT_RCBRACKET) {
+                    return result.failure(create_syntax_error("'}'", 1));
+                }
+                result.register_advance(advance());
+
+                node->set_class_def_expression_result(expr.node);
+            } else {
+                return result.failure(create_syntax_error("'{'", 1));
+            }
+            
+            node->set_end(current_t->start);
+            
+            result.set_node(node);
+            return result.success();
+        }
+
         ParserResult object_def() {
             ParserResult result;
 
@@ -1001,6 +1048,7 @@ class Parser {
             if(current_t->matches(TT_KEYWORD, object_keywords) == false) {
                 return result.failure(create_syntax_error("a classname", 1));
             }
+            node->set_token(current_t);
             result.register_advance(advance());
 
             if(current_t->type != TT_LPAREN) {

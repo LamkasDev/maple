@@ -3,7 +3,7 @@
 #include "utils/basic_utils.cpp"
 using namespace std;
 
-const vector<string> KEYWORDS { "VAR", "AND", "OR", "NOT", "IF", "ELSE", "ELIF", "FOR", "FOREACH", "TO", "STEP", "IN", "WHILE", "FUNC", "RETURN", "CONTINUE", "BREAK", "NEW", "OBJECT" }; 
+const vector<string> KEYWORDS { "VAR", "AND", "OR", "NOT", "IF", "ELSE", "ELIF", "FOR", "FOREACH", "TO", "STEP", "IN", "WHILE", "FUNC", "RETURN", "CONTINUE", "BREAK", "NEW", "CLASS" }; 
 const string LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 const string LETTERS_DIGITS = LETTERS + "0123456789";
 const string DIGITS = "0123456789";
@@ -61,6 +61,7 @@ const string KEYWORD_RETURN = "RETURN";
 const string KEYWORD_CONTINUE = "CONTINUE";
 const string KEYWORD_BREAK = "BREAK";
 const string KEYWORD_NEW = "NEW";
+const string KEYWORD_CLASS = "CLASS";
 
 class Token {
     public:

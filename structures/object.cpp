@@ -13,9 +13,12 @@ class Object {
         map<string, shared_ptr<Object>> objects;
         shared_ptr<ObjectPrototype> prototype = nullptr;
 
-        Object(shared_ptr<ObjectPrototype> _prototype, shared_ptr<Context> _context) {
-            prototype = _prototype;
+        Object(shared_ptr<Context> _context) {
             context = _context;
+        }
+
+        void set_prototype(shared_ptr<ObjectPrototype> _prototype) {
+            prototype = _prototype;
         }
 
         void set_pos(Position _start, Position _end) {

@@ -88,6 +88,8 @@ class Interpreter {
                 res = visit_break_node(node, _context);
             } else if(node->type == NODE_OBJECT_NEW) {
                 res = visit_object_new_node(node, _context);
+            } else if(node->type == NODE_CLASS_DEF) {
+                res = visit_class_def_node(node, _context);
             } else if(node->type == NODE_CHAINED) {
                 res = visit_chained_node(node, _context);
             } else if(node->type == NODE_CHAINED_ASSIGNMENT) {
@@ -167,7 +169,12 @@ class Interpreter {
 
         InterpreterResult visit_object_new_node(shared_ptr<Node> node, shared_ptr<Context> _context) {
             shared_ptr<Context> new_context = generate_new_context("obj_context", context);
-            shared_ptr<Object> n = make_shared<Object>(object_prototypes.at("OBJECT"), new_context);
+            shared_ptr<Object> n = make_shared<Object>(new_context);
+            n->set_prototype(object_prototypes.at(node->token->value_string));
+            
+            if(n->prototype->constructor != nullptr) {
+                visit_node(n->prototype->constructor, n->context);
+            }
             n->set_pos(node->start, node->end);
 
             InterpreterResult res;
@@ -175,6 +182,18 @@ class Interpreter {
             res.set_from(n);
 
             check_args_constructor(node, _context, res, node->object_argument_nodes_result, n);
+
+            return res.success();
+        }
+
+        InterpreterResult visit_class_def_node(shared_ptr<Node> node, shared_ptr<Context> _context) {
+            shared_ptr<ObjectPrototype> prot = make_shared<ObjectPrototype>();
+            prot->set_constructor(node->class_def_expression_result);
+
+            object_prototypes.insert_or_assign(node->token->value_string, prot);
+
+            InterpreterResult res;
+            res.set_pos(node->start, node->end);
 
             return res.success();
         }
@@ -636,7 +655,7 @@ class Interpreter {
                     return value;
                 }
             } catch(out_of_range e) {
-                shared_ptr<Object> res_err = make_shared<Object>(object_prototypes.at("OBJECT"), context);
+                shared_ptr<Object> res_err = make_shared<Object>(context);
                 res_err->state = -1;
                 return res_err;
             }

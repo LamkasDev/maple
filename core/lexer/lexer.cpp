@@ -9,12 +9,14 @@ class Lexer {
         string text = "";
         Position pos;
         char current_c;
+        vector<string> object_keywords;
 
         Lexer() {
-
+            
         }
 
-        Lexer(string _fileName, string _text) {
+        Lexer(vector<string> _object_keywords, string _fileName, string _text) {
+            object_keywords = _object_keywords;
             fileName = _fileName;
             text = _text;
 
@@ -225,7 +227,10 @@ class Lexer {
                 advance();
             }
 
-            if(in_array(str, KEYWORDS)) {
+            if(result.tokens.size() > 0 && result.tokens.back()->matches(TT_KEYWORD, KEYWORD_CLASS)) {
+                object_keywords.push_back(str);
+            }
+            if(in_array(str, KEYWORDS) || in_array(str, object_keywords)) {
                 shared_ptr<TokenKeyword> t = make_shared<TokenKeyword>();
                 t->init(str);
                 t->set_start(pos.copy());

@@ -38,16 +38,18 @@ using namespace std;
 
 class Runner {
     public:
-        shared_ptr<Interpreter> interpreter;
+        shared_ptr<Interpreter> interpreter = nullptr;
+        vector<string> object_keywords;
 
         Runner() {
             interpreter = make_shared<Interpreter>();
+            object_keywords.push_back("OBJECT");
         }
 
         RunResult run(string _fileName, string _text) {
             RunResult result;
 
-            Lexer lexer(_fileName, _text);
+            Lexer lexer(object_keywords, _fileName, _text);
             result.set_lexer(lexer);
             MakeTokensResult makeTokensResult = lexer.make_tokens();
             result.set_make_tokens_result(makeTokensResult);
@@ -55,7 +57,9 @@ class Runner {
                 return result;
             }
 
-            Parser parser(makeTokensResult.tokens);
+            object_keywords = lexer.object_keywords;
+
+            Parser parser(object_keywords, makeTokensResult.tokens);
             ParserResult parserResult = parser.parse();
             result.set_parser_result(parserResult);
             if(parserResult.state == -1) {

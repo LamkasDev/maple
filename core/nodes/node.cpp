@@ -23,6 +23,7 @@ const string NODE_BREAK = "BREAK";
 
 const string NODE_FUNC_DEF = "FUNC_DEF";
 const string NODE_FUNC_CALL = "FUNC_CALL";
+const string NODE_CLASS_DEF = "CLASS_DEF";
 
 const string NODE_CHAINED = "CHAINED";
 const string NODE_CHAINED_ASSIGNMENT = "CHAINED_ASSIGMENT";
@@ -69,6 +70,8 @@ class Node {
         list<shared_ptr<Node>> object_argument_nodes_result;
 
         shared_ptr<Node> chained_assigment_result = nullptr;
+
+        shared_ptr<Node> class_def_expression_result = nullptr;
 
         void set_type(string _type) {
             type = _type;
@@ -180,6 +183,10 @@ class Node {
 
         void set_chained_assigment_result(shared_ptr<Node> _chained_assigment_result) {
             chained_assigment_result = _chained_assigment_result;
+        }
+
+        void set_class_def_expression_result(shared_ptr<Node> _class_def_expression_result) {
+            class_def_expression_result = _class_def_expression_result;
         }
 
         shared_ptr<Node> copy() {
