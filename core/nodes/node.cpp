@@ -24,6 +24,7 @@ const string NODE_BREAK = "BREAK";
 const string NODE_FUNC_DEF = "FUNC_DEF";
 const string NODE_FUNC_CALL = "FUNC_CALL";
 const string NODE_CLASS_DEF = "CLASS_DEF";
+const string NODE_CONSTRUCTOR_DEF = "CONSTRUCTOR_DEF";
 
 const string NODE_CHAINED = "CHAINED";
 const string NODE_CHAINED_ASSIGNMENT = "CHAINED_ASSIGMENT";

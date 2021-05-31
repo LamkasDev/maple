@@ -124,6 +124,12 @@ class Parser {
 
                 result.set_node(def.node);
                 return result.success();
+            } else if(t->matches(TT_KEYWORD, KEYWORD_CONSTRUCTOR)) {
+                ParserResult def = constructor_def();
+                if(def.state == -1) { return result.failure(def.e); }
+
+                result.set_node(def.node);
+                return result.success();
             } else if(t->matches(TT_KEYWORD, KEYWORD_NEW)) {
                 ParserResult def = object_def();
                 if(def.state == -1) { return result.failure(def.e); }
@@ -982,6 +988,81 @@ class Parser {
                 node->set_func_def_expression_result(expr.node);
             } else {
                 return result.failure(create_syntax_error("'->' or '{'", 1));
+            }
+
+            node->set_end(current_t->start);
+            node->set_func_def_argument_tokens_result(arguments);
+            
+            result.set_node(node);
+            return result.success();
+        }
+
+        ParserResult constructor_def() {
+            ParserResult result;
+            vector<shared_ptr<Token>> arguments;
+
+            shared_ptr<Node> node = make_shared<Node>();
+            node->set_pos(current_t->start, current_t->end);
+            node->set_type(NODE_CONSTRUCTOR_DEF);
+
+            if(current_t->matches(TT_KEYWORD, KEYWORD_CONSTRUCTOR) == false) {
+                return result.failure(create_syntax_error("'CONSTRUCTOR'", 1));
+            }
+            result.register_advance(advance());
+
+            if(current_t->type != TT_LPAREN) {
+                return result.failure(create_syntax_error("'('", 1));
+            }
+            result.register_advance(advance());
+
+            bool identifier_errored_out = false;
+            InvalidSyntaxError id_e;
+            if(current_t->type == TT_IDENFIFIER) {
+                arguments.push_back(current_t);
+                result.register_advance(advance());
+
+                while(current_t->type == TT_COMMA) {
+                    result.register_advance(advance());
+                    
+                    if(current_t->type != TT_IDENFIFIER) {
+                        id_e = create_syntax_error("identifier", 1);
+                        identifier_errored_out = true;
+                        break;
+                    }
+
+                    arguments.push_back(current_t);
+                    result.register_advance(advance());
+                }
+
+                if(identifier_errored_out == false && current_t->type != TT_RPAREN) {
+                    id_e = create_syntax_error("',' or ')'", 1);
+                    identifier_errored_out = true;
+                }
+            } else {
+                if(current_t->type != TT_RPAREN) {
+                    id_e = create_syntax_error("identifier or ')'", 1);
+                    identifier_errored_out = true;
+                }
+            }
+            if(identifier_errored_out == true) {
+                return result.failure(id_e);
+            }
+            result.register_advance(advance());
+
+            if(current_t->type == TT_LCBRACKET) {
+                result.register_advance(advance());
+
+                ParserResult expr = result.register_result(statements());
+                if(result.state == -1) { return result; }
+
+                if(current_t->type != TT_RCBRACKET) {
+                    return result.failure(create_syntax_error("'}'", 1));
+                }
+                result.register_advance(advance());
+
+                node->set_func_def_expression_result(expr.node);
+            } else {
+                return result.failure(create_syntax_error("'{'", 1));
             }
 
             node->set_end(current_t->start);

@@ -34,7 +34,7 @@ class BuiltInRunner {
                 RuntimeError e(res.start, res.end, "Function doesn't exist");
                 return res.failure(e);
             }
-            if(res.state == -1) { return res; }
+            if(res.should_return()) { return res; }
 
             return res.success();
         }

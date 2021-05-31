@@ -177,6 +177,10 @@ bool run_tests(Runner runner) {
     total_tests += 11;
 
     printf("----------\n");
+    passed += run_integer_test(runner, "Classes 1 (CLASS class {})", "CLASS class {}", 0);
+    total_tests += 1;
+
+    printf("----------\n");
     printf("%i PASSED, %i FAILED", passed, (total_tests - passed));
     return passed < total_tests;
 }

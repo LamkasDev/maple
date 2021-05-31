@@ -32,7 +32,12 @@ class Interpreter {
             function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_parse_float = &BuiltInRunner::run_parse_float;
             add_builtin_function("parse_float", "value", run_parse_float);
 
+            shared_ptr<Node> default_body = make_shared<Node>();
+            default_body->type = NODE_STATEMENTS;
+
             shared_ptr<ObjectPrototype> prototype_object = make_shared<ObjectPrototype>();
+            prototype_object->set_body(default_body);
+
             object_prototypes.insert_or_assign("OBJECT", prototype_object);
         }
 
@@ -94,6 +99,9 @@ class Interpreter {
                 res = visit_chained_node(node, _context);
             } else if(node->type == NODE_CHAINED_ASSIGNMENT) {
                 res = visit_chained_assignment_node(node, _context);
+            } else if(node->type == NODE_CONSTRUCTOR_DEF) {
+                RuntimeError e(node->start, node->end, "Constructor outside of class definition");
+                res.failure(e);
             } else {
                 no_visit_method(node->type);
             }
@@ -168,32 +176,54 @@ class Interpreter {
         }
 
         InterpreterResult visit_object_new_node(shared_ptr<Node> node, shared_ptr<Context> _context) {
+            InterpreterResult res;
+            res.set_pos(node->start, node->end);
+
             shared_ptr<Context> new_context = generate_new_context("obj_context", context);
             shared_ptr<Object> n = make_shared<Object>(new_context);
+            n->set_pos(node->start, node->end);
             n->set_prototype(object_prototypes.at(node->token->value_string));
             
-            if(n->prototype->constructor != nullptr) {
-                visit_node(n->prototype->constructor, n->context);
+            for(shared_ptr<Node> _node : n->prototype->body->statements_nodes_result) {
+                if(_node->type != NODE_CONSTRUCTOR_DEF) {
+                    res.register_result(visit_node(_node, n->context));
+                }
+                if(res.should_return()) { return res; }
             }
-            n->set_pos(node->start, node->end);
+            if(n->prototype->constructor != nullptr) {
+                res = check_args_constructor(node, _context, res, node->object_argument_nodes_result, n);
+                if(res.should_return()) { return res; }
 
-            InterpreterResult res;
-            res.set_pos(n->start, n->end);
+                res = populate_args_constructor(node, _context, res,  node->object_argument_nodes_result, n);
+                if(res.should_return()) { return res; }
+
+                res.register_result(visit_node(n->prototype->constructor->func_def_expression_result, n->context));
+            }
+            if(res.should_return()) { return res; }
+
             res.set_from(n);
-
-            check_args_constructor(node, _context, res, node->object_argument_nodes_result, n);
-
             return res.success();
         }
 
         InterpreterResult visit_class_def_node(shared_ptr<Node> node, shared_ptr<Context> _context) {
-            shared_ptr<ObjectPrototype> prot = make_shared<ObjectPrototype>();
-            prot->set_constructor(node->class_def_expression_result);
-
-            object_prototypes.insert_or_assign(node->token->value_string, prot);
-
             InterpreterResult res;
             res.set_pos(node->start, node->end);
+
+            shared_ptr<ObjectPrototype> prot = make_shared<ObjectPrototype>();
+            prot->set_body(node->class_def_expression_result);
+            for(shared_ptr<Node> _node : node->class_def_expression_result->statements_nodes_result) {
+                if(_node->type != NODE_ASSIGNMENT && _node->type != NODE_FUNC_DEF && _node->type != NODE_CONSTRUCTOR_DEF) {
+                    RuntimeError e(_node->start, _node->end, "Expected variable assignment, function definition or constructor");
+                    res.failure(e);
+                    break;
+                }
+                if(_node->type == NODE_CONSTRUCTOR_DEF) {
+                    prot->set_constructor(_node);
+                }
+            }
+            if(res.should_return()) { return res; }
+
+            object_prototypes.insert_or_assign(node->token->value_string, prot);
 
             return res.success();
         }
@@ -563,6 +593,20 @@ class Interpreter {
             int i = 0;
             for(shared_ptr<Node> arg : arguments) {
                 shared_ptr<Token> token = function->arguments.at(i);
+                InterpreterResult arg_res = res.register_result(visit_node(arg, _context));
+                if(arg_res.should_return()) { break; }
+
+                save_to_context(token->value_string, arg_res, _context);
+                i++;
+            }
+
+            return res;
+        }
+
+        InterpreterResult populate_args_constructor(shared_ptr<Node> node, shared_ptr<Context> _context, InterpreterResult res, list<shared_ptr<Node>> arguments, shared_ptr<Object> object) {
+            int i = 0;
+            for(shared_ptr<Node> arg : arguments) {
+                shared_ptr<Token> token = object->prototype->constructor->func_def_argument_tokens_result.at(i);
                 InterpreterResult arg_res = res.register_result(visit_node(arg, _context));
                 if(arg_res.should_return()) { break; }
 
