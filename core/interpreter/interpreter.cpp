@@ -507,10 +507,10 @@ class Interpreter {
                 return res.failure(e);
             }
 
-            check_args(node, new_context, res, arguments, function);
+            res = check_args(node, new_context, res, arguments, function);
             if(res.should_return()) { return res; }
 
-            populate_args(node, new_context, res, arguments, function);
+            res = populate_args(node, new_context, res, arguments, function);
             if(res.should_return()) { return res; }
 
             InterpreterResult expr;
@@ -535,27 +535,31 @@ class Interpreter {
             return new_context;
         }
         
-        void check_args(shared_ptr<Node> node, shared_ptr<Context> _context, InterpreterResult res, list<shared_ptr<Node>> arguments, shared_ptr<Function> function) {
+        InterpreterResult check_args(shared_ptr<Node> node, shared_ptr<Context> _context, InterpreterResult res, list<shared_ptr<Node>> arguments, shared_ptr<Function> function) {
             if(arguments.size() > function->arguments.size()) {
-                RuntimeError e(node->start, node->end, ((arguments.size() - function->arguments.size()) + " too many args passed into " + node->token->value_string));
+                RuntimeError e(node->start, node->end, "Too many args passed into '" + node->token->value_string + "' (Got: " + to_string(arguments.size()) + "/" + to_string(function->arguments.size()) + ")");
                 res.failure(e);
             } else if(arguments.size() < function->arguments.size()) {
-                RuntimeError e(node->start, node->end, ((function->arguments.size() - arguments.size()) + " too few args passed into " + node->token->value_string));
+                RuntimeError e(node->start, node->end, "Not enough args passed into '" + node->token->value_string + "' (Got: " + to_string(arguments.size()) + "/" + to_string(function->arguments.size()) + ")");
                 res.failure(e);
             }
+
+            return res;
         }
         
-        void check_args_constructor(shared_ptr<Node> node, shared_ptr<Context> _context, InterpreterResult res, list<shared_ptr<Node>> arguments, shared_ptr<Object> object) {
-            if(arguments.size() > object->prototype->arguments.size()) {
-                RuntimeError e(node->start, node->end, ((arguments.size() - object->prototype->arguments.size()) + " too many args passed into " + node->token->value_string));
+        InterpreterResult check_args_constructor(shared_ptr<Node> node, shared_ptr<Context> _context, InterpreterResult res, list<shared_ptr<Node>> arguments, shared_ptr<Object> object) {
+            if(arguments.size() > object->prototype->constructor->func_def_argument_tokens_result.size()) {
+                RuntimeError e(node->start, node->end, "Too many args passed into '" + node->token->value_string + "' (Got: " + to_string(arguments.size()) + "/" + to_string(object->prototype->constructor->func_def_argument_tokens_result.size()) + ")");
                 res.failure(e);
-            } else if(arguments.size() < object->prototype->arguments.size()) {
-                RuntimeError e(node->start, node->end, ((object->prototype->arguments.size() - arguments.size()) + " too few args passed into " + node->token->value_string));
+            } else if(arguments.size() < object->prototype->constructor->func_def_argument_tokens_result.size()) {
+                RuntimeError e(node->start, node->end, "Not enough args passed into '" + node->token->value_string + "' (Got: " + to_string(arguments.size()) + "/" + to_string(object->prototype->constructor->func_def_argument_tokens_result.size()) + ")");
                 res.failure(e);
             }
+
+            return res;
         }
 
-        void populate_args(shared_ptr<Node> node, shared_ptr<Context> _context, InterpreterResult res, list<shared_ptr<Node>> arguments, shared_ptr<Function> function) {
+        InterpreterResult populate_args(shared_ptr<Node> node, shared_ptr<Context> _context, InterpreterResult res, list<shared_ptr<Node>> arguments, shared_ptr<Function> function) {
             int i = 0;
             for(shared_ptr<Node> arg : arguments) {
                 shared_ptr<Token> token = function->arguments.at(i);
@@ -565,6 +569,8 @@ class Interpreter {
                 save_to_context(token->value_string, arg_res, _context);
                 i++;
             }
+
+            return res;
         }
 
         void save_to_context(string name, InterpreterResult res, shared_ptr<Context> _context) {
