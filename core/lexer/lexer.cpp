@@ -317,6 +317,9 @@ class Lexer {
             if(current_c == '=') {
                 advance();
                 t->init(TT_EQEQ);
+            } else if(current_c == '>') {
+                advance();
+                t->init(TT_ARROW);
             }
 
             result.tokens.push_back(t);
@@ -362,9 +365,21 @@ class Lexer {
             t->set_end(pos.copy());
 
             advance();
-            if(current_c == '>') {
+
+            result.tokens.push_back(t);
+            return result;
+        }
+
+        MakeTokensResult make_plus(MakeTokensResult result) {
+            shared_ptr<Token> t = make_shared<Token>();
+            t->init(TT_PLUS);
+            t->set_start(pos.copy());
+            t->set_end(pos.copy());
+
+            advance();
+            if(current_c == '=') {
                 advance();
-                t->init(TT_ARROW);
+                t->init(TT_PLUSEQ);
             }
 
             result.tokens.push_back(t);
