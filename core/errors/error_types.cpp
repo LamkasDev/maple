@@ -1,0 +1,67 @@
+#pragma once
+#include "error.cpp"
+using namespace std;
+
+class IllegalCharacterError : public Error {
+    public:
+        IllegalCharacterError() {
+            
+        }
+        
+        IllegalCharacterError(Position _start, Position _end, string _details) {
+            start = _start;
+            end = _end;
+
+            type = ERROR_DEFAULT;
+            name = "IllegalCharacterError";
+            details = _details;
+        }
+};
+
+class InvalidSyntaxError : public Error {
+    public:
+        InvalidSyntaxError() {
+            
+        }
+
+        InvalidSyntaxError(Position _start, Position _end, string _details) {
+            start = _start;
+            end = _end;
+
+            type = ERROR_DEFAULT;
+            name = "InvalidSyntaxError";
+            details = _details;
+        }
+};
+
+class RuntimeError : public Error {
+    public:
+        RuntimeError() {
+            
+        }
+        
+        RuntimeError(Position _start, Position _end, string _details) {
+            start = _start;
+            end = _end;
+
+            type = ERROR_RUNTIME;
+            name = "RuntimeError";
+            details = _details;
+        }
+};
+
+class ExpectedCharacterError : public Error {
+    public:
+        ExpectedCharacterError() {
+            
+        }
+        
+        ExpectedCharacterError(Position _start, Position _end, string _details) {
+            start = _start;
+            end = _end;
+
+            type = ERROR_RUNTIME;
+            name = "ExpectedCharacterError";
+            details = _details;
+        }
+};

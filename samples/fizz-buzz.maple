@@ -1,0 +1,13 @@
+FOR(VAR i = 1) TO 101 {
+    IF(i % 5 == 0 AND i % 3 == 0) {
+        VAR s = "FizzBuzz";
+    } ELIF(i % 5 == 0) {
+        VAR s = "Buzz";
+    } ELIF(i % 3 == 0) {
+        VAR s = "Fizz";
+    } ELSE {
+        VAR s = "" + i;
+    };
+
+    print(s + "\n");
+};
