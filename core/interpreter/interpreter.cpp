@@ -336,6 +336,7 @@ class Interpreter {
                 new_value = res.process_binary(previous_value, plus_token, value_res);
 
                 if(res.should_return()) { return res; }
+                res.set_from(new_value);
             }
             
             save_to_context(node->token->value_string, res, _context);
