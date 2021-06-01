@@ -1000,14 +1000,16 @@ class ParseAll {
                 shared_ptr<Token> identifier = parser_store->current_t;
                 result.register_advance(parser_store->advance());
 
-                if(parser_store->current_t->type != TT_EQ) {
-                    return result.failure(create_syntax_error(parser_store, "'='"));
+                shared_ptr<Token> assignment_token = parser_store->current_t;
+
+                if(assignment_token->type != TT_EQ && assignment_token->type != TT_PLUSEQ) {
+                    return result.failure(create_syntax_error(parser_store, "'=' or '+='"));
                 }
                 result.register_advance(parser_store->advance());
 
                 ParserResult expr = result.register_result(expression(parser_store));
                 if(result.state == -1) { return result; }
-                shared_ptr<Node> n = make_shared<Node>(); n->set_pos(identifier->start, expr.node->end); n->set_type(NODE_ASSIGNMENT); n->set_token(identifier); n->set_to_right(expr.node);
+                shared_ptr<Node> n = make_shared<Node>(); n->set_pos(identifier->start, expr.node->end); n->set_type(NODE_ASSIGNMENT); n->set_token(identifier); n->set_assignment_token(assignment_token); n->set_to_right(expr.node);
                 
                 result.set_node(n);
                 return result.success();

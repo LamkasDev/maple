@@ -74,6 +74,8 @@ class Node {
 
         shared_ptr<Node> class_def_expression_result = nullptr;
 
+        shared_ptr<Token> assignment_token = nullptr;
+
         void set_type(string _type) {
             type = _type;
         }
@@ -107,6 +109,10 @@ class Node {
 
         void set_token(shared_ptr<Token> _token) {
             token = _token;
+        }
+
+        void set_assignment_token(shared_ptr<Token> _assignment_token) {
+            assignment_token = _assignment_token;
         }
 
         void set_start(Position _start) {

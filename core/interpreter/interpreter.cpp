@@ -315,8 +315,30 @@ class Interpreter {
             InterpreterResult value_res;
             value_res = res.register_result(visit_node(node->right, _context));
             if(res.should_return()) { return res; }
-            res.set_from(value_res);
 
+            if (node->assignment_token->type == TT_EQ) {
+                res.set_from(value_res);
+            } else if (node->assignment_token->type == TT_PLUSEQ) {
+                shared_ptr<Node> previous_node = make_shared<Node>();
+                previous_node->set_type(NODE_ACCESS);
+                previous_node->set_token(node->token);
+
+                InterpreterResult previous_value;
+
+                previous_value = res.register_result(visit_node(previous_node, _context));
+                if(res.should_return()) { return res; }
+                
+                shared_ptr<Token> plus_token = make_shared<Token>();
+                plus_token->init(TT_PLUS);
+
+
+                InterpreterResult new_value;
+                new_value = res.process_binary(previous_value, plus_token, value_res);
+
+                if(res.should_return()) { return res; }
+                res.set_from(new_value);
+            }
+            
             save_to_context(node->token->value_string, res, _context);
             return res.success();
         }

@@ -181,6 +181,10 @@ bool run_tests(Runner runner) {
     total_tests += 1;
 
     printf("----------\n");
+    passed += run_string_test(runner, "Equals math 1 (VAR a = \"a\"; VAR a += \"b\";)", "VAR a = \"a\"; VAR a += \"b\";", "ab");
+    total_tests += 1;
+
+    printf("----------\n");
     printf("%i PASSED, %i FAILED", passed, (total_tests - passed));
     return passed < total_tests;
 }
