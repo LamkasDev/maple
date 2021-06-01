@@ -317,6 +317,9 @@ class Lexer {
             if(current_c == '=') {
                 advance();
                 t->init(TT_EQEQ);
+            } else if(current_c == '>') {
+                advance();
+                t->init(TT_ARROW);
             }
 
             result.tokens.push_back(t);
@@ -362,10 +365,6 @@ class Lexer {
             t->set_end(pos.copy());
 
             advance();
-            if(current_c == '>') {
-                advance();
-                t->init(TT_ARROW);
-            }
 
             result.tokens.push_back(t);
             return result;
