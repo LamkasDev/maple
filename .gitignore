@@ -5,3 +5,7 @@ maple-shell.exe
 maple-shell.o
 maple-shell
 maple-icon.ico
+
+maple-shell-win.o
+maple-shell-linux.o
+maple-shell-mac.o

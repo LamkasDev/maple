@@ -1,21 +1,3 @@
-#include <stdio.h>
-#include <math.h>
-
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-
-#include <algorithm>
-#include <vector>
-#include <list>
-#include <map>
-#include <stdexcept>
-#include <memory>
-#include <functional>
-
-#include "runner/runner.cpp"
-#include "tests/tests.cpp"
 using namespace std;
 
 const string VERSION = "0.9.0";
@@ -55,7 +37,7 @@ bool run_file(Runner runner, string location, bool prints_result, bool prints_de
     }
 }
 
-int main(int argc, char** argv) {
+int run(int argc, char** argv) {
     Runner runner;
     bool debug_mode = false;
     if(argc >= 2) {
