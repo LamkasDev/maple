@@ -386,22 +386,6 @@ class Lexer {
             return result;
         }
 
-        MakeTokensResult make_plus(MakeTokensResult result) {
-            shared_ptr<Token> t = make_shared<Token>();
-            t->init(TT_PLUS);
-            t->set_start(pos.copy());
-            t->set_end(pos.copy());
-
-            advance();
-            if(current_c == '=') {
-                advance();
-                t->init(TT_PLUSEQ);
-            }
-
-            result.tokens.push_back(t);
-            return result;
-        }
-
         MakeTokensResult process_slash(MakeTokensResult result) {
             shared_ptr<Token> t = make_shared<Token>();
             t->init(TT_DIV);
