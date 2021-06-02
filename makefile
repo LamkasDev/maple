@@ -16,11 +16,15 @@ else
 	endif
 endif
 
-output: maple-shell.o
+maple-shell: FORCE
+	$(CC) $(CC_PREFLAGS) -c $(CC_FILE) -o maple-shell.o
+	$(CC) maple-shell.o -o maple-shell $(CC_POSTFLAGS)
+		
+debug:
+	$(CC) $(CC_PREFLAGS) -ggdb -c $(CC_FILE) -o maple-shell.o
 	$(CC) maple-shell.o -o maple-shell $(CC_POSTFLAGS)
 
-maple-shell.o: $(CC_FILE)
-	$(CC) $(CC_PREFLAGS) -c $(CC_FILE) -o maple-shell.o
-     
 clean:
 	rm *.o maple-shell
+
+FORCE: ;
