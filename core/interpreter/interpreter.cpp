@@ -4,6 +4,7 @@ using namespace std;
 class Interpreter {
     public:
         shared_ptr<BuiltInRunner> builtin_runner = nullptr;
+        map<string, function<InterpreterResult(Interpreter*, shared_ptr<Node>, shared_ptr<Context>)>> visit_functions;
 
         shared_ptr<Context> context = nullptr;
         shared_ptr<Object> context_object = nullptr;
@@ -21,16 +22,63 @@ class Interpreter {
             context->symbol_table->set("FALSE", sc_false);
 
             builtin_runner = make_shared<BuiltInRunner>();
-            function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_print = &BuiltInRunner::run_print;
-            add_builtin_function("print", "value", run_print);
-            function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_input = &BuiltInRunner::run_input;
-            add_builtin_function("input", run_input);
-            function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_is_nan = &BuiltInRunner::run_is_nan;
-            add_builtin_function("is_nan", "value", run_is_nan);
-            function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_parse_int = &BuiltInRunner::run_parse_int;
-            add_builtin_function("parse_int", "value", run_parse_int);
-            function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_parse_float = &BuiltInRunner::run_parse_float;
-            add_builtin_function("parse_float", "value", run_parse_float);
+            function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_func;
+            run_func = &BuiltInRunner::run_print;
+            add_builtin_function("print", "value", run_func);
+            run_func = &BuiltInRunner::run_input;
+            add_builtin_function("input", run_func);
+            run_func = &BuiltInRunner::run_is_nan;
+            add_builtin_function("is_nan", "value", run_func);
+            run_func = &BuiltInRunner::run_parse_int;
+            add_builtin_function("parse_int", "value", run_func);
+            run_func = &BuiltInRunner::run_parse_float;
+            add_builtin_function("parse_float", "value", run_func);
+
+            function<InterpreterResult(Interpreter*, shared_ptr<Node>, shared_ptr<Context>)>visit_func;
+            visit_func = &Interpreter::visit_int_node;
+            visit_functions.insert_or_assign(NODE_INT, visit_func);
+            visit_func = &Interpreter::visit_float_node;
+            visit_functions.insert_or_assign(NODE_FLOAT, visit_func);
+            visit_func = &Interpreter::visit_unary_node;
+            visit_functions.insert_or_assign(NODE_UNARY, visit_func);
+            visit_func = &Interpreter::visit_binary_node;
+            visit_functions.insert_or_assign(NODE_BINARY, visit_func);
+            visit_func = &Interpreter::visit_variable_access_node;
+            visit_functions.insert_or_assign(NODE_ACCESS, visit_func);
+            visit_func = &Interpreter::visit_variable_assignment_node;
+            visit_functions.insert_or_assign(NODE_ASSIGNMENT, visit_func);
+            visit_func = &Interpreter::visit_if_node;
+            visit_functions.insert_or_assign(NODE_IF, visit_func);
+            visit_func = &Interpreter::visit_for_node;
+            visit_functions.insert_or_assign(NODE_FOR, visit_func);
+            visit_func = &Interpreter::visit_foreach_node;
+            visit_functions.insert_or_assign(NODE_FOREACH, visit_func);
+            visit_func = &Interpreter::visit_while_node;
+            visit_functions.insert_or_assign(NODE_WHILE, visit_func);
+            visit_func = &Interpreter::visit_func_call_node;
+            visit_functions.insert_or_assign(NODE_FUNC_CALL, visit_func);
+            visit_func = &Interpreter::visit_func_def_node;
+            visit_functions.insert_or_assign(NODE_FUNC_DEF, visit_func);
+            visit_func = &Interpreter::visit_string_node;
+            visit_functions.insert_or_assign(NODE_STRING, visit_func);
+            visit_func = &Interpreter::visit_list_node;
+            visit_functions.insert_or_assign(NODE_LIST, visit_func);
+            visit_func = &Interpreter::visit_statements_node;
+            visit_functions.insert_or_assign(NODE_STATEMENTS, visit_func);
+            visit_func = &Interpreter::visit_return_node;
+            visit_functions.insert_or_assign(NODE_RETURN, visit_func);
+            visit_func = &Interpreter::visit_continue_node;
+            visit_functions.insert_or_assign(NODE_CONTINUE, visit_func);
+            visit_func = &Interpreter::visit_break_node;
+            visit_functions.insert_or_assign(NODE_BREAK, visit_func);
+            visit_func = &Interpreter::visit_object_new_node;
+            visit_functions.insert_or_assign(NODE_OBJECT_NEW, visit_func);
+            visit_func = &Interpreter::visit_class_def_node;
+            visit_functions.insert_or_assign(NODE_CLASS_DEF, visit_func);
+            visit_func = &Interpreter::visit_chained_node;
+            visit_functions.insert_or_assign(NODE_CHAINED, visit_func);
+            visit_func = &Interpreter::visit_chained_assignment_node;
+            visit_functions.insert_or_assign(NODE_CHAINED_ASSIGNMENT, visit_func);
 
             shared_ptr<Node> default_body = make_shared<Node>();
             default_body->type = NODE_STATEMENTS;
@@ -55,55 +103,16 @@ class Interpreter {
 
         InterpreterResult visit_node(shared_ptr<Node> node, shared_ptr<Context> _context) {
             InterpreterResult res;
-            if(node->type == NODE_INT) {
-                res = visit_int_node(node, _context);
-            } else if(node->type == NODE_FLOAT) {
-                res = visit_float_node(node, _context);
-            } else if(node->type == NODE_UNARY) {
-                res = visit_unary_node(node, _context);
-            } else if(node->type == NODE_BINARY) {
-                res = visit_binary_node(node, _context);
-            } else if(node->type == NODE_ACCESS) {
-                res = visit_variable_access_node(node, _context);
-            } else if(node->type == NODE_ASSIGNMENT) {
-                res = visit_variable_assign(node, _context);
-            } else if(node->type == NODE_IF) {
-                res = visit_if_node(node, _context);
-            } else if(node->type == NODE_FOR) {
-                res = visit_for_node(node, _context);
-            } else if(node->type == NODE_FOREACH) {
-                res = visit_foreach_node(node, _context);
-            } else if(node->type == NODE_WHILE) {
-                res = visit_while_node(node, _context);
-            } else if(node->type == NODE_FUNC_CALL) {
-                res = visit_func_call_node(node, _context);
-            } else if(node->type == NODE_FUNC_DEF) {
-                res = visit_func_def_node(node, _context);
-            } else if(node->type == NODE_STRING) {
-                res = visit_string_node(node, _context);
-            } else if(node->type == NODE_LIST) {
-                res = visit_list_node(node, _context);
-            } else if(node->type == NODE_STATEMENTS) {
-                res = visit_statements_node(node, _context);
-            } else if(node->type == NODE_RETURN) {
-                res = visit_return_node(node, _context);
-            } else if(node->type == NODE_CONTINUE) {
-                res = visit_continue_node(node, _context);
-            } else if(node->type == NODE_BREAK) {
-                res = visit_break_node(node, _context);
-            } else if(node->type == NODE_OBJECT_NEW) {
-                res = visit_object_new_node(node, _context);
-            } else if(node->type == NODE_CLASS_DEF) {
-                res = visit_class_def_node(node, _context);
-            } else if(node->type == NODE_CHAINED) {
-                res = visit_chained_node(node, _context);
-            } else if(node->type == NODE_CHAINED_ASSIGNMENT) {
-                res = visit_chained_assignment_node(node, _context);
-            } else if(node->type == NODE_CONSTRUCTOR_DEF) {
+            if(node->type == NODE_CONSTRUCTOR_DEF) {
                 RuntimeError e(node->start, node->end, "Constructor outside of class definition");
                 res.failure(e);
             } else {
-                no_visit_method(node->type);
+                try {
+                    function<InterpreterResult(Interpreter*, shared_ptr<Node>, shared_ptr<Context>)> visit_func = visit_functions.at(node->type);
+                    res = visit_func(this, node, _context);
+                } catch(out_of_range e) {
+                    no_visit_method(node->type);
+                }
             }
 
             return res;
@@ -331,7 +340,7 @@ class Interpreter {
             return res;    
         }
 
-        InterpreterResult visit_variable_assign(shared_ptr<Node> node, shared_ptr<Context> _context) {
+        InterpreterResult visit_variable_assignment_node(shared_ptr<Node> node, shared_ptr<Context> _context) {
             InterpreterResult res;
             res.set_pos(node->start, node->end);
             
