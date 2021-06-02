@@ -32,6 +32,7 @@ const string TT_POW = "POW";
 const string TT_MOD = "MOD";
 
 const string TT_PLUSEQ = "PLUSEQ";
+const string TT_MINUSEQ = "MINUSEQ";
 const string TT_LPAREN = "LPAREN";
 const string TT_RPAREN = "RPAREN";
 const string TT_LSBRACKET = "LSBRACKET";
