@@ -14,6 +14,9 @@
 #include <memory>
 #include <functional>
 
+#define CPPHTTPLIB_OPENSSL_SUPPORT
+#include "../libs/httplib.h"
+
 #include "../runner/runner.cpp"
 #include "../tests/tests.cpp"
 #include "../maple-shell.cpp"

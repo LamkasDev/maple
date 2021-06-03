@@ -23,16 +23,19 @@ class Interpreter {
 
             builtin_runner = make_shared<BuiltInRunner>();
             function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_func;
-            run_func = &BuiltInRunner::run_print;
-            add_builtin_function("print", "value", run_func);
-            run_func = &BuiltInRunner::run_input;
-            add_builtin_function("input", run_func);
-            run_func = &BuiltInRunner::run_is_nan;
-            add_builtin_function("is_nan", "value", run_func);
-            run_func = &BuiltInRunner::run_parse_int;
-            add_builtin_function("parse_int", "value", run_func);
-            run_func = &BuiltInRunner::run_parse_float;
-            add_builtin_function("parse_float", "value", run_func);
+            list<string> arguments;
+            run_func = &BuiltInRunner::run_print; arguments.clear(); arguments.push_back("value");
+            add_builtin_function("print", arguments, run_func);
+            run_func = &BuiltInRunner::run_input; arguments.clear();
+            add_builtin_function("input", arguments, run_func);
+            run_func = &BuiltInRunner::run_is_nan; arguments.clear(); arguments.push_back("value");
+            add_builtin_function("is_nan", arguments, run_func);
+            run_func = &BuiltInRunner::run_parse_int; arguments.clear(); arguments.push_back("value");
+            add_builtin_function("parse_int", arguments, run_func);
+            run_func = &BuiltInRunner::run_parse_float; arguments.clear(); arguments.push_back("value");
+            add_builtin_function("parse_float", arguments, run_func);
+            run_func = &BuiltInRunner::run_fetch; arguments.clear(); arguments.push_back("address");
+            add_builtin_function("fetch", arguments, run_func);
 
             function<InterpreterResult(Interpreter*, shared_ptr<Node>, shared_ptr<Context>)>visit_func;
             visit_func = &Interpreter::visit_int_node;
@@ -85,19 +88,12 @@ class Interpreter {
 
             shared_ptr<ObjectPrototype> prototype_object = make_shared<ObjectPrototype>();
             prototype_object->set_body(default_body);
-
             object_prototypes.insert_or_assign("OBJECT", prototype_object);
         }
 
-        void add_builtin_function(string name, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> function) {
-            list<string> arguments;
+        void add_builtin_function(string name, list<string> arguments, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> function) {
             shared_ptr<Function> f = builtin_runner->create_builtin_function(name, arguments, function);
-            context->functions[f->name->value_string] = f;
-        }
-
-        void add_builtin_function(string name, string arg_1, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> function) {
-            list<string> arguments; arguments.push_back(arg_1);
-            shared_ptr<Function> f = builtin_runner->create_builtin_function(name, arguments, function);
+            builtin_runner->add_builtin_function(name, function);
             context->functions[f->name->value_string] = f;
         }
 

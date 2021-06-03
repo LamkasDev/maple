@@ -21,8 +21,11 @@ class BuiltInRunner {
             }
 
             f->set_arguments(arguments_tokens);
-            builtin_functions.insert_or_assign(name, function);
             return f;
+        }
+
+        void add_builtin_function(string name, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> function) {
+            builtin_functions.insert_or_assign(name, function);
         }
 
         InterpreterResult run(shared_ptr<Function> _function, shared_ptr<Context> _context) {
@@ -89,6 +92,21 @@ class BuiltInRunner {
                 res.set_from(stof(value.value_string));
             } catch(invalid_argument e_0) {
                 RuntimeError e(res.start, res.end, "Invalid argument");
+                return res.failure(e);
+            }
+
+            return res.success();
+        }
+        
+        InterpreterResult run_fetch(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            SymbolContainer address = context->symbol_table->get("address");
+            try {
+                httplib::Client cli(address.value_string.c_str());
+                auto _res = cli.Get("/");
+
+                res.set_from(_res->body);
+            } catch(invalid_argument e_0) {
+                RuntimeError e(res.start, res.end, "Something went wrong");
                 return res.failure(e);
             }
 
