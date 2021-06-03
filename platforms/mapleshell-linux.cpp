@@ -14,7 +14,7 @@
 #include <memory>
 #include <functional>
 
-#define CPPHTTPLIB_OPENSSL_SUPPORT
+//#define CPPHTTPLIB_OPENSSL_SUPPORT
 #include "../libs/httplib.h"
 
 #include "../runner/runner.cpp"

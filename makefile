@@ -1,6 +1,6 @@
 CC=g++
 CC_PREFLAGS=-std=c++17 -I "C:\Program Files\OpenSSL-Win64\include"
-CC_POSTFLAGS=-static -static-libgcc -static-libstdc++ -lssl -lcrypto -lws2_32
+CC_POSTFLAGS=-static -static-libgcc -static-libstdc++ -lws2_32
 CC_FILE=maple-shell.cpp
 
 ifeq ($(OS),Windows_NT)
