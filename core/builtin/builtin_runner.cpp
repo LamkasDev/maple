@@ -98,7 +98,7 @@ class BuiltInRunner {
             return res.success();
         }
         
-        InterpreterResult run_fetch(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+        /*InterpreterResult run_fetch(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             SymbolContainer address = context->symbol_table->get("address");
             try {
                 httplib::Client cli(address.value_string.c_str());
@@ -111,5 +111,5 @@ class BuiltInRunner {
             }
 
             return res.success();
-        }
+        }*/
 };

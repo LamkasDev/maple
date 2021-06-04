@@ -34,8 +34,8 @@ class Interpreter {
             add_builtin_function("parse_int", arguments, run_func);
             run_func = &BuiltInRunner::run_parse_float; arguments.clear(); arguments.push_back("value");
             add_builtin_function("parse_float", arguments, run_func);
-            run_func = &BuiltInRunner::run_fetch; arguments.clear(); arguments.push_back("address");
-            add_builtin_function("fetch", arguments, run_func);
+            /*run_func = &BuiltInRunner::run_fetch; arguments.clear(); arguments.push_back("address");
+            add_builtin_function("fetch", arguments, run_func);*/
 
             function<InterpreterResult(Interpreter*, shared_ptr<Node>, shared_ptr<Context>)>visit_func;
             visit_func = &Interpreter::visit_int_node;
