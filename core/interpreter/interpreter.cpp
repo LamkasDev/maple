@@ -1,4 +1,5 @@
 #pragma once
+#include "../../structures/list_store.cpp"
 using namespace std;
 
 class Interpreter {
@@ -10,6 +11,9 @@ class Interpreter {
         shared_ptr<Object> context_object = nullptr;
         map<string, shared_ptr<Object>> objects;
         map<string, shared_ptr<ObjectPrototype>> object_prototypes;
+        
+        map<int, shared_ptr<ListStore>> lists;
+        int list_uuid = 0;
 
         Interpreter() {
             SymbolContainer sc_null(0);
@@ -17,9 +21,9 @@ class Interpreter {
             SymbolContainer sc_false(0);
             
             context = make_shared<Context>("global");
-            context->symbol_table->set("NULL", sc_null);
-            context->symbol_table->set("TRUE", sc_true);
-            context->symbol_table->set("FALSE", sc_false);
+            save_to_context("NULL", sc_null, context);
+            save_to_context("TRUE", sc_true, context);
+            save_to_context("FALSE", sc_false, context);
 
             builtin_runner = make_shared<BuiltInRunner>();
             function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_func;
@@ -151,23 +155,37 @@ class Interpreter {
             shared_ptr<List> n = make_shared<List>();
             n->set_pos(node->start, node->end);
 
+            int current_uuid = list_uuid;
+            list_uuid++;
+
+            shared_ptr<ListStore> n_1 = make_shared<ListStore>();
+            n->set_list_id(current_uuid);
+            lists.insert_or_assign(current_uuid, n_1);
+
             InterpreterResult res;
             res.set_pos(n->start, n->end);
             for(shared_ptr<Node> _node : node->list_nodes_result) {
                 InterpreterResult value_res = res.register_result(visit_node(_node, _context));
                 if(res.should_return()) { break; }
 
-                if(n->type != SYMBOL_LIST_UNKNOWN && n->type != value_res.type) {
+                if(n_1->type != SYMBOL_LIST_UNKNOWN && n_1->type != value_res.type) {
                     RuntimeError e(_node->start, _node->end, "Mixed types in an array are not allowed");
                     res.failure(e);
                     break;
                 }
                 if(value_res.type == NODE_INT) {
-                    n->add_value(value_res.res_int.value);
+                    SymbolContainer container(value_res.res_int.value);
+                    n_1->add_value(container);
                 } else if(value_res.type == NODE_FLOAT) {
-                    n->add_value(value_res.res_float.value);
+                    SymbolContainer container(value_res.res_float.value);
+                    n_1->add_value(container);
                 } else if(value_res.type == NODE_STRING) {
-                    n->add_value(value_res.res_string.value);
+                    SymbolContainer container(value_res.res_string.value);
+                    n_1->add_value(container);
+                } else if(value_res.type == NODE_LIST) {
+                    n_1->add_value(value_res.res_list);
+                } else if(value_res.type == NODE_OBJECT_NEW) {
+                    n_1->add_value(value_res.res_obj);
                 } else {
                     RuntimeError e(_node->start, _node->end, "Unsupported type in list");
                     res.failure(e);
@@ -415,7 +433,7 @@ class Interpreter {
             int i = start_value.get_value();
             while((st_dir == true && i < end_value.get_value()) || (st_dir == false && i > end_value.get_value())) {
                 SymbolContainer container(i);
-                _context->symbol_table->set(node->token->value_string, container);
+                save_to_context(node->token->value_string, container, _context);
                 i += step_value.get_value();
 
                 InterpreterResult expr = res.register_result(visit_node(node->for_expr_result, _context));
@@ -441,10 +459,12 @@ class Interpreter {
                 return res.failure(e);
             }
 
-            if(list.res_list->type == SYMBOL_LIST_INT) {
-                for(int e : list.res_list->list_ints) {
-                    SymbolContainer container(e);
-                    _context->symbol_table->set(node->token->value_string, container);
+            shared_ptr<ListStore> list_store = get_list_store(list.res_list->list_id);
+
+            if(list_store->type == SYMBOL_LIST_INT || list_store->type == SYMBOL_LIST_FLOAT || list_store->type == SYMBOL_LIST_STRING) {
+                vector<SymbolContainer> iterable_list = list_store->get_iterable_containers();
+                for(SymbolContainer e : iterable_list) {
+                    save_to_context(node->token->value_string, e, _context);
 
                     InterpreterResult expr = res.register_result(visit_node(node->for_expr_result, _context));
 
@@ -453,10 +473,9 @@ class Interpreter {
                     if(res.loop_should_break == true) { res.reset(); break; }
                     if(res.has_return_value == true) { res.set_from(expr); res.reset(); break; }
                 }
-            } else if(list.res_list->type == SYMBOL_LIST_FLOAT) {
-                for(float e : list.res_list->list_floats) {
-                    SymbolContainer container(e);
-                    context->symbol_table->set(node->token->value_string, container);
+            } else if(list_store->type == SYMBOL_LIST_LIST) {
+                for(shared_ptr<List> e : list_store->list_lists) {
+                    save_to_context(node->token->value_string, e, _context);
 
                     InterpreterResult expr = res.register_result(visit_node(node->for_expr_result, _context));
 
@@ -465,10 +484,9 @@ class Interpreter {
                     if(res.loop_should_break == true) { res.reset(); break; }
                     if(res.has_return_value == true) { res.set_from(expr); res.reset(); break; }
                 }
-            } else if(list.res_list->type == SYMBOL_LIST_STRING) {
-                for(string e : list.res_list->list_strings) {
-                    SymbolContainer container(e);
-                    context->symbol_table->set(node->token->value_string, container);
+            } else if(list_store->type == SYMBOL_LIST_OBJECT) {
+                for(shared_ptr<Object> e : list_store->list_objects) {
+                    save_to_context(node->token->value_string, e, _context);
 
                     InterpreterResult expr = res.register_result(visit_node(node->for_expr_result, _context));
 
@@ -672,6 +690,22 @@ class Interpreter {
             }
         }
 
+        void save_to_context(string name, SymbolContainer value, shared_ptr<Context> _context) {
+            _context->symbol_table->set(name, value);
+        }
+
+        void save_to_context(string name, shared_ptr<List> value, shared_ptr<Context> _context) {
+            _context->lists[name] = value;
+        }
+
+        void save_to_context(string name, shared_ptr<Object> value, shared_ptr<Context> _context) {
+            if(context_object == nullptr) {
+                objects[name] = value;
+            } else {
+                context_object->objects[name] = value;
+            }
+        }
+
         InterpreterResult visit_statements_node(shared_ptr<Node> node, shared_ptr<Context> _context) {
             InterpreterResult res;
             res.set_pos(node->start, node->end);
@@ -740,6 +774,15 @@ class Interpreter {
                 shared_ptr<Object> res_err = make_shared<Object>(context);
                 res_err->state = -1;
                 return res_err;
+            }
+        }
+
+        shared_ptr<ListStore> get_list_store(int id) {
+            try {
+                shared_ptr<ListStore> value = lists.at(id);
+                return value;
+            } catch(out_of_range e) {
+                return nullptr;
             }
         }
 
