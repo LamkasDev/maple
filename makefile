@@ -5,12 +5,14 @@ CC_FILE=maple-shell.cpp
 
 ifeq ($(OS),Windows_NT)
 	CC_PREFLAGS=-std=c++17 -I "C:\Program Files\OpenSSL-Win64\include"
+	#CC_POSTFLAGS=-static -static-libgcc -static-libstdc++ -L "C:\Program Files\OpenSSL-Win64\lib" -lssl -lcrypto -lws2_32
 	CC_POSTFLAGS=-static -static-libgcc -static-libstdc++ -lws2_32
 	CC_FILE := platforms/mapleshell-win.cpp
 else
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Linux)
 		CC_PREFLAGS=-std=c++17 -I "/usr/include/openssl"
+		CC_POSTFLAGS=-static -static-libgcc -static-libstdc++ -lssl -lcrypto -lpthread -ldl
 		CC_FILE := platforms/mapleshell-linux.cpp
 	else
 		ifeq ($(UNAME_S),Darwin)
