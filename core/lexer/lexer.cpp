@@ -171,8 +171,7 @@ class Lexer {
                 }
             }
 
-            shared_ptr<Token> t = make_shared<Token>();
-            t->init(TT_EOF);
+            shared_ptr<Token> t = make_shared<Token>(TT_EOF);
             t->set_start(pos);
             result.tokens.push_back(t);
 
@@ -181,8 +180,7 @@ class Lexer {
         }
 
         MakeTokensResult add_generic_token(MakeTokensResult result, string type) {
-            shared_ptr<Token> t = make_shared<Token>();
-            t->init(type);
+            shared_ptr<Token> t = make_shared<Token>(type);
             t->set_start(pos);
             result.tokens.push_back(t); advance();
 
@@ -203,15 +201,13 @@ class Lexer {
             }
             
             if(dot == 0) {
-                shared_ptr<TokenInt> t = make_shared<TokenInt>();
-                t->init(stoi(str));
+                shared_ptr<TokenInt> t = make_shared<TokenInt>(stoi(str));
                 t->set_start(pos.copy());
                 t->set_end(pos.copy());
 
                 result.tokens.push_back(t);
             } else {
-                shared_ptr<TokenFloat> t = make_shared<TokenFloat>();
-                t->init(atof(str.c_str()));
+                shared_ptr<TokenFloat> t = make_shared<TokenFloat>(atof(str.c_str()));
                 t->set_start(pos.copy());
                 t->set_end(pos.copy());
 
@@ -232,15 +228,13 @@ class Lexer {
                 object_keywords.push_back(str);
             }
             if(in_array(str, KEYWORDS) || in_array(str, object_keywords)) {
-                shared_ptr<TokenKeyword> t = make_shared<TokenKeyword>();
-                t->init(str);
+                shared_ptr<TokenKeyword> t = make_shared<TokenKeyword>(str);
                 t->set_start(pos.copy());
                 t->set_end(pos.copy());
 
                 result.tokens.push_back(t);
             } else {
-                shared_ptr<TokenIdentifier> t = make_shared<TokenIdentifier>();
-                t->init(str);
+                shared_ptr<TokenIdentifier> t = make_shared<TokenIdentifier>(str);
                 t->set_start(pos.copy());
                 t->set_end(pos.copy());
 
@@ -279,8 +273,7 @@ class Lexer {
 
             advance();
 
-            shared_ptr<TokenString> t = make_shared<TokenString>();
-            t->init(str);
+            shared_ptr<TokenString> t = make_shared<TokenString>(str);
             t->set_start(pos.copy());
             t->set_end(pos.copy());
 
@@ -289,14 +282,13 @@ class Lexer {
         }
 
         MakeTokensResult make_not_equals(MakeTokensResult result) {
-            shared_ptr<Token> t = make_shared<Token>();
+            shared_ptr<Token> t = make_shared<Token>(TT_NEQ);
             t->set_start(pos.copy());
             t->set_end(pos.copy());
 
             advance();
             if(current_c == '=') {
                 advance();
-                t->init(TT_NEQ);
                 result.tokens.push_back(t);
             } else {
                 ExpectedCharacterError e(pos.copy(), pos.copy(), "'=' (after '!')");
@@ -308,18 +300,17 @@ class Lexer {
         }
 
         MakeTokensResult make_equals(MakeTokensResult result) {
-            shared_ptr<Token> t = make_shared<Token>();
-            t->init(TT_EQ);
+            shared_ptr<Token> t = make_shared<Token>(TT_EQ);
             t->set_start(pos.copy());
             t->set_end(pos.copy());
 
             advance();
             if(current_c == '=') {
                 advance();
-                t->init(TT_EQEQ);
+                t->set_type(TT_EQEQ);
             } else if(current_c == '>') {
                 advance();
-                t->init(TT_ARROW);
+                t->set_type(TT_ARROW);
             }
 
             result.tokens.push_back(t);
@@ -327,15 +318,14 @@ class Lexer {
         }
 
         MakeTokensResult make_less_than(MakeTokensResult result) {
-            shared_ptr<Token> t = make_shared<Token>();
-            t->init(TT_LTHAN);
+            shared_ptr<Token> t = make_shared<Token>(TT_LTHAN);
             t->set_start(pos.copy());
             t->set_end(pos.copy());
 
             advance();
             if(current_c == '=') {
                 advance();
-                t->init(TT_LTHANEQ);
+                t->set_type(TT_LTHANEQ);
             }
 
             result.tokens.push_back(t);
@@ -343,15 +333,14 @@ class Lexer {
         }
 
         MakeTokensResult make_greater_than(MakeTokensResult result) {
-            shared_ptr<Token> t = make_shared<Token>();
-            t->init(TT_GTHAN);
+            shared_ptr<Token> t = make_shared<Token>(TT_GTHAN);
             t->set_start(pos.copy());
             t->set_end(pos.copy());
 
             advance();
             if(current_c == '=') {
                 advance();
-                t->init(TT_GTHANEQ);
+                t->set_type(TT_GTHANEQ);
             }
 
             result.tokens.push_back(t);
@@ -359,15 +348,14 @@ class Lexer {
         }
 
         MakeTokensResult make_minus(MakeTokensResult result) {
-            shared_ptr<Token> t = make_shared<Token>();
-            t->init(TT_MINUS);
+            shared_ptr<Token> t = make_shared<Token>(TT_MINUS);
             t->set_start(pos.copy());
             t->set_end(pos.copy());
 
             advance();
             if(current_c == '=') {
                 advance();
-                t->init(TT_MINUSEQ);
+                t->set_type(TT_MINUSEQ);
             }
 
             result.tokens.push_back(t);
@@ -375,15 +363,14 @@ class Lexer {
         }
 
         MakeTokensResult make_plus(MakeTokensResult result) {
-            shared_ptr<Token> t = make_shared<Token>();
-            t->init(TT_PLUS);
+            shared_ptr<Token> t = make_shared<Token>(TT_PLUS);
             t->set_start(pos.copy());
             t->set_end(pos.copy());
 
             advance();
             if(current_c == '=') {
                 advance();
-                t->init(TT_PLUSEQ);
+                t->set_type(TT_PLUSEQ);
             }
 
             result.tokens.push_back(t);
@@ -391,8 +378,7 @@ class Lexer {
         }
 
         MakeTokensResult process_slash(MakeTokensResult result) {
-            shared_ptr<Token> t = make_shared<Token>();
-            t->init(TT_DIV);
+            shared_ptr<Token> t = make_shared<Token>(TT_DIV);
             t->set_start(pos.copy());
             t->set_end(pos.copy());
 

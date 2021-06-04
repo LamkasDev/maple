@@ -243,15 +243,13 @@ class Interpreter {
             if(node->token->type == TT_PLUS) {
                 res.set_from(right);
             } else if(node->token->type == TT_MINUS) {
-                shared_ptr<Token> n_t = make_shared<Token>();
-                n_t->init(TT_MUL);
+                shared_ptr<Token> n_t = make_shared<Token>(TT_MUL);
                 InterpreterResult n_m_i;
                 n_m_i.set_from(-1);
 
                 res = res.process_binary(right, n_t, n_m_i);
             } else if(node->token->matches(TT_KEYWORD, KEYWORD_NOT)) {
-                shared_ptr<Token> n_t = make_shared<Token>();
-                n_t->init(TT_EQEQ);
+                shared_ptr<Token> n_t = make_shared<Token>(TT_EQEQ);
                 InterpreterResult n_m_i;
                 n_m_i.set_from(0);
 
@@ -323,10 +321,7 @@ class Interpreter {
             previous_value = res.register_result(visit_node(previous_node, _context));
             if(res.should_return()) { return res; }
             
-            shared_ptr<Token> _token = make_shared<Token>();
-            _token->init(token);
-
-
+            shared_ptr<Token> _token = make_shared<Token>(token);
             InterpreterResult new_value;
             new_value = res.register_result(res.process_binary(previous_value, _token, value_res));
 
