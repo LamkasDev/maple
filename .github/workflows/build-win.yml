@@ -6,7 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install tools
-        run: choco install make
+        run: choco install make openssl
       - name: Compile shell
         run: make
       - uses: actions/upload-artifact@v2

@@ -76,7 +76,15 @@ class Token {
         float value_float = 0;
         string value_string = "";
 
-        void init(string _type) {
+        Token() {
+            
+        }
+
+        Token(string _type) {
+            type = _type;
+        }
+
+        void set_type(string _type) {
             type = _type;
         }
 
@@ -99,8 +107,7 @@ class Token {
         }
 
         shared_ptr<Token> copy() {
-            shared_ptr<Token> copy = make_shared<Token>();
-            copy->init(type);
+            shared_ptr<Token> copy = make_shared<Token>(type);
             copy->set_start(start);
             copy->set_end(end);
             copy->value_int = value_int;
@@ -129,7 +136,7 @@ class Token {
 
 class TokenKeyword : public Token {
     public:
-        void init(string _value) {
+        TokenKeyword(string _value) {
             type = TT_KEYWORD;
             value_string = _value;
         }
@@ -137,7 +144,7 @@ class TokenKeyword : public Token {
 
 class TokenIdentifier : public Token {
     public:
-        void init(string _value) {
+        TokenIdentifier(string _value) {
             type = TT_IDENFIFIER;
             value_string = _value;
         }
@@ -145,7 +152,7 @@ class TokenIdentifier : public Token {
 
 class TokenInt : public Token {
     public:
-        void init(int _value) {
+        TokenInt(int _value) {
             type = TT_INT;
             value_int = _value;
         }
@@ -153,7 +160,7 @@ class TokenInt : public Token {
 
 class TokenFloat : public Token {
     public:
-        void init(float _value) {
+        TokenFloat(float _value) {
             type = TT_FLOAT;
             value_float = _value;
         }
@@ -161,7 +168,7 @@ class TokenFloat : public Token {
 
 class TokenString : public Token {
     public:
-        void init(string _value) {
+        TokenString(string _value) {
             type = TT_STRING;
             value_string = _value;
         }

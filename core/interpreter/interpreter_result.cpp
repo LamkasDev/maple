@@ -84,8 +84,8 @@ class InterpreterResult {
         }
 
         void set_from(int _res_int) {
-            IntNumber _res(_res_int);
-            res_int = _res;
+            IntNumber _result(_res_int);
+            res_int = _result;
             type = NODE_INT;
         }
 
@@ -95,8 +95,8 @@ class InterpreterResult {
         }
 
         void set_from(float _res_float) {
-            FloatNumber _res(_res_float);
-            res_float = _res;
+            FloatNumber _result(_res_float);
+            res_float = _result;
             type = NODE_FLOAT;
         }
 
@@ -116,8 +116,8 @@ class InterpreterResult {
         }
 
         void set_from(string _res_string) {
-            String _res(_res_string);
-            res_string = _res;
+            String _result(_res_string);
+            res_string = _result;
             type = NODE_STRING;
         }
 
@@ -131,24 +131,24 @@ class InterpreterResult {
             type = NODE_LIST;
         }
 
-        void set_from(InterpreterResult _res) {
-            if(_res.type == NODE_INT) {
-                res_int = _res.res_int;
+        void set_from(InterpreterResult _result) {
+            if(_result.type == NODE_INT) {
+                res_int = _result.res_int;
                 type = NODE_INT;
-            } else if(_res.type == NODE_FLOAT) {
-                res_float = _res.res_float;
+            } else if(_result.type == NODE_FLOAT) {
+                res_float = _result.res_float;
                 type = NODE_FLOAT;
-            } else if(_res.type == NODE_FUNC_DEF) {
-                res_func = _res.res_func;
+            } else if(_result.type == NODE_FUNC_DEF) {
+                res_func = _result.res_func;
                 type = NODE_FUNC_DEF;
-            } else if(_res.type == NODE_STRING) {
-                res_string = _res.res_string;
+            } else if(_result.type == NODE_STRING) {
+                res_string = _result.res_string;
                 type = NODE_STRING;
-            } else if(_res.type == NODE_LIST) {
-                res_list = _res.res_list;
+            } else if(_result.type == NODE_LIST) {
+                res_list = _result.res_list;
                 type = NODE_LIST;
-            } else if(_res.type == NODE_OBJECT_NEW) {
-                res_obj = _res.res_obj;
+            } else if(_result.type == NODE_OBJECT_NEW) {
+                res_obj = _result.res_obj;
                 type = NODE_OBJECT_NEW;
             }
         }

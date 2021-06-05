@@ -9,20 +9,21 @@ class BuiltInRunner {
             shared_ptr<Function> f = make_shared<Function>();
             f->built_in = true;
 
-            shared_ptr<TokenString> t_name = make_shared<TokenString>();
-            t_name->init(name);
+            shared_ptr<TokenString> t_name = make_shared<TokenString>(name);
             f->set_name(t_name);
 
             vector<shared_ptr<Token>> arguments_tokens;
             for(string argument : arguments) {
-                shared_ptr<TokenString> t_argument = make_shared<TokenString>();
-                t_argument->init(argument);
+                shared_ptr<TokenString> t_argument = make_shared<TokenString>(argument);
                 arguments_tokens.push_back(t_argument);
             }
 
             f->set_arguments(arguments_tokens);
-            builtin_functions.insert_or_assign(name, function);
             return f;
+        }
+
+        void add_builtin_function(string name, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> function) {
+            builtin_functions.insert_or_assign(name, function);
         }
 
         InterpreterResult run(shared_ptr<Function> _function, shared_ptr<Context> _context) {
@@ -94,4 +95,19 @@ class BuiltInRunner {
 
             return res.success();
         }
+        
+        /*InterpreterResult run_fetch(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            SymbolContainer address = context->symbol_table->get("address");
+            try {
+                httplib::Client cli(address.value_string.c_str());
+                auto _res = cli.Get("/");
+
+                res.set_from(_res->body);
+            } catch(invalid_argument e_0) {
+                RuntimeError e(res.start, res.end, "Something went wrong");
+                return res.failure(e);
+            }
+
+            return res.success();
+        }*/
 };

@@ -33,6 +33,7 @@
 #include "../structures/object.cpp"
 #include "../structures/object_prototype.cpp"
 #include "../structures/list.cpp"
+#include "../structures/list_store.cpp"
 
 using namespace std;
 

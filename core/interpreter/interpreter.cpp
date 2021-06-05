@@ -1,14 +1,19 @@
 #pragma once
+#include "../../structures/list_store.cpp"
 using namespace std;
 
 class Interpreter {
     public:
         shared_ptr<BuiltInRunner> builtin_runner = nullptr;
+        map<string, function<InterpreterResult(Interpreter*, shared_ptr<Node>, shared_ptr<Context>)>> visit_functions;
 
         shared_ptr<Context> context = nullptr;
         shared_ptr<Object> context_object = nullptr;
         map<string, shared_ptr<Object>> objects;
         map<string, shared_ptr<ObjectPrototype>> object_prototypes;
+        
+        map<int, shared_ptr<ListStore>> lists;
+        int list_uuid = 0;
 
         Interpreter() {
             SymbolContainer sc_null(0);
@@ -16,94 +21,98 @@ class Interpreter {
             SymbolContainer sc_false(0);
             
             context = make_shared<Context>("global");
-            context->symbol_table->set("NULL", sc_null);
-            context->symbol_table->set("TRUE", sc_true);
-            context->symbol_table->set("FALSE", sc_false);
+            save_to_context("NULL", sc_null, context);
+            save_to_context("TRUE", sc_true, context);
+            save_to_context("FALSE", sc_false, context);
 
             builtin_runner = make_shared<BuiltInRunner>();
-            function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_print = &BuiltInRunner::run_print;
-            add_builtin_function("print", "value", run_print);
-            function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_input = &BuiltInRunner::run_input;
-            add_builtin_function("input", run_input);
-            function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_is_nan = &BuiltInRunner::run_is_nan;
-            add_builtin_function("is_nan", "value", run_is_nan);
-            function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_parse_int = &BuiltInRunner::run_parse_int;
-            add_builtin_function("parse_int", "value", run_parse_int);
-            function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_parse_float = &BuiltInRunner::run_parse_float;
-            add_builtin_function("parse_float", "value", run_parse_float);
+            function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_func;
+            list<string> arguments;
+            run_func = &BuiltInRunner::run_print; arguments.clear(); arguments.push_back("value");
+            add_builtin_function("print", arguments, run_func);
+            run_func = &BuiltInRunner::run_input; arguments.clear();
+            add_builtin_function("input", arguments, run_func);
+            run_func = &BuiltInRunner::run_is_nan; arguments.clear(); arguments.push_back("value");
+            add_builtin_function("is_nan", arguments, run_func);
+            run_func = &BuiltInRunner::run_parse_int; arguments.clear(); arguments.push_back("value");
+            add_builtin_function("parse_int", arguments, run_func);
+            run_func = &BuiltInRunner::run_parse_float; arguments.clear(); arguments.push_back("value");
+            add_builtin_function("parse_float", arguments, run_func);
+            /*run_func = &BuiltInRunner::run_fetch; arguments.clear(); arguments.push_back("address");
+            add_builtin_function("fetch", arguments, run_func);*/
+
+            function<InterpreterResult(Interpreter*, shared_ptr<Node>, shared_ptr<Context>)>visit_func;
+            visit_func = &Interpreter::visit_int_node;
+            visit_functions.insert_or_assign(NODE_INT, visit_func);
+            visit_func = &Interpreter::visit_float_node;
+            visit_functions.insert_or_assign(NODE_FLOAT, visit_func);
+            visit_func = &Interpreter::visit_unary_node;
+            visit_functions.insert_or_assign(NODE_UNARY, visit_func);
+            visit_func = &Interpreter::visit_binary_node;
+            visit_functions.insert_or_assign(NODE_BINARY, visit_func);
+            visit_func = &Interpreter::visit_variable_access_node;
+            visit_functions.insert_or_assign(NODE_ACCESS, visit_func);
+            visit_func = &Interpreter::visit_variable_assignment_node;
+            visit_functions.insert_or_assign(NODE_ASSIGNMENT, visit_func);
+            visit_func = &Interpreter::visit_if_node;
+            visit_functions.insert_or_assign(NODE_IF, visit_func);
+            visit_func = &Interpreter::visit_for_node;
+            visit_functions.insert_or_assign(NODE_FOR, visit_func);
+            visit_func = &Interpreter::visit_foreach_node;
+            visit_functions.insert_or_assign(NODE_FOREACH, visit_func);
+            visit_func = &Interpreter::visit_while_node;
+            visit_functions.insert_or_assign(NODE_WHILE, visit_func);
+            visit_func = &Interpreter::visit_func_call_node;
+            visit_functions.insert_or_assign(NODE_FUNC_CALL, visit_func);
+            visit_func = &Interpreter::visit_func_def_node;
+            visit_functions.insert_or_assign(NODE_FUNC_DEF, visit_func);
+            visit_func = &Interpreter::visit_string_node;
+            visit_functions.insert_or_assign(NODE_STRING, visit_func);
+            visit_func = &Interpreter::visit_list_node;
+            visit_functions.insert_or_assign(NODE_LIST, visit_func);
+            visit_func = &Interpreter::visit_statements_node;
+            visit_functions.insert_or_assign(NODE_STATEMENTS, visit_func);
+            visit_func = &Interpreter::visit_return_node;
+            visit_functions.insert_or_assign(NODE_RETURN, visit_func);
+            visit_func = &Interpreter::visit_continue_node;
+            visit_functions.insert_or_assign(NODE_CONTINUE, visit_func);
+            visit_func = &Interpreter::visit_break_node;
+            visit_functions.insert_or_assign(NODE_BREAK, visit_func);
+            visit_func = &Interpreter::visit_object_new_node;
+            visit_functions.insert_or_assign(NODE_OBJECT_NEW, visit_func);
+            visit_func = &Interpreter::visit_class_def_node;
+            visit_functions.insert_or_assign(NODE_CLASS_DEF, visit_func);
+            visit_func = &Interpreter::visit_chained_node;
+            visit_functions.insert_or_assign(NODE_CHAINED, visit_func);
+            visit_func = &Interpreter::visit_chained_assignment_node;
+            visit_functions.insert_or_assign(NODE_CHAINED_ASSIGNMENT, visit_func);
 
             shared_ptr<Node> default_body = make_shared<Node>();
             default_body->type = NODE_STATEMENTS;
 
             shared_ptr<ObjectPrototype> prototype_object = make_shared<ObjectPrototype>();
             prototype_object->set_body(default_body);
-
             object_prototypes.insert_or_assign("OBJECT", prototype_object);
         }
 
-        void add_builtin_function(string name, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> function) {
-            list<string> arguments;
+        void add_builtin_function(string name, list<string> arguments, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> function) {
             shared_ptr<Function> f = builtin_runner->create_builtin_function(name, arguments, function);
-            context->functions[f->name->value_string] = f;
-        }
-
-        void add_builtin_function(string name, string arg_1, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> function) {
-            list<string> arguments; arguments.push_back(arg_1);
-            shared_ptr<Function> f = builtin_runner->create_builtin_function(name, arguments, function);
+            builtin_runner->add_builtin_function(name, function);
             context->functions[f->name->value_string] = f;
         }
 
         InterpreterResult visit_node(shared_ptr<Node> node, shared_ptr<Context> _context) {
             InterpreterResult res;
-            if(node->type == NODE_INT) {
-                res = visit_int_node(node, _context);
-            } else if(node->type == NODE_FLOAT) {
-                res = visit_float_node(node, _context);
-            } else if(node->type == NODE_UNARY) {
-                res = visit_unary_node(node, _context);
-            } else if(node->type == NODE_BINARY) {
-                res = visit_binary_node(node, _context);
-            } else if(node->type == NODE_ACCESS) {
-                res = visit_variable_access_node(node, _context);
-            } else if(node->type == NODE_ASSIGNMENT) {
-                res = visit_variable_assign(node, _context);
-            } else if(node->type == NODE_IF) {
-                res = visit_if_node(node, _context);
-            } else if(node->type == NODE_FOR) {
-                res = visit_for_node(node, _context);
-            } else if(node->type == NODE_FOREACH) {
-                res = visit_foreach_node(node, _context);
-            } else if(node->type == NODE_WHILE) {
-                res = visit_while_node(node, _context);
-            } else if(node->type == NODE_FUNC_CALL) {
-                res = visit_func_call_node(node, _context);
-            } else if(node->type == NODE_FUNC_DEF) {
-                res = visit_func_def_node(node, _context);
-            } else if(node->type == NODE_STRING) {
-                res = visit_string_node(node, _context);
-            } else if(node->type == NODE_LIST) {
-                res = visit_list_node(node, _context);
-            } else if(node->type == NODE_STATEMENTS) {
-                res = visit_statements_node(node, _context);
-            } else if(node->type == NODE_RETURN) {
-                res = visit_return_node(node, _context);
-            } else if(node->type == NODE_CONTINUE) {
-                res = visit_continue_node(node, _context);
-            } else if(node->type == NODE_BREAK) {
-                res = visit_break_node(node, _context);
-            } else if(node->type == NODE_OBJECT_NEW) {
-                res = visit_object_new_node(node, _context);
-            } else if(node->type == NODE_CLASS_DEF) {
-                res = visit_class_def_node(node, _context);
-            } else if(node->type == NODE_CHAINED) {
-                res = visit_chained_node(node, _context);
-            } else if(node->type == NODE_CHAINED_ASSIGNMENT) {
-                res = visit_chained_assignment_node(node, _context);
-            } else if(node->type == NODE_CONSTRUCTOR_DEF) {
+            if(node->type == NODE_CONSTRUCTOR_DEF) {
                 RuntimeError e(node->start, node->end, "Constructor outside of class definition");
                 res.failure(e);
             } else {
-                no_visit_method(node->type);
+                try {
+                    function<InterpreterResult(Interpreter*, shared_ptr<Node>, shared_ptr<Context>)> visit_func = visit_functions.at(node->type);
+                    res = visit_func(this, node, _context);
+                } catch(out_of_range e) {
+                    no_visit_method(node->type);
+                }
             }
 
             return res;
@@ -146,23 +155,37 @@ class Interpreter {
             shared_ptr<List> n = make_shared<List>();
             n->set_pos(node->start, node->end);
 
+            int current_uuid = list_uuid;
+            list_uuid++;
+
+            shared_ptr<ListStore> n_1 = make_shared<ListStore>();
+            n->set_list_id(current_uuid);
+            lists.insert_or_assign(current_uuid, n_1);
+
             InterpreterResult res;
             res.set_pos(n->start, n->end);
             for(shared_ptr<Node> _node : node->list_nodes_result) {
                 InterpreterResult value_res = res.register_result(visit_node(_node, _context));
                 if(res.should_return()) { break; }
 
-                if(n->type != SYMBOL_LIST_UNKNOWN && n->type != value_res.type) {
+                if(n_1->type != SYMBOL_LIST_UNKNOWN && n_1->type != value_res.type) {
                     RuntimeError e(_node->start, _node->end, "Mixed types in an array are not allowed");
                     res.failure(e);
                     break;
                 }
                 if(value_res.type == NODE_INT) {
-                    n->add_value(value_res.res_int.value);
+                    SymbolContainer container(value_res.res_int.value);
+                    n_1->add_value(container);
                 } else if(value_res.type == NODE_FLOAT) {
-                    n->add_value(value_res.res_float.value);
+                    SymbolContainer container(value_res.res_float.value);
+                    n_1->add_value(container);
                 } else if(value_res.type == NODE_STRING) {
-                    n->add_value(value_res.res_string.value);
+                    SymbolContainer container(value_res.res_string.value);
+                    n_1->add_value(container);
+                } else if(value_res.type == NODE_LIST) {
+                    n_1->add_value(value_res.res_list);
+                } else if(value_res.type == NODE_OBJECT_NEW) {
+                    n_1->add_value(value_res.res_obj);
                 } else {
                     RuntimeError e(_node->start, _node->end, "Unsupported type in list");
                     res.failure(e);
@@ -238,15 +261,13 @@ class Interpreter {
             if(node->token->type == TT_PLUS) {
                 res.set_from(right);
             } else if(node->token->type == TT_MINUS) {
-                shared_ptr<Token> n_t = make_shared<Token>();
-                n_t->init(TT_MUL);
+                shared_ptr<Token> n_t = make_shared<Token>(TT_MUL);
                 InterpreterResult n_m_i;
                 n_m_i.set_from(-1);
 
                 res = res.process_binary(right, n_t, n_m_i);
             } else if(node->token->matches(TT_KEYWORD, KEYWORD_NOT)) {
-                shared_ptr<Token> n_t = make_shared<Token>();
-                n_t->init(TT_EQEQ);
+                shared_ptr<Token> n_t = make_shared<Token>(TT_EQEQ);
                 InterpreterResult n_m_i;
                 n_m_i.set_from(0);
 
@@ -318,10 +339,7 @@ class Interpreter {
             previous_value = res.register_result(visit_node(previous_node, _context));
             if(res.should_return()) { return res; }
             
-            shared_ptr<Token> _token = make_shared<Token>();
-            _token->init(token);
-
-
+            shared_ptr<Token> _token = make_shared<Token>(token);
             InterpreterResult new_value;
             new_value = res.register_result(res.process_binary(previous_value, _token, value_res));
 
@@ -331,7 +349,7 @@ class Interpreter {
             return res;    
         }
 
-        InterpreterResult visit_variable_assign(shared_ptr<Node> node, shared_ptr<Context> _context) {
+        InterpreterResult visit_variable_assignment_node(shared_ptr<Node> node, shared_ptr<Context> _context) {
             InterpreterResult res;
             res.set_pos(node->start, node->end);
             
@@ -415,7 +433,7 @@ class Interpreter {
             int i = start_value.get_value();
             while((st_dir == true && i < end_value.get_value()) || (st_dir == false && i > end_value.get_value())) {
                 SymbolContainer container(i);
-                _context->symbol_table->set(node->token->value_string, container);
+                save_to_context(node->token->value_string, container, _context);
                 i += step_value.get_value();
 
                 InterpreterResult expr = res.register_result(visit_node(node->for_expr_result, _context));
@@ -441,10 +459,12 @@ class Interpreter {
                 return res.failure(e);
             }
 
-            if(list.res_list->type == SYMBOL_LIST_INT) {
-                for(int e : list.res_list->list_ints) {
-                    SymbolContainer container(e);
-                    _context->symbol_table->set(node->token->value_string, container);
+            shared_ptr<ListStore> list_store = get_list_store(list.res_list->list_id);
+
+            if(list_store->type == SYMBOL_LIST_INT || list_store->type == SYMBOL_LIST_FLOAT || list_store->type == SYMBOL_LIST_STRING) {
+                vector<SymbolContainer> iterable_list = list_store->get_iterable_containers();
+                for(SymbolContainer e : iterable_list) {
+                    save_to_context(node->token->value_string, e, _context);
 
                     InterpreterResult expr = res.register_result(visit_node(node->for_expr_result, _context));
 
@@ -453,10 +473,9 @@ class Interpreter {
                     if(res.loop_should_break == true) { res.reset(); break; }
                     if(res.has_return_value == true) { res.set_from(expr); res.reset(); break; }
                 }
-            } else if(list.res_list->type == SYMBOL_LIST_FLOAT) {
-                for(float e : list.res_list->list_floats) {
-                    SymbolContainer container(e);
-                    context->symbol_table->set(node->token->value_string, container);
+            } else if(list_store->type == SYMBOL_LIST_LIST) {
+                for(shared_ptr<List> e : list_store->list_lists) {
+                    save_to_context(node->token->value_string, e, _context);
 
                     InterpreterResult expr = res.register_result(visit_node(node->for_expr_result, _context));
 
@@ -465,10 +484,9 @@ class Interpreter {
                     if(res.loop_should_break == true) { res.reset(); break; }
                     if(res.has_return_value == true) { res.set_from(expr); res.reset(); break; }
                 }
-            } else if(list.res_list->type == SYMBOL_LIST_STRING) {
-                for(string e : list.res_list->list_strings) {
-                    SymbolContainer container(e);
-                    context->symbol_table->set(node->token->value_string, container);
+            } else if(list_store->type == SYMBOL_LIST_OBJECT) {
+                for(shared_ptr<Object> e : list_store->list_objects) {
+                    save_to_context(node->token->value_string, e, _context);
 
                     InterpreterResult expr = res.register_result(visit_node(node->for_expr_result, _context));
 
@@ -672,6 +690,22 @@ class Interpreter {
             }
         }
 
+        void save_to_context(string name, SymbolContainer value, shared_ptr<Context> _context) {
+            _context->symbol_table->set(name, value);
+        }
+
+        void save_to_context(string name, shared_ptr<List> value, shared_ptr<Context> _context) {
+            _context->lists[name] = value;
+        }
+
+        void save_to_context(string name, shared_ptr<Object> value, shared_ptr<Context> _context) {
+            if(context_object == nullptr) {
+                objects[name] = value;
+            } else {
+                context_object->objects[name] = value;
+            }
+        }
+
         InterpreterResult visit_statements_node(shared_ptr<Node> node, shared_ptr<Context> _context) {
             InterpreterResult res;
             res.set_pos(node->start, node->end);
@@ -740,6 +774,15 @@ class Interpreter {
                 shared_ptr<Object> res_err = make_shared<Object>(context);
                 res_err->state = -1;
                 return res_err;
+            }
+        }
+
+        shared_ptr<ListStore> get_list_store(int id) {
+            try {
+                shared_ptr<ListStore> value = lists.at(id);
+                return value;
+            } catch(out_of_range e) {
+                return nullptr;
             }
         }
 

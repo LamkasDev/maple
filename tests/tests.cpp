@@ -143,7 +143,9 @@ bool run_tests(Runner runner) {
     passed += run_integer_test(runner, "Lists 1 (VAR list_a = [1,2,3])", "VAR list_a = [1,2,3]", 0);
     passed += run_integer_test(runner, "Lists 2 (VAR list_b = [1.25,2.5,3.0])", "VAR list_b = [1.25,2.5,3.0]", 0);
     passed += run_integer_test(runner, "Lists 3 (VAR list_c = [\"b\",\"c\",\"d\"])", "VAR list_c = [\"b\",\"c\",\"d\"]", 0);
-    total_tests += 3;
+    passed += run_integer_test(runner, "Lists 4 (VAR list_d = [[1,2,3],[4,5,6],[7,8,9]])", "VAR list_d = [[1,2,3],[4,5,6],[7,8,9]]", 0);
+    passed += run_integer_test(runner, "Lists 5 (VAR list_e = [NEW OBJECT(), NEW OBJECT(), NEW OBJECT()])", "VAR list_e = [NEW OBJECT(), NEW OBJECT(), NEW OBJECT()]", 0);
+    total_tests += 5;
 
     printf("----------\n");
     passed += run_integer_test(runner, "List Functions 1 (VAR a = 0)", "VAR a = 0", 0);
