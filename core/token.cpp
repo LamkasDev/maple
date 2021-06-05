@@ -33,6 +33,9 @@ const string TT_MOD = "MOD";
 
 const string TT_PLUSEQ = "PLUSEQ";
 const string TT_MINUSEQ = "MINUSEQ";
+const string TT_MULEQ = "MULEQ";
+const string TT_DIVEQ = "DIVEQ";
+const string TT_PLUSPLUS = "PLUSPLUS";
 
 const string TT_LPAREN = "LPAREN";
 const string TT_RPAREN = "RPAREN";

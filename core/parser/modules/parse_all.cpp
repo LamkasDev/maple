@@ -1002,8 +1002,8 @@ class ParseAll {
 
                 shared_ptr<Token> assignment_token = parser_store->current_t;
 
-                if(assignment_token->type != TT_EQ && assignment_token->type != TT_PLUSEQ && assignment_token->type != TT_MINUSEQ) {
-                    return result.failure(create_syntax_error(parser_store, "'=', '+=' or '-='"));
+                if(assignment_token->type != TT_EQ && assignment_token->type != TT_PLUSEQ && assignment_token->type != TT_MINUSEQ && assignment_token->type != TT_MULEQ && assignment_token->type != TT_DIVEQ && assignment_token->type != TT_PLUSPLUS) {
+                    return result.failure(create_syntax_error(parser_store, "'=', '+=', '*=', '/=', '++' or '-='"));
                 }
                 result.register_advance(parser_store->advance());
 
