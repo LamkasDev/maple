@@ -5,12 +5,18 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Remove old OpenSSL
+        run:
+          rmdir /s /q "C:\Program Files\OpenSSL-Win64\lib"
       - name: Install tools
-        run: |
-          rmdir /q /s "C:\Program Files\OpenSSL-Win64\lib"
+        run:
           powershell.exe -Command (new-object System.Net.WebClient).DownloadFile('https://lamkas.dev/public/maple/OpenSSL-Win64.zip','C:\Program Files\OpenSSL-Win64.zip')
+      - name: Unzip new OpenSSL
+        run:
           7z.exe x -y "C:\Program Files\OpenSSL-Win64.zip"
-          dir
+      - name: Debug directory
+        run:
+          dir "C:\Program Files"
       - name: Compile shell
         run: make
       - uses: actions/upload-artifact@v2
