@@ -4,6 +4,8 @@ using namespace std;
 class BuiltInRunner {
     public:
         map<string, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)>> builtin_functions;
+        map<string, shared_ptr<Function>> non_root_functions;
+        shared_ptr<ListStore> non_root_arguments;
 
         shared_ptr<Function> create_builtin_function(string name, list<string> arguments, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> function) {
             shared_ptr<Function> f = make_shared<Function>();
@@ -32,7 +34,7 @@ class BuiltInRunner {
                 function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_function = get_function(_function->name->value_string);
                 res = run_function(this, res, _function, _context);
             } catch(out_of_range e_0) {
-                RuntimeError e(res.start, res.end, "Function doesn't exist");
+                RuntimeError e(res.start, res.end, "Function callback doesn't exist");
                 return res.failure(e);
             }
             if(res.should_return()) { return res; }
@@ -95,13 +97,26 @@ class BuiltInRunner {
 
             return res.success();
         }
-        
-        /*InterpreterResult run_fetch(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
-            SymbolContainer address = context->symbol_table->get("address");
-            try {
-                httplib::Client cli(address.value_string.c_str());
-                auto _res = cli.Get("/");
 
+        InterpreterResult run_run_builtin_function(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            SymbolContainer func_name = context->symbol_table->get("func_name");
+            try {
+                shared_ptr<Function> non_root_function = non_root_functions.at(func_name.value_string);
+                InterpreterResult result = run(non_root_function, context);
+                return result;
+            } catch(out_of_range e_0) {
+                RuntimeError e(res.start, res.end, "Function doesn't exist");
+                return res.failure(e);
+            }
+        }
+        
+        InterpreterResult run_http_fetch(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string address = non_root_arguments->list_strings[0].value_string;
+
+            try {
+                httplib::Client cli(address.c_str());
+                auto _res = cli.Get("/");
+                
                 res.set_from(_res->body);
             } catch(invalid_argument e_0) {
                 RuntimeError e(res.start, res.end, "Something went wrong");
@@ -109,5 +124,5 @@ class BuiltInRunner {
             }
 
             return res.success();
-        }*/
+        }
 };

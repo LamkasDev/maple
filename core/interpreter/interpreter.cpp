@@ -1,5 +1,6 @@
 #pragma once
 #include "../../structures/list_store.cpp"
+#include "../builtin/builtin_runner.cpp"
 using namespace std;
 
 class Interpreter {
@@ -10,6 +11,7 @@ class Interpreter {
         shared_ptr<Context> context = nullptr;
         shared_ptr<Object> context_object = nullptr;
         map<string, shared_ptr<Object>> objects;
+
         map<string, shared_ptr<ObjectPrototype>> object_prototypes;
         
         map<int, shared_ptr<ListStore>> lists;
@@ -26,6 +28,7 @@ class Interpreter {
             save_to_context("FALSE", sc_false, context);
 
             builtin_runner = make_shared<BuiltInRunner>();
+
             function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_func;
             list<string> arguments;
             run_func = &BuiltInRunner::run_print; arguments.clear(); arguments.push_back("value");
@@ -38,8 +41,11 @@ class Interpreter {
             add_builtin_function("parse_int", arguments, run_func);
             run_func = &BuiltInRunner::run_parse_float; arguments.clear(); arguments.push_back("value");
             add_builtin_function("parse_float", arguments, run_func);
-            /*run_func = &BuiltInRunner::run_fetch; arguments.clear(); arguments.push_back("address");
-            add_builtin_function("fetch", arguments, run_func);*/
+            run_func = &BuiltInRunner::run_run_builtin_function; arguments.clear(); arguments.push_back("func_name"); arguments.push_back("arguments");
+            add_builtin_function("run_builtin_function", arguments, run_func);
+
+            run_func = &BuiltInRunner::run_http_fetch; arguments.clear(); arguments.push_back("address");
+            add_non_root_builtin_function("http_fetch", arguments, run_func);
 
             function<InterpreterResult(Interpreter*, shared_ptr<Node>, shared_ptr<Context>)>visit_func;
             visit_func = &Interpreter::visit_int_node;
@@ -99,6 +105,12 @@ class Interpreter {
             shared_ptr<Function> f = builtin_runner->create_builtin_function(name, arguments, function);
             builtin_runner->add_builtin_function(name, function);
             context->functions[f->name->value_string] = f;
+        }
+
+        void add_non_root_builtin_function(string name, list<string> arguments, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> function) {
+            shared_ptr<Function> f = builtin_runner->create_builtin_function(name, arguments, function);
+            builtin_runner->add_builtin_function(name, function);
+            builtin_runner->non_root_functions.insert_or_assign(name, f);
         }
 
         InterpreterResult visit_node(shared_ptr<Node> node, shared_ptr<Context> _context) {
@@ -596,6 +608,11 @@ class Interpreter {
             InterpreterResult expr;
             if(function->built_in == false) {
                 expr = res.register_result(visit_node(function->expression, new_context));
+            } else if(function->name->value_string == "run_builtin_function") {
+                shared_ptr<ListStore> arguments = get_list_store(new_context->get_list("arguments")->list_id);
+                builtin_runner->non_root_arguments = arguments;
+
+                expr = res.register_result(builtin_runner->run(function, new_context));
             } else {
                 expr = res.register_result(builtin_runner->run(function, new_context));
             }
