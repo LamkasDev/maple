@@ -11,8 +11,8 @@ void print_result(RunResult result, bool prints_result, bool prints_debug) {
         printf("%s \n", result.interpreterResult.e.as_string().c_str());
     } else {
         if(prints_debug == true) {
-            printf("Tokens - %s \n", print_tree(result.makeTokensResult.tokens).c_str());
-            printf("Nodes - %s \n", ("(" + result.parserResult.node->repr() + ")").c_str());
+            printf("[Debug] Tokens - %s \n", print_tree(result.makeTokensResult.tokens).c_str());
+            printf("[Debug] Nodes - %s \n", ("(" + result.parserResult.node->repr() + ")").c_str());
         }
         if(prints_result == true) {
             printf("Result - %s \n\n", ("[" + result.interpreterResult.type + "] " +  result.interpreterResult.repr()).c_str());
@@ -20,41 +20,41 @@ void print_result(RunResult result, bool prints_result, bool prints_debug) {
     }
 }
 
-bool run_file(Runner runner, string location, bool prints_result, bool prints_debug) {
-    ifstream file;
-    file.open(location);
-    if(!file) {
-        printf("File doesn't exist-");
-        return 1;
-    } else {
-        stringstream stream;
-        stream << file.rdbuf();
-        string contents = stream.str();
-
-        RunResult result = runner.run("<file>", contents);
-        print_result(result, prints_result, prints_debug);
-        return 0;
-    }
-}
-
 int run(int argc, char** argv) {
     Runner runner;
-    bool debug_mode = false;
+
+    bool debug_mode = argc >= 2 && string(argv[1]) == "-d";
+    runner.debug_mode = debug_mode;
+    RunResult pkg_result = runner.load_packages();
+    if(pkg_result.state == -1) {
+        print_result(pkg_result, false, debug_mode);
+        exit(1);
+    }
+
     if(argc >= 2) {
-        if(string(argv[1]) == "-run") {
-            if(argc >= 3) {
-                exit(run_file(runner, string(argv[2]), false, false));
-            } else {
-                printf("No file name was specified-");
-                exit(1);
-            }
+        if(string(argv[1]) == "-d") {
+            printf("[Debug] Running Maple in Debug Mode...\n");
         } else if(string(argv[1]) == "-tests") {
             exit(run_tests(runner));
         } else if(string(argv[1]) == "-v") {
             printf("Maple version %s (Built by LamkasDev)-", VERSION.c_str());
             exit(0);
-        } else if(string(argv[1]) == "-d") {
-            debug_mode = true;
+        } else if(string(argv[1]) == "-run") {
+            if(argc >= 3) {
+                RunResult result = runner.run_file(string(argv[2]));
+                if(result.state == -1) {
+                    print_result(result, false, debug_mode);
+                    exit(1);
+                } else if(result.state == -2) {
+                    printf("File doesn't exist-");
+                    exit(1);
+                } else {
+                    exit(0);
+                } 
+            } else {
+                printf("No file name was specified-");
+                exit(1);
+            }
         } else {
             printf("Unknown argument '%s'", string(argv[1]).c_str());
             exit(1);
@@ -82,7 +82,12 @@ int run(int argc, char** argv) {
             scanf("%[^\n]%*c", &s2);
             _s2 = string(s2);
 
-            run_file(runner, _s2, true, debug_mode);
+            RunResult result = runner.run_file(_s2);
+            if(result.state == 0) {
+                print_result(result, true, debug_mode);
+            } else {
+                printf("File doesn't exist-");
+            }
             continue;
         } else if(_s == "exit()") {
             printf("Bye bye~");

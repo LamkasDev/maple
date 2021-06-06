@@ -16,8 +16,10 @@
 
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include "../libs/httplib.h"
+#include "../libs/dirent.h"
 #include <Windows.h>
 
+#define MAPLE_OS 3
 #include "../runner/runner.cpp"
 #include "../tests/tests.cpp"
 #include "../maple-shell.cpp"

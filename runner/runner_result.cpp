@@ -10,6 +10,7 @@ class RunResult {
         MakeTokensResult makeTokensResult;
         ParserResult parserResult;
         InterpreterResult interpreterResult;
+        int state = 0;
 
         void set_make_tokens_result(MakeTokensResult _makeTokensResult) {
             makeTokensResult = _makeTokensResult;
