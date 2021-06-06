@@ -11,11 +11,7 @@ jobs:
         shell: cmd
       - name: Unzip new OpenSSL
         run:
-          7z.exe x -y "C:\Program Files\OpenSSL-Win64.zip"
-        shell: cmd
-      - name: Debug directory
-        run:
-          dir "C:\Program Files"
+          7z.exe x -y "C:\Program Files\OpenSSL-Win64.zip" -o"C:\Program Files\OpenSSL-Win64"
         shell: cmd
       - name: Compile shell
         run: make
