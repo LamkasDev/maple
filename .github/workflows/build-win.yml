@@ -7,7 +7,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Remove old OpenSSL
         run:
-          rmdir /s /q "C:\Program Files\OpenSSL-Win64"
+          rmdir /s /q "C:\Program Files\OpenSSL-Win64" 2>nul
         shell: cmd
       - name: Install tools
         run:
