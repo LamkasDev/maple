@@ -5,11 +5,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Remove old OpenSSL
-        run:
-          rmdir /s /q "C:\Program Files\OpenSSL-Win64" 2>nul
-        shell: cmd
-      - name: Install tools
+      - name: Download new OpenSSL
         run:
           powershell.exe -Command (new-object System.Net.WebClient).DownloadFile('https://lamkas.dev/public/maple/OpenSSL-Win64.zip','C:\Program Files\OpenSSL-Win64.zip')
         shell: cmd
