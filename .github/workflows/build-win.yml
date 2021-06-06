@@ -6,7 +6,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install tools
-        run: choco install make openssl
+        run: |
+          rmdir /q /s "C:\Program Files\OpenSSL-Win64\lib"
+          powershell.exe -Command (new-object System.Net.WebClient).DownloadFile('https://lamkas.dev/public/maple/OpenSSL-Win64.zip','C:\Program Files\OpenSSL-Win64.zip')
+          7z.exe x -y "C:\Program Files\OpenSSL-Win64.zip"
+          dir
       - name: Compile shell
         run: make
       - uses: actions/upload-artifact@v2
