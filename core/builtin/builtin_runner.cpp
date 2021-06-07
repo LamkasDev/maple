@@ -115,9 +115,9 @@ class BuiltInRunner {
 
             try {
                 httplib::Client cli(address.c_str());
-                auto _res = cli.Get("/");
+                auto _result = cli.Get("/");
                 
-                res.set_from(_res->body);
+                res.set_from(_result->body);
             } catch(invalid_argument e_0) {
                 RuntimeError e(res.start, res.end, "Something went wrong");
                 return res.failure(e);

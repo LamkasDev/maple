@@ -16,7 +16,7 @@
 
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include "../libs/httplib.h"
-#include "../libs/dirent.h"
+#include <dirent.h>
 
 #define MAPLE_OS 1
 #include "../runner/runner.cpp"
