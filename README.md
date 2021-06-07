@@ -18,19 +18,19 @@
 </div>
 
 <div align="center">
-    <h4>Quick Start</h4>
+    <h4>🚀 Quick Start</h4>
     <p>
         You can grab the latest release <a href="https://github.com/LamkasDev/maple/releases">here</a>~<br />
         Also check out the guide <a href="https://github.com/LamkasDev/maple/wiki">here</a> (soon)
     </p>
-    <h4>Want to contribute?</h4>
+    <h4>📌 Want to contribute?</h4>
     <p>That's great! Make a <a href="https://github.com/LamkasDev/maple/pulls">pull request</a>~
 </div>
 
 <hr />
 
 <div align="center">
-    <h3>Features</h3>
+    <h3>🔥 Features</h3>
     <p>
         Support for integers, floats, strings, lists and objects<br />
         Basic math operations (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>^</code>)<br />
@@ -42,13 +42,10 @@
         While loops (<code>WHILE</code>)<br />
         Functions (<code>FUNC</code>)<br />
         Other (<code>RETURN</code>, <code>BREAK</code>, <code>CONTINUE</code>)<br />
-        Objects (<code>NEW</code>, <code>OBJECT</code>)
+        Objects (<code>NEW</code>, <code>OBJECT</code>)<br />
+        Classes (<code>CLASS</code>, <code>CONSTRUCTOR</code>)
     </p>
-    <h3>Is that all?</h3>
-    <p>
-        For now, yes-
-    </p>
-    <h3>Are there some examples?</h3>
+    <h3>🧱 Are there some examples?</h3>
     <p>
         Yes, examples are in <a href="https://github.com/LamkasDev/maple/tree/master/samples">here</a>, I'll add more once I'm not lazy~
     </p>
@@ -57,20 +54,21 @@
 <hr />
 
 <div align="center">
-    <h3>Want to compile yourself?</h3>
+    <h3>✅ Want to compile yourself?</h3>
     <p>
         Requirements: <code>g++</code> 5.1 or later and <code>make</code> 3.81 or later<br />
-        After you have all required tools, run <code>make</code><br /><br />
-        <b>(Instructions - Windows)</b><br />
-        g++: Install <a href="http://mingw-w64.org/doku.php">mingw-w64</a><br />
-        make: Install <a href="https://chocolatey.org/install">Chocolatey</a> and then install with <code>choco install make</code><br /><br />
-        <b>(Instructions - Linux)</b><br />
-        g++ and make: Run <code>sudo apt-get install g++ build-essential</code><br /><br />
-        <b>(Instructions - macOS)</b><br />
-        g++ and make: Run <code>g++ -v</code> (installs automatically)<br />
+        After you have all required tools, run <code>make</code> or <code>make debug</code><br /><br />
+        <b>> Instructions - Windows (64-bit) <</b><br />
+        Install <a href="http://mingw-w64.org/doku.php">mingw-w64</a> (64-bit version only)<br />
+        Install <a href="https://chocolatey.org/install">Chocolatey</a> and then install with <code>choco install make</code><br />
+        Also download <a href="https://chocolatey.org/install">maple_devtools-win.zip</a> and extract the files into <code>C:/Program Files/maple_devtools-win</code><br /><br />
+        <b>> Instructions - Linux <</b><br />
+        Run <code>sudo apt-get install g++ build-essential libssl-dev</code><br /><br />
+        <b>> Instructions - macOS <</b><br />
+        Not supported yet<br />
     </p>
     <hr />
-    <h3>Commands</h3>
+    <h3>🖥️ Commands</h3>
     <p>
         <code>.\maple-shell</code> - Starts the standard shell to execute Maple code<br />
         <code>.\maple-shell -d</code> - Starts the standard shell with extra debug info<br /><br />
