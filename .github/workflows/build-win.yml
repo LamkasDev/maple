@@ -5,13 +5,13 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Download new OpenSSL
+      - name: Download maple-devtools
         run:
-          powershell.exe -Command (new-object System.Net.WebClient).DownloadFile('https://lamkas.dev/public/maple/OpenSSL-Win64.zip','C:\Program Files\OpenSSL-Win64.zip')
+          powershell.exe -Command (new-object System.Net.WebClient).DownloadFile('https://lamkas.dev/public/maple/maple_devtools-win.zip','C:\Program Files\maple_devtools-win.zip')
         shell: cmd
-      - name: Unzip new OpenSSL
+      - name: Unzip maple-devtools
         run:
-          7z.exe x -y "C:\Program Files\OpenSSL-Win64.zip" -o"C:\Program Files\OpenSSL-Win64"
+          7z.exe x -y "C:\Program Files\maple_devtools-win.zip" -o"C:\Program Files\maple_devtools-win"
         shell: cmd
       - name: Compile shell
         run: make
