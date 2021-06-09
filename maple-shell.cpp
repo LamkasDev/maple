@@ -1,6 +1,6 @@
 using namespace std;
 
-const string VERSION = "0.9.1";
+const string VERSION = "1.0.0";
 
 void print_result(RunResult result, bool prints_result, bool prints_debug) {
     if(result.makeTokensResult.state == -1) {
