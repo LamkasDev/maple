@@ -4,7 +4,7 @@ CC_POSTFLAGS=
 CC_FILE=maple-shell.cpp
 
 ifeq ($(OS),Windows_NT)
-	CC_PREFLAGS=-std=c++17 -Os -flto -I "C:\Program Files\maple_devtools-win\OpenSSL\include"
+	CC_PREFLAGS=-std=c++17 -O2 -flto -I "C:\Program Files\maple_devtools-win\OpenSSL\include"
 	CC_POSTFLAGS=-L "C:\Program Files\maple_devtools-win\OpenSSL\lib" -lssl -lcrypto -lcrypt32 -lgdi32 -lws2_32
 	CC_FILE := platforms/mapleshell-win.cpp
 else
