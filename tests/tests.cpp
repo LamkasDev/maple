@@ -170,17 +170,16 @@ bool run_tests(Runner runner) {
     passed += run_integer_test(runner, "Built-in Functions 9 (\"abcdcd\".last_index_of(\"c\"))", "\"abcdcd\".last_index_of(\"c\")", 4);
     passed += run_string_test(runner, "Built-in Functions 10 (\"abcd\".replace(\"cd\", \"11\"))", "\"abcd\".replace(\"cd\", \"11\")", "ab11");
     passed += run_string_test(runner, "Built-in Functions 11 (\"1111\".replace_all(\"1\", \"2\"))", "\"1111\".replace_all(\"1\", \"2\")", "2222");
-    passed += run_string_test(runner, "Built-in Functions 12 (\"abcd\".slice(2))", "\"abcd\".slice(2)", "cd");
-    /*passed += run_string_test(runner, "Built-in Functions 13 (VAR a = \"-\")", "VAR a = \"-\"", "-");
-    passed += run_integer_test(runner, "Built-in Functions 14 (VAR list_a = \"ab.cd\".split(\".\"))", "VAR list_a = \"ab.cd\".split(\".\")", 0);
-    passed += run_string_test(runner, "Built-in Functions 15 (FOREACH(el IN list_a) { VAR a = a + el })", "FOREACH(el IN list_a) { VAR a = a + el }", "-abcd");*/
-    passed += run_string_test(runner, "Built-in Functions 16 (\"abcd\".substring(1,3))", "\"abcd\".substring(1,3)", "bc");
-    passed += run_string_test(runner, "Built-in Functions 17 (\"aBCd\".to_lower_case())", "\"aBCd\".to_lower_case()", "abcd");
-    passed += run_string_test(runner, "Built-in Functions 18 (\"aBCd\".to_upper_case())", "\"aBCd\".to_upper_case()", "ABCD");
-    passed += run_string_test(runner, "Built-in Functions 19 (\" ababa \".trim())", "\" ababa \".trim()", "ababa");
-    passed += run_string_test(runner, "Built-in Functions 20 (\" ababa \".trim_start())", "\" ababa \".trim_start()", "ababa ");
-    passed += run_string_test(runner, "Built-in Functions 21 (\" ababa \".trim_end())", "\" ababa \".trim_end()", " ababa");
-    total_tests += 18;
+    /*passed += run_string_test(runner, "Built-in Functions 12 (VAR a = \"-\")", "VAR a = \"-\"", "-");
+    passed += run_integer_test(runner, "Built-in Functions 13 (VAR list_a = \"ab.cd\".split(\".\"))", "VAR list_a = \"ab.cd\".split(\".\")", 0);
+    passed += run_string_test(runner, "Built-in Functions 14 (FOREACH(el IN list_a) { VAR a = a + el })", "FOREACH(el IN list_a) { VAR a = a + el }", "-abcd");*/
+    passed += run_string_test(runner, "Built-in Functions 15 (\"abcd\".substring(1,3))", "\"abcd\".substring(1,3)", "bc");
+    passed += run_string_test(runner, "Built-in Functions 16 (\"aBCd\".to_lower_case())", "\"aBCd\".to_lower_case()", "abcd");
+    passed += run_string_test(runner, "Built-in Functions 17 (\"aBCd\".to_upper_case())", "\"aBCd\".to_upper_case()", "ABCD");
+    passed += run_string_test(runner, "Built-in Functions 18 (\" ababa \".trim())", "\" ababa \".trim()", "ababa");
+    passed += run_string_test(runner, "Built-in Functions 19 (\" ababa \".trim_start())", "\" ababa \".trim_start()", "ababa ");
+    passed += run_string_test(runner, "Built-in Functions 20 (\" ababa \".trim_end())", "\" ababa \".trim_end()", " ababa");
+    total_tests += 17;
 
     printf("----------\n");
     passed += run_integer_test(runner, "Objects 1 (VAR obj = NEW OBJECT())", "VAR obj = NEW OBJECT()", 0);
