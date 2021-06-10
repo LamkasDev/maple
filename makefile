@@ -1,4 +1,5 @@
 CC=g++
+CC_DEBUG_PREFLAGS=-std=c++17 -I "C:\Program Files\maple_devtools-win\OpenSSL\include"
 CC_PREFLAGS=-std=c++17 -Os -flto -fdata-sections -ffunction-sections
 CC_POSTFLAGS=
 CC_FILE=maple-shell.cpp
@@ -25,7 +26,7 @@ maple-shell: FORCE
 	$(CC) maple-shell.o -o maple-shell $(CC_POSTFLAGS)
 		
 debug:
-	$(CC) $(CC_PREFLAGS) -ggdb -c $(CC_FILE) -o maple-shell.o
+	$(CC) $(CC_DEBUG_PREFLAGS) -ggdb -c $(CC_FILE) -o maple-shell.o
 	$(CC) maple-shell.o -o maple-shell $(CC_POSTFLAGS)
 
 clean:
