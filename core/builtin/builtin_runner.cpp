@@ -125,4 +125,198 @@ class BuiltInRunner {
 
             return res.success();
         }
+        
+        InterpreterResult run_string_char_at(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string value = non_root_arguments->list_symbols[0].value_string;
+            int pos = non_root_arguments->list_symbols[1].value_int;
+            try {
+                res.set_from(string(1, value.at(pos)));
+            } catch(out_of_range e_0) {
+                RuntimeError e(res.start, res.end, "The index is out of range");
+                return res.failure(e);
+            }
+
+            return res.success();
+        }
+        
+        InterpreterResult run_string_char_code_at(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string value = non_root_arguments->list_symbols[0].value_string;
+            int pos = non_root_arguments->list_symbols[1].value_int;
+            try {
+                res.set_from(value.at(pos));
+            } catch(out_of_range e_0) {
+                RuntimeError e(res.start, res.end, "The index is out of range");
+                return res.failure(e);
+            }
+
+            return res.success();
+        }
+        
+        InterpreterResult run_string_concat(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string value;
+            for(SymbolContainer _symbol : non_root_arguments->list_symbols) {
+                value += _symbol.value_string;
+            }
+
+            res.set_from(value);
+            return res.success();
+        }
+        
+        InterpreterResult run_string_ends_with(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string value = non_root_arguments->list_symbols[0].value_string;
+            string value_c = non_root_arguments->list_symbols[1].value_string;
+            bool result = false; res.set_from(result);
+            if (value_c.size() > value.size()) { return res.success(); }
+            result = equal(value_c.rbegin(), value_c.rend(), value.rbegin());
+
+            res.set_from(result);
+            return res.success();
+        }
+        
+        InterpreterResult run_string_starts_with(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string value = non_root_arguments->list_symbols[0].value_string;
+            string value_c = non_root_arguments->list_symbols[1].value_string;
+            bool result = false; res.set_from(result);
+            if (value_c.size() > value.size()) { return res.success(); }
+            result = equal(value_c.begin(), value_c.end(), value.begin());
+
+            res.set_from(result);
+            return res.success();
+        }
+        
+        InterpreterResult run_string_includes(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string value = non_root_arguments->list_symbols[0].value_string;
+            string value_c = non_root_arguments->list_symbols[1].value_string;
+            bool result = value.find(value_c) != string::npos;
+
+            res.set_from(result);
+            return res.success();
+        }
+        
+        InterpreterResult run_string_index_of(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string value = non_root_arguments->list_symbols[0].value_string;
+            string value_c = non_root_arguments->list_symbols[1].value_string;
+            size_t result = value.find(value_c);
+            if(result == string::npos) {
+                res.set_from(-1);
+            } else {
+                res.set_from(static_cast<int>(result));
+            }
+
+            return res.success();
+        }
+        
+        InterpreterResult run_string_last_index_of(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string value = non_root_arguments->list_symbols[0].value_string;
+            string value_c = non_root_arguments->list_symbols[1].value_string;
+            size_t result = value.rfind(value_c);
+            if(result == string::npos) {
+                res.set_from(-1);
+            } else {
+                res.set_from(static_cast<int>(result));
+            }
+
+            return res.success();
+        }
+        
+        InterpreterResult run_string_repeat(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string value = non_root_arguments->list_symbols[0].value_string;
+            int n = non_root_arguments->list_symbols[1].value_int;
+            res.set_from(repeat_string(value, n));
+
+            return res.success();
+        }
+        
+        InterpreterResult run_string_replace(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string value = non_root_arguments->list_symbols[0].value_string;
+            string from_value = non_root_arguments->list_symbols[1].value_string;
+            string to_value = non_root_arguments->list_symbols[2].value_string;
+            replace_string(value, from_value, to_value);
+            res.set_from(value);
+
+            return res.success();
+        }
+        
+        InterpreterResult run_string_replace_all(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string value = non_root_arguments->list_symbols[0].value_string;
+            string from_value = non_root_arguments->list_symbols[1].value_string;
+            string to_value = non_root_arguments->list_symbols[2].value_string;
+            replace_string_all(value, from_value, to_value);
+            res.set_from(value);
+
+            return res.success();
+        }
+        
+        /*InterpreterResult run_string_split(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string value = non_root_arguments->list_symbols[0].value_string;
+            string delim = non_root_arguments->list_symbols[1].value_string;
+
+            vector<string> array = split_string(value, delim);
+            shared_ptr<Node> list_node = make_shared<Node>();
+            list_node->set_type(NODE_LIST);
+
+            list<shared_ptr<Node>> chunks;
+            for(string chunk : array) {
+                shared_ptr<Node> chunk_node = make_shared<Node>();
+                chunk_node->set_value(chunk);
+                chunks.push_back(chunk_node);
+            }
+
+            list_node->set_list_nodes_result(chunks);
+            res.set_from(list_node);
+            return res.success();
+        }*/
+        
+        InterpreterResult run_string_substring(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string value = non_root_arguments->list_symbols[0].value_string;
+            int start = non_root_arguments->list_symbols[1].value_int;
+            if(non_root_arguments->list_symbols.size() >= 2) {
+                int end = non_root_arguments->list_symbols[2].value_int;
+                res.set_from(value.substr(start, end - start));
+            } else {
+                res.set_from(value.substr(start));
+            }
+
+            return res.success();
+        }
+        
+        InterpreterResult run_string_to_lower_case(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string value = non_root_arguments->list_symbols[0].value_string;
+            value = to_lower_case_string(value);
+            res.set_from(value);
+
+            return res.success();
+        }
+        
+        InterpreterResult run_string_to_upper_case(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string value = non_root_arguments->list_symbols[0].value_string;
+            value = to_upper_case_string(value);
+            res.set_from(value);
+
+            return res.success();
+        }
+        
+        InterpreterResult run_string_trim(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string value = non_root_arguments->list_symbols[0].value_string;
+            trim_string(value);
+            res.set_from(value);
+
+            return res.success();
+        }
+        
+        InterpreterResult run_string_trim_start(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string value = non_root_arguments->list_symbols[0].value_string;
+            ltrim_string(value);
+            res.set_from(value);
+
+            return res.success();
+        }
+        
+        InterpreterResult run_string_trim_end(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string value = non_root_arguments->list_symbols[0].value_string;
+            rtrim_string(value);
+            res.set_from(value);
+
+            return res.success();
+        }
 };

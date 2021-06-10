@@ -49,10 +49,43 @@ class Interpreter {
             add_builtin_function("parse_float", arguments, run_func);
             run_func = &BuiltInRunner::run_run_builtin_function; arguments.clear(); arguments.push_back("func_name"); arguments.push_back("arguments");
             add_builtin_function("run_builtin_function", arguments, run_func);
-            run_func = &BuiltInRunner::run_run_builtin_function; arguments.clear(); arguments.push_back("location");
-            add_builtin_function("run_builtin_function", arguments, run_func);
 
-            run_func = &BuiltInRunner::run_http_fetch; arguments.clear(); arguments.push_back("address");
+            run_func = &BuiltInRunner::run_string_char_at; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("STRING_char_at", arguments, run_func);
+            run_func = &BuiltInRunner::run_string_char_code_at; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("STRING_char_code_at", arguments, run_func);
+            run_func = &BuiltInRunner::run_string_concat; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("STRING_concat", arguments, run_func);
+            run_func = &BuiltInRunner::run_string_ends_with; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("STRING_ends_with", arguments, run_func);
+            run_func = &BuiltInRunner::run_string_starts_with; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("STRING_starts_with", arguments, run_func);
+            run_func = &BuiltInRunner::run_string_includes; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("STRING_includes", arguments, run_func);
+            run_func = &BuiltInRunner::run_string_index_of; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("STRING_index_of", arguments, run_func);
+            run_func = &BuiltInRunner::run_string_last_index_of; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("STRING_last_index_of", arguments, run_func);
+            run_func = &BuiltInRunner::run_string_replace; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("STRING_replace", arguments, run_func);
+            run_func = &BuiltInRunner::run_string_replace_all; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("STRING_replace_all", arguments, run_func);
+            /*run_func = &BuiltInRunner::run_string_split; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("STRING_split", arguments, run_func);*/
+            run_func = &BuiltInRunner::run_string_substring; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("STRING_substring", arguments, run_func);
+            run_func = &BuiltInRunner::run_string_to_lower_case; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("STRING_to_lower_case", arguments, run_func);
+            run_func = &BuiltInRunner::run_string_to_upper_case; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("STRING_to_upper_case", arguments, run_func);
+            run_func = &BuiltInRunner::run_string_trim; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("STRING_trim", arguments, run_func);
+            run_func = &BuiltInRunner::run_string_trim_start; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("STRING_trim_start", arguments, run_func);
+            run_func = &BuiltInRunner::run_string_trim_end; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("STRING_trim_end", arguments, run_func);
+
+            run_func = &BuiltInRunner::run_http_fetch; arguments.clear(); arguments.push_back("arguments");
             add_non_root_builtin_function("http_fetch", arguments, run_func);
 
             function<InterpreterResult(Interpreter*, shared_ptr<Node>, shared_ptr<Context>)>visit_func;
