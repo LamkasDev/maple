@@ -1,4 +1,5 @@
 #pragma once
+#include "symbols/symbol_container.cpp"
 #include "symbols/symbol_table.cpp"
 #include "../structures/list.cpp"
 #include "../structures/function.cpp"

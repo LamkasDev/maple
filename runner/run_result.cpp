@@ -1,7 +1,4 @@
 #pragma once
-#include "../core/lexer/lexer.cpp"
-#include "../core/parser/parser_result.cpp"
-#include "../core/interpreter/interpreter_result.cpp"
 using namespace std;
 
 class RunResult {

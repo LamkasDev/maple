@@ -1,5 +1,4 @@
 #pragma once
-#include "../position.cpp"
 using namespace std;
 
 const string ERROR_UNKNOWN = "UNKNOWN";

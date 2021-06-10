@@ -1,6 +1,8 @@
 #pragma once
-#include "../token.cpp"
+#include "../position.cpp"
 #include "../errors/error_types.cpp"
+#include "../utils/basic_utils.cpp"
+#include "../token.cpp"
 using namespace std;
 
 class Lexer {

@@ -1,7 +1,4 @@
 #pragma once
-#include "../../structures/number.cpp"
-#include "../../structures/string.cpp"
-#include "../../structures/object.cpp"
 using namespace std;
 
 class InterpreterResult {

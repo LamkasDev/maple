@@ -1,6 +1,4 @@
 #pragma once
-#include "object_prototype.cpp"
-#include "../core/context.cpp"
 using namespace std;
 
 class Object {

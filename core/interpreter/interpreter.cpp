@@ -1,5 +1,11 @@
 #pragma once
+#include "../context.cpp"
+#include "../../structures/number.cpp"
+#include "../../structures/string.cpp"
+#include "../../structures/object_prototype.cpp"
+#include "../../structures/object.cpp"
 #include "../../structures/list_store.cpp"
+#include "interpreter_result.cpp"
 #include "../builtin/builtin_runner.cpp"
 using namespace std;
 
@@ -42,6 +48,8 @@ class Interpreter {
             run_func = &BuiltInRunner::run_parse_float; arguments.clear(); arguments.push_back("value");
             add_builtin_function("parse_float", arguments, run_func);
             run_func = &BuiltInRunner::run_run_builtin_function; arguments.clear(); arguments.push_back("func_name"); arguments.push_back("arguments");
+            add_builtin_function("run_builtin_function", arguments, run_func);
+            run_func = &BuiltInRunner::run_run_builtin_function; arguments.clear(); arguments.push_back("location");
             add_builtin_function("run_builtin_function", arguments, run_func);
 
             run_func = &BuiltInRunner::run_http_fetch; arguments.clear(); arguments.push_back("address");

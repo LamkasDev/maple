@@ -1,6 +1,8 @@
 #pragma once
+#include "../nodes/node.cpp"
 #include "parser_store.cpp"
 #include "parser_utils.cpp"
+#include "parser_result.cpp"
 #include "modules/parse_all.cpp"
 using namespace std;
 

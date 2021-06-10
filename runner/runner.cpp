@@ -1,37 +1,10 @@
 #pragma once
 
-#include "runner_result.cpp"
-
-#include "../core/context.cpp"
-#include "../core/position.cpp"
-#include "../core/token.cpp"
-
-#include "../core/errors/error_types.cpp"
-#include "../core/errors/error.cpp"
-
-#include "../core/interpreter/interpreter.cpp"
-#include "../core/interpreter/interpreter_result.cpp"
 #include "../core/lexer/lexer.cpp"
-
-#include "../core/nodes/node.cpp"
-#include "../core/nodes/node_value.cpp"
-
 #include "../core/parser/parser.cpp"
-#include "../core/parser/parser_result.cpp"
-
-#include "../core/symbols/symbol_table.cpp"
-#include "../core/symbols/symbol_container.cpp"
-
-#include "../core/utils/basic_utils.cpp"
+#include "../core/interpreter/interpreter.cpp"
 #include "../core/utils/other_utils.cpp"
-
-#include "../structures/number.cpp"
-#include "../structures/function.cpp"
-#include "../structures/string.cpp"
-#include "../structures/object.cpp"
-#include "../structures/object_prototype.cpp"
-#include "../structures/list.cpp"
-#include "../structures/list_store.cpp"
+#include "run_result.cpp"
 
 using namespace std;
 

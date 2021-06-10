@@ -1,5 +1,4 @@
 #pragma once
-#include <stdio.h>
 using namespace std;
 
 int run_integer_test(Runner runner, string name, string code, int value) {

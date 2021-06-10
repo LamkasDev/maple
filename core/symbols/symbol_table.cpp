@@ -1,5 +1,4 @@
 #pragma once
-#include "symbol_container.cpp"
 using namespace std;
 
 class SymbolTable {
