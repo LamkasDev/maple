@@ -751,6 +751,34 @@ class Interpreter {
 
             InterpreterResult left = res.register_result(visit_node(node->left, _context));
             if(res.should_return()) { return res; }
+            if(left.type != NODE_OBJECT_NEW && node->right->type == NODE_FUNC_CALL) {
+                string func_name = node->right->func_call_expression_result->token->value_string;
+                node->right->func_call_expression_result->token->value_string = "run_builtin_function";
+                
+                list<shared_ptr<Node>> arguments;
+                list<shared_ptr<Node>> list_elements;
+
+                shared_ptr<Node> func_name_node = make_shared<Node>();
+                func_name_node->set_value(left.type + "_" + func_name);
+
+                shared_ptr<Node> list_node = make_shared<Node>();
+                list_node->set_type(NODE_LIST);
+                list_elements.push_back(node->left);
+                for(shared_ptr<Node> _node : node->right->func_call_argument_nodes_result) {
+                    list_elements.push_back(_node);
+                }
+                list_node->set_list_nodes_result(list_elements);
+
+                arguments.push_back(func_name_node);
+                arguments.push_back(list_node);
+                node->right->set_func_call_argument_nodes_result(arguments);
+
+                InterpreterResult right = res.register_result(visit_node(node->right, _context));
+                if(res.should_return()) { return res; }
+
+                res.set_from(right);
+                return res.success();
+            }
             if(left.type != NODE_OBJECT_NEW) {
                 RuntimeError e(node->start, node->end, "Expected object");
                 return res.failure(e);
