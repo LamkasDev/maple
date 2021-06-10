@@ -188,7 +188,8 @@ class Interpreter {
                 InterpreterResult value_res = res.register_result(visit_node(_node, _context));
                 if(res.should_return()) { break; }
 
-                if(n_1->type != SYMBOL_LIST_UNKNOWN && n_1->type != value_res.type) {
+                bool is_mixed = n_1->type != SYMBOL_LIST_UNKNOWN && ((n_1->type == SYMBOL_LIST_SYMBOLS && (value_res.type != NODE_INT && value_res.type != NODE_FLOAT && value_res.type != NODE_STRING)) || (n_1->type != SYMBOL_LIST_SYMBOLS && n_1->type != value_res.type));
+                if(is_mixed == true) {
                     RuntimeError e(_node->start, _node->end, "Mixed types in an array are not allowed");
                     res.failure(e);
                     break;
@@ -481,9 +482,8 @@ class Interpreter {
 
             shared_ptr<ListStore> list_store = get_list_store(list.res_list->list_id);
 
-            if(list_store->type == SYMBOL_LIST_INT || list_store->type == SYMBOL_LIST_FLOAT || list_store->type == SYMBOL_LIST_STRING) {
-                vector<SymbolContainer> iterable_list = list_store->get_iterable_containers();
-                for(SymbolContainer e : iterable_list) {
+            if(list_store->type == SYMBOL_LIST_SYMBOLS) {
+                for(SymbolContainer e : list_store->list_symbols) {
                     save_to_context(node->token->value_string, e, _context);
 
                     InterpreterResult expr = res.register_result(visit_node(node->for_expr_result, _context));

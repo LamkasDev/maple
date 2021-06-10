@@ -2,6 +2,7 @@
 
 #include "../core/lexer/lexer.cpp"
 #include "../core/parser/parser.cpp"
+#include "../core/lexer/lexer.cpp"
 #include "../core/interpreter/interpreter.cpp"
 #include "../core/utils/other_utils.cpp"
 #include "run_result.cpp"

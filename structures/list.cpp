@@ -2,9 +2,7 @@
 using namespace std;
 
 const string SYMBOL_LIST_UNKNOWN = "UNKNOWN";
-const string SYMBOL_LIST_INT = "INT";
-const string SYMBOL_LIST_FLOAT = "FLOAT";
-const string SYMBOL_LIST_STRING = "STRING";
+const string SYMBOL_LIST_SYMBOLS = "SYMBOL";
 const string SYMBOL_LIST_LIST = "LIST";
 const string SYMBOL_LIST_OBJECT = "OBJECT";
 

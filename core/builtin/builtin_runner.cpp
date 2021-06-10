@@ -111,7 +111,7 @@ class BuiltInRunner {
         }
         
         InterpreterResult run_http_fetch(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
-            string address = non_root_arguments->list_strings[0].value_string;
+            string address = non_root_arguments->list_symbols[0].value_string;
 
             try {
                 httplib::Client cli(address.c_str());
