@@ -8,6 +8,7 @@ const string SYMBOL_FUNC = "FUNC";
 const string SYMBOL_STRING = "STRING";
 const string SYMBOL_LIST = "LIST";
 const string SYMBOL_OBJECT = "OBJECT";
+const string SYMBOL_FUNCTION = "FUNCTION";
 
 class SymbolContainer {
     public:
@@ -19,6 +20,7 @@ class SymbolContainer {
         string value_string = "";
         shared_ptr<List> value_list = nullptr;
         shared_ptr<Object> value_object = nullptr;
+        shared_ptr<Function> value_function = nullptr;
 
         SymbolContainer() {
             
@@ -47,5 +49,10 @@ class SymbolContainer {
         SymbolContainer(shared_ptr<Object> _value) {
             type = SYMBOL_OBJECT;
             value_object = _value;
+        }
+
+        SymbolContainer(shared_ptr<Function> _value) {
+            type = SYMBOL_FUNCTION;
+            value_function = _value;
         }
 };

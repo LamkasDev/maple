@@ -144,7 +144,9 @@ class Interpreter {
         void add_builtin_function(string name, list<string> arguments, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> function) {
             shared_ptr<Function> f = builtin_runner->create_builtin_function(name, arguments, function);
             builtin_runner->add_builtin_function(name, function);
-            context->functions[f->name->value_string] = f;
+
+            SymbolContainer f_s(f);
+            context->symbol_table->set(f->name->value_string, f_s);
         }
 
         void add_non_root_builtin_function(string name, list<string> arguments, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> function) {
@@ -634,28 +636,28 @@ class Interpreter {
             res.set_pos(node->start, node->end);
             shared_ptr<Context> new_context = generate_new_context(node->token->value_string, _context);
 
-            shared_ptr<Function> function = _context->get_function(node->token->value_string);
-            if(function->state == -1) {
+            SymbolContainer function = _context->get_variable(node->token->value_string);
+            if(function.state == -1) {
                 RuntimeError e(node->start, node->end, "Function '" + node->token->value_string + "' does not exist");
                 return res.failure(e);
             }
 
-            res = check_args(node, new_context, res, arguments, function);
+            res = check_args(node, new_context, res, arguments, function.value_function);
             if(res.should_return()) { return res; }
 
-            res = populate_args(node, new_context, res, arguments, function);
+            res = populate_args(node, new_context, res, arguments, function.value_function);
             if(res.should_return()) { return res; }
 
             InterpreterResult expr;
-            if(function->built_in == false) {
-                expr = res.register_result(visit_node(function->expression, new_context));
-            } else if(function->name->value_string == "run_builtin_function") {
+            if(function.value_function->built_in == false) {
+                expr = res.register_result(visit_node(function.value_function->expression, new_context));
+            } else if(function.value_function->name->value_string == "run_builtin_function") {
                 shared_ptr<ListStore> arguments = get_list_store(new_context->get_variable("arguments").value_list->list_id);
                 builtin_runner->non_root_arguments = arguments;
 
-                expr = res.register_result(builtin_runner->run(function, new_context));
+                expr = res.register_result(builtin_runner->run(function.value_function, new_context));
             } else {
-                expr = res.register_result(builtin_runner->run(function, new_context));
+                expr = res.register_result(builtin_runner->run(function.value_function, new_context));
             }
             if(res.should_return() && res.has_return_value == false) { return res; }
 
@@ -667,7 +669,6 @@ class Interpreter {
             shared_ptr<Context> new_context = make_shared<Context>(name);
             new_context->set_parent(_context);
             new_context->set_symbol_table(_context->symbol_table);
-            new_context->set_functions(_context->functions);
 
             return new_context;
         }
@@ -732,7 +733,8 @@ class Interpreter {
                 SymbolContainer value(res.res_float.value);
                 _context->symbol_table->set(name, value);
             } else if(res.type == NODE_FUNC_DEF) {
-                _context->functions[name] = res.res_func;
+                SymbolContainer value(res.res_func);
+                _context->symbol_table->set(name, value);
             } else if(res.type == NODE_STRING) {
                 SymbolContainer value(res.res_string.value);
                 _context->symbol_table->set(name, value);
