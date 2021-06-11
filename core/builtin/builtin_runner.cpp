@@ -114,10 +114,20 @@ class BuiltInRunner {
             string address = non_root_arguments->list_symbols[0].value_string;
 
             try {
+                httplib::Headers headers = {
+                    { "Accept-Encoding", "gzip, deflate" },
+                    { "User-Agent", "maple/1.0" }
+                };
                 httplib::Client cli(address.c_str());
-                auto _result = cli.Get("/");
+                cli.set_follow_location(true);
                 
-                res.set_from(_result->body);
+                auto _result = cli.Get("/", headers);
+                if(_result) {
+                    res.set_from(_result->body);
+                } else {
+                    auto err = _result.error();
+                    res.set_from(static_cast<int>(err));
+                }
             } catch(invalid_argument e_0) {
                 RuntimeError e(res.start, res.end, "Something went wrong");
                 return res.failure(e);

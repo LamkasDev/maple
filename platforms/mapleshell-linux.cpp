@@ -15,6 +15,7 @@
 #include <functional>
 
 #define CPPHTTPLIB_OPENSSL_SUPPORT
+#define CPPHTTPLIB_ZLIB_SUPPORT
 #include "../libs/httplib.h"
 #include <dirent.h>
 
