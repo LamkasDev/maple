@@ -192,14 +192,21 @@ class Lexer {
         MakeTokensResult make_number(MakeTokensResult result) {
             string str;
             int dot = 0;
+            bool is_dot_last = false;
             while(pos.index < text.length() && (DIGITS + ".").find(current_c) != string::npos) {
+                is_dot_last = false;
                 if(current_c == '.') {
                     if(dot == 1) { break; }
                     dot++;
+                    is_dot_last = true;
                 }
 
                 str += current_c;
                 advance();
+            }
+            if(is_dot_last == true) {
+                str = str.substr(0, str.size() - 1);
+                dot = 0;
             }
             
             if(dot == 0) {
@@ -214,6 +221,13 @@ class Lexer {
                 t->set_end(pos.copy());
 
                 result.tokens.push_back(t);
+            }
+            if(is_dot_last == true) {
+                shared_ptr<Token> t_1 = make_shared<Token>(TT_DOT);
+                t_1->set_start(pos.copy());
+                t_1->set_end(pos.copy());
+
+                result.tokens.push_back(t_1);
             }
 
             return result;

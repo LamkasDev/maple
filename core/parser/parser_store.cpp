@@ -24,6 +24,7 @@ class ParserStore {
             return 1;
         }
 
+        /* TODO: is this actually intended to not bring the tokens back? */
         int unadvance(int ammount) {
             index -= ammount;
             update_current_token();
