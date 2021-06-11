@@ -371,20 +371,14 @@ class Interpreter {
                     res.set_from(value.value_float);
                 } else if(value.type == SYMBOL_STRING) {
                     res.set_from(value.value_string);
+                } else if(value.type == SYMBOL_LIST) {
+                    res.set_from(value.value_list);
+                } else if(value.type == SYMBOL_OBJECT) {
+                    res.set_from(value.value_object);
                 }
             } else {
-                shared_ptr<List> value_list = _context->get_list(node->token->value_string);
-                if(value_list->state == 0) {
-                    res.set_from(value_list);
-                } else {
-                    shared_ptr<Object> value_obj = _context->get_obj(node->token->value_string);
-                    if(value_obj->state == 0) {
-                        res.set_from(value_obj);
-                    } else {
-                        RuntimeError e(node->start, node->end, node->token->value_string + " is not defined");
-                        return res.failure(e);
-                    }
-                }
+                RuntimeError e(node->start, node->end, node->token->value_string + " is not defined");
+                return res.failure(e);
             }
 
             return res.success();
@@ -656,7 +650,7 @@ class Interpreter {
             if(function->built_in == false) {
                 expr = res.register_result(visit_node(function->expression, new_context));
             } else if(function->name->value_string == "run_builtin_function") {
-                shared_ptr<ListStore> arguments = get_list_store(new_context->get_list("arguments")->list_id);
+                shared_ptr<ListStore> arguments = get_list_store(new_context->get_variable("arguments").value_list->list_id);
                 builtin_runner->non_root_arguments = arguments;
 
                 expr = res.register_result(builtin_runner->run(function, new_context));
@@ -673,8 +667,6 @@ class Interpreter {
             shared_ptr<Context> new_context = make_shared<Context>(name);
             new_context->set_parent(_context);
             new_context->set_symbol_table(_context->symbol_table);
-            new_context->set_lists(_context->lists);
-            new_context->set_objects(_context->objects);
             new_context->set_functions(_context->functions);
 
             return new_context;
@@ -745,22 +737,16 @@ class Interpreter {
                 SymbolContainer value(res.res_string.value);
                 _context->symbol_table->set(name, value);
             } else if(res.type == NODE_LIST) {
-                _context->lists[name] = res.res_list;
+                SymbolContainer value(res.res_list);
+                _context->symbol_table->set(name, value);
             } else if(res.type == NODE_OBJECT_NEW) {
-                _context->objects[name] = res.res_obj;
+                SymbolContainer value(res.res_obj);
+                _context->symbol_table->set(name, value);
             }
         }
 
         void save_to_context(string name, SymbolContainer value, shared_ptr<Context> _context) {
             _context->symbol_table->set(name, value);
-        }
-
-        void save_to_context(string name, shared_ptr<List> value, shared_ptr<Context> _context) {
-            _context->lists[name] = value;
-        }
-
-        void save_to_context(string name, shared_ptr<Object> value, shared_ptr<Context> _context) {
-            _context->objects[name] = value;
         }
 
         InterpreterResult visit_statements_node(shared_ptr<Node> node, shared_ptr<Context> _context) {

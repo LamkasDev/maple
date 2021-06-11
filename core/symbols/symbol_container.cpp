@@ -7,6 +7,7 @@ const string SYMBOL_FLOAT = "FLOAT";
 const string SYMBOL_FUNC = "FUNC";
 const string SYMBOL_STRING = "STRING";
 const string SYMBOL_LIST = "LIST";
+const string SYMBOL_OBJECT = "OBJECT";
 
 class SymbolContainer {
     public:
@@ -16,6 +17,8 @@ class SymbolContainer {
         int value_int = 0;
         float value_float = 0;
         string value_string = "";
+        shared_ptr<List> value_list = nullptr;
+        shared_ptr<Object> value_object = nullptr;
 
         SymbolContainer() {
             
@@ -34,5 +37,15 @@ class SymbolContainer {
         SymbolContainer(string _value) {
             type = SYMBOL_STRING;
             value_string = _value;
+        }
+
+        SymbolContainer(shared_ptr<List> _value) {
+            type = SYMBOL_LIST;
+            value_list = _value;
+        }
+
+        SymbolContainer(shared_ptr<Object> _value) {
+            type = SYMBOL_OBJECT;
+            value_object = _value;
         }
 };
