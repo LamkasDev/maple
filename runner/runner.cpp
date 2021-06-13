@@ -22,7 +22,7 @@ class Runner {
 
         RunResult load_packages() {
             #if MAPLE_OS == 1
-                string packages_path = "usr/bin/maple/packages";
+                string packages_path = "/usr/bin/maple/packages";
             #endif
             #if MAPLE_OS == 3
                 string packages_path = "C:\\Program Files\\Maple\\packages";
@@ -34,7 +34,15 @@ class Runner {
             for (string package : default_packages) {
                 if(debug_mode == true) { printf("[Debug] Loading default package - '%s'...\n", package.c_str()); }
                 
-                result = run_file(packages_path + "\\" + package);
+                string package_path = packages_path;
+                #if MAPLE_OS == 1
+                    package_path += "/" + package;
+                #endif
+                #if MAPLE_OS == 3
+                    package_path += "\\" + package;
+                #endif
+
+                result = run_file(package_path);
                 if(result.state != 0) {
                     return result;
                 }
