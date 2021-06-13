@@ -125,16 +125,40 @@ class BuiltInRunner {
         
         InterpreterResult run_http_fetch(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             string address = non_root_arguments->list_symbols[0].value_string;
-
             try {
                 httplib::Headers headers = {
                     { "Accept-Encoding", "gzip, deflate" },
                     { "User-Agent", "maple/1.0" }
                 };
+                httplib::Params params;
+                size_t params_result = address.find("?");
+                if(params_result != string::npos) {
+                    string params_chunk = address.substr(static_cast<int>(params_result) + 1);
+                    vector<string> params_strings = split_string(params_chunk, "&");
+                    for(string param_whole : params_strings) {
+                        vector<string> param_parts = split_string(param_whole, "=");
+                        params.emplace(param_parts.at(0), param_parts.at(1));
+                    }
+
+                    address = address.substr(0, static_cast<int>(params_result));
+                }
+
+                string path = "/";
+                int path_start = 0;
+                size_t path_start_a = address.find("//");
+                if(path_start_a != string::npos) {
+                    path_start = static_cast<int>(path_start_a) + 2;
+                }
+                size_t path_start_b = address.find("/", path_start);
+                if(path_start_b != string::npos) {
+                    path = address.substr(path_start_b);
+                    address = address.substr(0, path_start_b);
+                }
+
                 httplib::Client cli(address.c_str());
                 cli.set_follow_location(true);
                 
-                auto _result = cli.Get("/", headers);
+                auto _result = cli.Get(path.c_str(), params, headers);
                 if(_result) {
                     res.set_from(_result->body);
                 } else {
