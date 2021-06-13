@@ -30,13 +30,14 @@ class BuiltInRunner {
 
         InterpreterResult run(shared_ptr<Function> _function, shared_ptr<Context> _context) {
             InterpreterResult res;
+            function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_function;
             try {
-                function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_function = get_function(_function->name->value_string);
-                res = run_function(this, res, _function, _context);
+                run_function = get_function(_function->name->value_string);
             } catch(out_of_range e_0) {
                 RuntimeError e(res.start, res.end, "Function callback doesn't exist", generate_traceback(_context));
                 return res.failure(e);
             }
+            res = run_function(this, res, _function, _context);
             if(res.should_return()) { return res; }
 
             return res.success();
@@ -108,14 +109,18 @@ class BuiltInRunner {
 
         InterpreterResult run_run_builtin_function(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             SymbolContainer func_name = context->symbol_table->get("func_name");
+            shared_ptr<Function> non_root_function;
             try {
-                shared_ptr<Function> non_root_function = non_root_functions.at(func_name.value_string);
-                InterpreterResult result = run(non_root_function, context);
-                return result;
+                non_root_function = non_root_functions.at(func_name.value_string);
             } catch(out_of_range e_0) {
                 RuntimeError e(res.start, res.end, "Function doesn't exist", generate_traceback(context));
                 return res.failure(e);
             }
+
+            InterpreterResult result = run(non_root_function, context);
+            if(result.should_return()) { return result; }
+
+            return result.success();
         }
         
         InterpreterResult run_http_fetch(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
