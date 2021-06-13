@@ -84,10 +84,12 @@ int run(int argc, char** argv) {
             _s2 = string(s2);
 
             RunResult result = runner.run_file(_s2);
-            if(result.state == 0) {
-                print_result(result, true, debug_mode);
-            } else {
+            if(result.state == -1) {
+                print_result(result, false, debug_mode);
+            } else if(result.state == -2) {
                 printf("File doesn't exist-");
+            } else {
+                print_result(result, true, debug_mode);
             }
             continue;
         } else if(file_contents == "exit()") {
