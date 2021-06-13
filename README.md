@@ -63,7 +63,7 @@
         Install <a href="https://chocolatey.org/install">Chocolatey</a> and then install with <code>choco install make</code><br />
         Also download <a href="https://chocolatey.org/install">maple_devtools-win.zip</a> and extract the files into <code>C:/Program Files/maple_devtools-win</code><br /><br />
         <b>> Instructions - Linux <</b><br />
-        Run <code>sudo apt-get install g++ build-essential libssl-dev</code><br /><br />
+        Run <code>sudo apt-get install g++ build-essential libssl-dev zlib1g-dev</code><br /><br />
         <b>> Instructions - macOS <</b><br />
         Not supported yet<br />
     </p>
