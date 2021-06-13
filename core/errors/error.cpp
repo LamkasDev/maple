@@ -13,43 +13,33 @@ class Error {
         string type = ERROR_UNKNOWN;
         string name = "";
         string details = "";
+        string file_name = "";
+        string traceback = "";
         int extra = 0;
 
         Error() {
             
         }
 
-        Error(Position _start, Position _end, string _name, string _details) {
+        Error(string _file_name, Position _start, Position _end, string _name, string _details) {
+            file_name = _file_name;
             start = _start;
             end = _end;
             name = _name;
             details = _details;
         }
 
-        string as_string() {
+        string as_string(string file_contents) {
             if(type != ERROR_RUNTIME) {
                 string s = name + ": " + details + "\n";
-                s += "File " + start.fileName + ", line " + to_string(start.line + 1) + ", col " + to_string(start.column) + "-" + to_string(end.column);
-		        s += "\n\n" + print_error(start.fileContents, start, end);
+                s += "File " + file_name + ", line " + to_string(start.line + 1) + ", col " + to_string(start.column) + "-" + to_string(end.column);
+		        s += "\n\n" + print_error(file_contents, start, end);
                 return s;
             } else {
-                string s = generate_traceback();
+                string s = traceback;
                 s += name + ": " + details + "\n";
                 return s;
             }
-        }
-
-        string generate_traceback() {
-            string res = "";
-            Position _start = start;
-            /*shared_ptr<Context> _context = context;
-            while(_context != nullptr) {
-                res = "  File " + start.fileName + ", line " + to_string(_start.line + 1) + ", col " + to_string(_start.column) + "-" + to_string(end.column) + " in " + _context->display_name + "\n" + res;
-                _start = _context->parent_entry_pos;
-                _context = _context->parent;
-            }*/
-
-            return "Traceback (most recent call last):\n" + res;
         }
 
         string print_error(string text, Position pos_start, Position pos_end) {

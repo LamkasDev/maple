@@ -1,5 +1,6 @@
 #pragma once
 #include "../context.cpp"
+#include "../utils/error_utils.cpp"
 #include "../../structures/number.cpp"
 #include "../../structures/string.cpp"
 #include "../../structures/object_prototype.cpp"
@@ -27,7 +28,7 @@ class Interpreter {
             SymbolContainer sc_true(1);
             SymbolContainer sc_false(0);
             
-            context = make_shared<Context>("global");
+            context = make_shared<Context>("unknown", "global");
             save_to_context("NULL", sc_null, context);
             save_to_context("TRUE", sc_true, context);
             save_to_context("FALSE", sc_false, context);
@@ -158,7 +159,7 @@ class Interpreter {
         InterpreterResult visit_node(shared_ptr<Node> node, shared_ptr<Context> _context) {
             InterpreterResult res;
             if(node->type == NODE_CONSTRUCTOR_DEF) {
-                RuntimeError e(node->start, node->end, "Constructor outside of class definition");
+                RuntimeError e(node->start, node->end, "Constructor outside of class definition", generate_traceback(_context));
                 res.failure(e);
             } else {
                 try {
@@ -224,7 +225,7 @@ class Interpreter {
 
                 bool is_mixed = n_1->type != SYMBOL_LIST_UNKNOWN && ((n_1->type == SYMBOL_LIST_SYMBOLS && (value_res.type != NODE_INT && value_res.type != NODE_FLOAT && value_res.type != NODE_STRING)) || (n_1->type != SYMBOL_LIST_SYMBOLS && n_1->type != value_res.type));
                 if(is_mixed == true) {
-                    RuntimeError e(_node->start, _node->end, "Mixed types in an array are not allowed");
+                    RuntimeError e(_node->start, _node->end, "Mixed types in an array are not allowed", generate_traceback(_context));
                     res.failure(e);
                     break;
                 }
@@ -242,7 +243,7 @@ class Interpreter {
                 } else if(value_res.type == NODE_OBJECT_NEW) {
                     n_1->add_value(value_res.res_obj);
                 } else {
-                    RuntimeError e(_node->start, _node->end, "Unsupported type in list");
+                    RuntimeError e(_node->start, _node->end, "Unsupported type in list", generate_traceback(_context));
                     res.failure(e);
                     break;
                 }
@@ -299,7 +300,7 @@ class Interpreter {
             prot->set_body(node->class_def_expression_result);
             for(shared_ptr<Node> _node : node->class_def_expression_result->statements_nodes_result) {
                 if(_node->type != NODE_ASSIGNMENT && _node->type != NODE_FUNC_DEF && _node->type != NODE_CONSTRUCTOR_DEF) {
-                    RuntimeError e(_node->start, _node->end, "Expected variable assignment, function definition or constructor");
+                    RuntimeError e(_node->start, _node->end, "Expected variable assignment, function definition or constructor", generate_traceback(_context));
                     res.failure(e);
                     break;
                 }
@@ -328,13 +329,13 @@ class Interpreter {
                 InterpreterResult n_m_i;
                 n_m_i.set_from(-1);
 
-                res = res.process_binary(right, n_t, n_m_i);
+                res = res.process_binary(right, n_t, n_m_i, _context);
             } else if(node->token->matches(TT_KEYWORD, KEYWORD_NOT)) {
                 shared_ptr<Token> n_t = make_shared<Token>(TT_EQEQ);
                 InterpreterResult n_m_i;
                 n_m_i.set_from(0);
 
-                res = res.process_binary(right, n_t, n_m_i);
+                res = res.process_binary(right, n_t, n_m_i, _context);
             }
 
             return res.success();
@@ -355,7 +356,7 @@ class Interpreter {
             res.register_result(right_res);
             if(res.should_return()) { return res; }
 
-            res = res.process_binary(left_res, node->token, right_res);
+            res = res.process_binary(left_res, node->token, right_res, _context);
             if(res.should_return()) { return res; }
 
             return res.success();
@@ -379,7 +380,7 @@ class Interpreter {
                     res.set_from(value.value_object);
                 }
             } else {
-                RuntimeError e(node->start, node->end, node->token->value_string + " is not defined");
+                RuntimeError e(node->start, node->end, node->token->value_string + " is not defined", generate_traceback(_context));
                 return res.failure(e);
             }
 
@@ -398,7 +399,7 @@ class Interpreter {
             
             shared_ptr<Token> _token = make_shared<Token>(token);
             InterpreterResult new_value;
-            new_value = res.register_result(res.process_binary(previous_value, _token, value_res));
+            new_value = res.register_result(res.process_binary(previous_value, _token, value_res, _context));
 
             if(res.should_return()) { return res; }
 
@@ -512,7 +513,7 @@ class Interpreter {
             InterpreterResult list = res.register_result(visit_node(node->for_start_result, _context));
             if(res.should_return()) { return res; }
             if(list.type != NODE_LIST) {
-                RuntimeError e(node->start, node->end, "Foreach must contain a valid list");
+                RuntimeError e(node->start, node->end, "Foreach must contain a valid list", generate_traceback(_context));
                 return res.failure(e);
             }
 
@@ -551,7 +552,7 @@ class Interpreter {
                     if(res.has_return_value == true) { res.set_from(expr); res.reset(); break; }
                 }
             } else {
-                RuntimeError e(node->start, node->end, "Invalid type to iterate over");
+                RuntimeError e(node->start, node->end, "Invalid type to iterate over", generate_traceback(_context));
                 return res.failure(e);
             }
             if(res.should_return()) { return res; }
@@ -638,7 +639,7 @@ class Interpreter {
 
             SymbolContainer function = _context->get_variable(node->token->value_string);
             if(function.state == -1) {
-                RuntimeError e(node->start, node->end, "Function '" + node->token->value_string + "' does not exist");
+                RuntimeError e(node->start, node->end, "Function '" + node->token->value_string + "' does not exist", generate_traceback(_context));
                 return res.failure(e);
             }
 
@@ -666,7 +667,7 @@ class Interpreter {
         }
 
         shared_ptr<Context> generate_new_context(string name, shared_ptr<Context> _context) {
-            shared_ptr<Context> new_context = make_shared<Context>(name);
+            shared_ptr<Context> new_context = make_shared<Context>(_context->file_name, name);
             new_context->set_parent(_context);
             new_context->set_symbol_table(_context->symbol_table);
 
@@ -675,10 +676,10 @@ class Interpreter {
         
         InterpreterResult check_args(shared_ptr<Node> node, shared_ptr<Context> _context, InterpreterResult res, list<shared_ptr<Node>> arguments, shared_ptr<Function> function) {
             if(arguments.size() > function->arguments.size()) {
-                RuntimeError e(node->start, node->end, "Too many args passed into '" + node->token->value_string + "' (Got: " + to_string(arguments.size()) + "/" + to_string(function->arguments.size()) + ")");
+                RuntimeError e(node->start, node->end, "Too many args passed into '" + node->token->value_string + "' (Got: " + to_string(arguments.size()) + "/" + to_string(function->arguments.size()) + ")", generate_traceback(_context));
                 res.failure(e);
             } else if(arguments.size() < function->arguments.size()) {
-                RuntimeError e(node->start, node->end, "Not enough args passed into '" + node->token->value_string + "' (Got: " + to_string(arguments.size()) + "/" + to_string(function->arguments.size()) + ")");
+                RuntimeError e(node->start, node->end, "Not enough args passed into '" + node->token->value_string + "' (Got: " + to_string(arguments.size()) + "/" + to_string(function->arguments.size()) + ")", generate_traceback(_context));
                 res.failure(e);
             }
 
@@ -687,10 +688,10 @@ class Interpreter {
         
         InterpreterResult check_args_constructor(shared_ptr<Node> node, shared_ptr<Context> _context, InterpreterResult res, list<shared_ptr<Node>> arguments, shared_ptr<ObjectStore> object) {
             if(arguments.size() > object->prototype->constructor->func_def_argument_tokens_result.size()) {
-                RuntimeError e(node->start, node->end, "Too many args passed into '" + node->token->value_string + "' (Got: " + to_string(arguments.size()) + "/" + to_string(object->prototype->constructor->func_def_argument_tokens_result.size()) + ")");
+                RuntimeError e(node->start, node->end, "Too many args passed into '" + node->token->value_string + "' (Got: " + to_string(arguments.size()) + "/" + to_string(object->prototype->constructor->func_def_argument_tokens_result.size()) + ")", generate_traceback(_context));
                 res.failure(e);
             } else if(arguments.size() < object->prototype->constructor->func_def_argument_tokens_result.size()) {
-                RuntimeError e(node->start, node->end, "Not enough args passed into '" + node->token->value_string + "' (Got: " + to_string(arguments.size()) + "/" + to_string(object->prototype->constructor->func_def_argument_tokens_result.size()) + ")");
+                RuntimeError e(node->start, node->end, "Not enough args passed into '" + node->token->value_string + "' (Got: " + to_string(arguments.size()) + "/" + to_string(object->prototype->constructor->func_def_argument_tokens_result.size()) + ")", generate_traceback(_context));
                 res.failure(e);
             }
 
@@ -800,7 +801,7 @@ class Interpreter {
                 return res.success();
             }
             if(left.type != NODE_OBJECT_NEW) {
-                RuntimeError e(node->start, node->end, "Expected object");
+                RuntimeError e(node->start, node->end, "Expected object", generate_traceback(_context));
                 return res.failure(e);
             }
 
@@ -819,7 +820,7 @@ class Interpreter {
             InterpreterResult left = res.register_result(visit_node(node->left, _context));
             if(res.should_return()) { return res; }
             if(left.type != NODE_OBJECT_NEW) {
-                RuntimeError e(node->start, node->end, "Expected object");
+                RuntimeError e(node->start, node->end, "Expected object", generate_traceback(_context));
                 return res.failure(e);
             }
 

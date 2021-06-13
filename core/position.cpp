@@ -6,15 +6,11 @@ class Position {
         int index = 0;
         int line = 0;
         int column = 0;
-        string fileName = "";
-        string fileContents = "";
 
-        void set_location(int _index, int _line, int _column, string _fileName, string _fileContents) {
+        void set_location(int _index, int _line, int _column) {
             index = _index;
             line = _line;
             column = _column;
-            fileName = _fileName;
-            fileContents = _fileContents;
         }
 
         void advance(char current_c) {
@@ -35,8 +31,7 @@ class Position {
 
         Position copy() {
             Position p;
-            p.set_location(index, line, column, fileName, fileContents);
-
+            p.set_location(index, line, column);
             return p;
         }
 };

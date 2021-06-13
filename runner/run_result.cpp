@@ -7,6 +7,7 @@ class RunResult {
         MakeTokensResult makeTokensResult;
         ParserResult parserResult;
         InterpreterResult interpreterResult;
+        string file_contents = "";
         int state = 0;
 
         void set_make_tokens_result(MakeTokensResult _makeTokensResult) {
@@ -23,5 +24,9 @@ class RunResult {
 
         void set_lexer(Lexer _lexer) {
             lexer = _lexer;
+        }
+
+        void set_file_contents(string _file_contents) {
+            file_contents = _file_contents;
         }
 };

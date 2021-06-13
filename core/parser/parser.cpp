@@ -11,8 +11,8 @@ class Parser {
         shared_ptr<ParserStore> parser_store = nullptr;
         shared_ptr<ParseAll> parse_module = nullptr;
 
-        Parser(vector<string> _object_keywords, list<shared_ptr<Token>> _tokens) {
-            parser_store = make_shared<ParserStore>(_object_keywords, _tokens);
+        Parser(vector<string> _object_keywords, string _file_name, list<shared_ptr<Token>> _tokens) {
+            parser_store = make_shared<ParserStore>(_object_keywords, _file_name, _tokens);
             parser_store->advance();
 
             parse_module = make_shared<ParseAll>();

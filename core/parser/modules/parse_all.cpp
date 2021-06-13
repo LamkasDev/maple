@@ -1107,7 +1107,7 @@ class ParseAll {
                         break;
                     }
                     if(parser_store->current_t->type != TT_NEWLINE) {
-                        ExpectedCharacterError e(parser_store->current_t->start, parser_store->current_t->end, "Expected ';'");
+                        ExpectedCharacterError e(parser_store->file_name, parser_store->current_t->start, parser_store->current_t->end, "Expected ';'");
                         result.failure(e);
                         break;
                     }

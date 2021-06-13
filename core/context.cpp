@@ -9,11 +9,15 @@ using namespace std;
 class Context {
     public:
         string display_name = "";
+        string file_name = "";
+        Position entry_pos;
+
         shared_ptr<Context> parent = nullptr;
         shared_ptr<SymbolTable> symbol_table;
 
-        Context(string _display_name) {
+        Context(string _file_name, string _display_name) {
             symbol_table = make_shared<SymbolTable>();
+            file_name = _file_name;
             display_name = _display_name;
         }
 
@@ -27,5 +31,9 @@ class Context {
 
         void set_symbol_table(shared_ptr<SymbolTable> _symbol_table) {
             symbol_table = _symbol_table;
+        }
+        
+        void set_entry_pos(Position _entry_pos) {
+            entry_pos = _entry_pos;
         }
 };

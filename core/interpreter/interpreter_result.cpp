@@ -150,32 +150,32 @@ class InterpreterResult {
             }
         }
 
-        InterpreterResult process_binary(InterpreterResult _left, shared_ptr<Token> _op, InterpreterResult _right) {
+        InterpreterResult process_binary(InterpreterResult _left, shared_ptr<Token> _op, InterpreterResult _right, shared_ptr<Context> _context) {
             if(_op->type == TT_PLUS) {
-                return _left.added_to(_right);
+                return _left.added_to(_right, _context);
             } else if(_op->type == TT_MINUS) {
-                return _left.substracted_by(_right);
+                return _left.substracted_by(_right, _context);
             } else if(_op->type == TT_MUL) {
-                return _left.multiplied_by(_right);
+                return _left.multiplied_by(_right, _context);
             } else if(_op->type == TT_DIV) {
-                return _left.divided_by(_right);
+                return _left.divided_by(_right, _context);
             } else if(_op->type == TT_POW) {
-                return _left.power_on(_right);
+                return _left.power_on(_right, _context);
             } else if(_op->type == TT_EQEQ || _op->type == TT_NEQ || _op->type == TT_LTHAN || _op->type == TT_GTHAN || _op->type == TT_LTHANEQ || _op->type == TT_GTHANEQ) {
-                return _left.get_comparison(_op, _right);
+                return _left.get_comparison(_op, _right, _context);
             } else if(_op->matches(TT_KEYWORD, KEYWORD_AND)) {
-                return _left.and_by(_right);
+                return _left.and_by(_right, _context);
             } else if(_op->matches(TT_KEYWORD, KEYWORD_OR))  {
-                return _left.or_by(_right);
+                return _left.or_by(_right, _context);
             } else if(_op->type == TT_MOD) {
-                return _left.modulo_of(_right);
+                return _left.modulo_of(_right, _context);
             }
 
             InterpreterResult res;
             return res;
         }
 
-        InterpreterResult added_to(InterpreterResult _right) {
+        InterpreterResult added_to(InterpreterResult _right, shared_ptr<Context> _context) {
             if((type == NODE_STRING && _right.type == NODE_INT) || (type == NODE_INT && _right.type == NODE_STRING) || (type == NODE_STRING && _right.type == NODE_FLOAT) || (type == NODE_FLOAT && _right.type == NODE_STRING) || (type == NODE_STRING && _right.type == NODE_STRING)) {
                 InterpreterResult res;
                 String n_str(get_string_value() + _right.get_string_value());
@@ -184,7 +184,7 @@ class InterpreterResult {
                 return res;
             }
 
-            if(((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT))) { return illegal_operation(_right); }
+            if(((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT))) { return illegal_operation(_right, _context); }
 
             InterpreterResult res;
             if(type == NODE_INT && _right.type == NODE_INT) {
@@ -198,8 +198,8 @@ class InterpreterResult {
             return res;
         }
 
-        InterpreterResult substracted_by(InterpreterResult _right) {
-            if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right); }
+        InterpreterResult substracted_by(InterpreterResult _right, shared_ptr<Context> _context) {
+            if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right, _context); }
 
             InterpreterResult res;
             if(type == NODE_INT && _right.type == NODE_INT) {
@@ -213,8 +213,8 @@ class InterpreterResult {
             return res;
         }
 
-        InterpreterResult multiplied_by(InterpreterResult _right) {
-            if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right); }
+        InterpreterResult multiplied_by(InterpreterResult _right, shared_ptr<Context> _context) {
+            if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right, _context); }
 
             InterpreterResult res;
             if(type == NODE_INT && _right.type == NODE_INT) {
@@ -228,15 +228,15 @@ class InterpreterResult {
             return res;
         }
 
-        InterpreterResult divided_by(InterpreterResult _right) {
-            if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right); }
+        InterpreterResult divided_by(InterpreterResult _right, shared_ptr<Context> _context) {
+            if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right, _context); }
 
             InterpreterResult res;
             if(_right.type == NODE_INT && _right.res_int.value == 0) {
-                RuntimeError e_0(_right.start, _right.end, "Division by zero");
+                RuntimeError e_0(_right.start, _right.end, "Division by zero", generate_traceback(_context));
                 return res.failure(e_0);
             } else if(_right.type == NODE_FLOAT && _right.res_float.value == 0) {
-                RuntimeError e_0(_right.start, _right.end, "Division by zero");
+                RuntimeError e_0(_right.start, _right.end, "Division by zero", generate_traceback(_context));
                 return res.failure(e_0);
             }
 
@@ -246,8 +246,8 @@ class InterpreterResult {
             return res;
         }
 
-        InterpreterResult power_on(InterpreterResult _right) {
-            if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right); }
+        InterpreterResult power_on(InterpreterResult _right, shared_ptr<Context> _context) {
+            if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right, _context); }
 
             InterpreterResult res;
             if(type == NODE_INT && _right.type == NODE_INT) {
@@ -261,8 +261,8 @@ class InterpreterResult {
             return res;
         }
 
-        InterpreterResult modulo_of(InterpreterResult _right) {
-            if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right); }
+        InterpreterResult modulo_of(InterpreterResult _right, shared_ptr<Context> _context) {
+            if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right, _context); }
 
             InterpreterResult res;
             if(type == NODE_INT && _right.type == NODE_INT) {
@@ -276,8 +276,8 @@ class InterpreterResult {
             return res;
         }
 
-        InterpreterResult get_comparison(shared_ptr<Token> _token, InterpreterResult _right) {
-            if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right); }
+        InterpreterResult get_comparison(shared_ptr<Token> _token, InterpreterResult _right, shared_ptr<Context> _context) {
+            if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right, _context); }
 
             InterpreterResult res;
             IntNumber n_int(0);
@@ -299,8 +299,8 @@ class InterpreterResult {
             return res;
         }
 
-        InterpreterResult and_by(InterpreterResult _right) {
-            if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right); }
+        InterpreterResult and_by(InterpreterResult _right, shared_ptr<Context> _context) {
+            if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right, _context); }
 
             InterpreterResult res;
             IntNumber n_int(get_value() && _right.get_value());
@@ -309,8 +309,8 @@ class InterpreterResult {
             return res;
         }
 
-        InterpreterResult or_by(InterpreterResult _right) {
-            if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right); }
+        InterpreterResult or_by(InterpreterResult _right, shared_ptr<Context> _context) {
+            if((type != NODE_INT && type != NODE_FLOAT) || (_right.type != NODE_INT && _right.type != NODE_FLOAT)) { return illegal_operation(_right, _context); }
 
             InterpreterResult res;
             IntNumber n_int(get_value() || _right.get_value());
@@ -329,9 +329,9 @@ class InterpreterResult {
             }
         }
 
-        InterpreterResult illegal_operation(InterpreterResult _right) {
+        InterpreterResult illegal_operation(InterpreterResult _right, shared_ptr<Context> _context) {
             InterpreterResult res;
-            RuntimeError e_0(start, _right.end, "Illegal operation");
+            RuntimeError e_0(start, _right.end, "Illegal operation", generate_traceback(_context));
             return res.failure(e_0);
         }
 

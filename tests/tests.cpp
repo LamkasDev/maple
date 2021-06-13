@@ -4,10 +4,10 @@ using namespace std;
 int run_integer_test(Runner runner, string name, string code, int value) {
     RunResult result = runner.run(name, code);
     if(result.interpreterResult.res_int.value == value) {
-        printf("Result of %s - %s (%s)\n", result.lexer.fileName.c_str(), "PASSED", (result.interpreterResult.res_int.repr() + "/" + to_string(value)).c_str());
+        printf("Result of %s - %s (%s)\n", result.lexer.file_name.c_str(), "PASSED", (result.interpreterResult.res_int.repr() + "/" + to_string(value)).c_str());
         return 1;
     } else {
-        printf("Result of %s - %s (%s)\n", result.lexer.fileName.c_str(), "FAILED", (result.interpreterResult.res_int.repr() + "/" + to_string(value)).c_str());
+        printf("Result of %s - %s (%s)\n", result.lexer.file_name.c_str(), "FAILED", (result.interpreterResult.res_int.repr() + "/" + to_string(value)).c_str());
         return 0;
     }
 }
@@ -15,10 +15,10 @@ int run_integer_test(Runner runner, string name, string code, int value) {
 int run_float_test(Runner runner, string name, string code, float value) {
     RunResult result = runner.run(name, code);
     if(result.interpreterResult.res_float.value == value) {
-        printf("Result of %s - %s (%s)\n", result.lexer.fileName.c_str(), "PASSED", (result.interpreterResult.res_float.repr() + "/" + to_string(value)).c_str());
+        printf("Result of %s - %s (%s)\n", result.lexer.file_name.c_str(), "PASSED", (result.interpreterResult.res_float.repr() + "/" + to_string(value)).c_str());
         return 1;
     } else {
-        printf("Result of %s - %s (%s)\n", result.lexer.fileName.c_str(), "FAILED", (result.interpreterResult.res_float.repr() + "/" + to_string(value)).c_str());
+        printf("Result of %s - %s (%s)\n", result.lexer.file_name.c_str(), "FAILED", (result.interpreterResult.res_float.repr() + "/" + to_string(value)).c_str());
         return 0;
     }
 }
@@ -26,10 +26,10 @@ int run_float_test(Runner runner, string name, string code, float value) {
 int run_string_test(Runner runner, string name, string code, string value) {
     RunResult result = runner.run(name, code);
     if(result.interpreterResult.res_string.value == value) {
-        printf("Result of %s - %s (%s)\n", result.lexer.fileName.c_str(), "PASSED", (result.interpreterResult.res_string.repr() + "/" + value).c_str());
+        printf("Result of %s - %s (%s)\n", result.lexer.file_name.c_str(), "PASSED", (result.interpreterResult.res_string.repr() + "/" + value).c_str());
         return 1;
     } else {
-        printf("Result of %s - %s (%s)\n", result.lexer.fileName.c_str(), "FAILED", (result.interpreterResult.res_string.repr() + "/" + value).c_str());
+        printf("Result of %s - %s (%s)\n", result.lexer.file_name.c_str(), "FAILED", (result.interpreterResult.res_string.repr() + "/" + value).c_str());
         return 0;
     }
 }

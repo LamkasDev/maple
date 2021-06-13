@@ -8,7 +8,8 @@ class IllegalCharacterError : public Error {
             
         }
         
-        IllegalCharacterError(Position _start, Position _end, string _details) {
+        IllegalCharacterError(string _file_name, Position _start, Position _end, string _details) {
+            file_name = _file_name;
             start = _start;
             end = _end;
 
@@ -24,7 +25,8 @@ class InvalidSyntaxError : public Error {
             
         }
 
-        InvalidSyntaxError(Position _start, Position _end, string _details) {
+        InvalidSyntaxError(string _file_name, Position _start, Position _end, string _details) {
+            file_name = _file_name;
             start = _start;
             end = _end;
 
@@ -40,13 +42,14 @@ class RuntimeError : public Error {
             
         }
         
-        RuntimeError(Position _start, Position _end, string _details) {
+        RuntimeError(Position _start, Position _end, string _details, string _traceback) {
             start = _start;
             end = _end;
 
             type = ERROR_RUNTIME;
             name = "RuntimeError";
             details = _details;
+            traceback = _traceback;
         }
 };
 
@@ -56,7 +59,8 @@ class ExpectedCharacterError : public Error {
             
         }
         
-        ExpectedCharacterError(Position _start, Position _end, string _details) {
+        ExpectedCharacterError(string _file_name, Position _start, Position _end, string _details) {
+            file_name = _file_name;
             start = _start;
             end = _end;
 

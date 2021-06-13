@@ -4,11 +4,11 @@ const string VERSION = "1.0.0";
 
 void print_result(RunResult result, bool prints_result, bool prints_debug) {
     if(result.makeTokensResult.state == -1) {
-        printf("%s \n\n", result.makeTokensResult.e.as_string().c_str());
+        printf("%s \n\n", result.makeTokensResult.e.as_string(result.file_contents).c_str());
     } else if(result.parserResult.state == -1) {
-        printf("%s \n\n", result.parserResult.e.as_string().c_str());
+        printf("%s \n\n", result.parserResult.e.as_string(result.file_contents).c_str());
     } else if(result.interpreterResult.state == -1) {
-        printf("%s \n", result.interpreterResult.e.as_string().c_str());
+        printf("%s \n", result.interpreterResult.e.as_string(result.file_contents).c_str());
     } else {
         if(prints_debug == true) {
             printf("[Debug] Tokens - %s \n", print_tree(result.makeTokensResult.tokens).c_str());
@@ -31,6 +31,7 @@ int run(int argc, char** argv) {
         exit(1);
     }
 
+    string file_contents = "";
     if(argc >= 2) {
         if(string(argv[1]) == "-d") {
             printf("[Debug] Running Maple in Debug Mode...\n");
@@ -41,7 +42,8 @@ int run(int argc, char** argv) {
             exit(0);
         } else if(string(argv[1]) == "-run") {
             if(argc >= 3) {
-                RunResult result = runner.run_file(string(argv[2]));
+                file_contents = string(argv[2]);
+                RunResult result = runner.run_file(file_contents);
                 if(result.state == -1) {
                     print_result(result, false, debug_mode);
                     exit(1);
@@ -65,16 +67,15 @@ int run(int argc, char** argv) {
     printf("Commands: run(), tests(), exit()\n");
 
     char s[8192];
-    string _s;
     while(true) {
         printf("%s", ">>> ");
         scanf("%[^\n]%*c", &s);
-        _s = string(s);
+        file_contents = string(s);
 
-        if(_s == "tests()") {
+        if(file_contents == "tests()") {
             run_tests(runner);
             break;
-        } else if(_s == "run()") {
+        } else if(file_contents == "run()") {
             char s2[1024];
             string _s2;
 
@@ -89,12 +90,12 @@ int run(int argc, char** argv) {
                 printf("File doesn't exist-");
             }
             continue;
-        } else if(_s == "exit()") {
+        } else if(file_contents == "exit()") {
             printf("Bye bye~");
             break;
         }
         
-        RunResult result = runner.run("<stdin>", _s);
+        RunResult result = runner.run("<stdin>", file_contents);
         print_result(result, true, debug_mode);
     }
 

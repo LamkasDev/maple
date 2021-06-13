@@ -34,7 +34,7 @@ class BuiltInRunner {
                 function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_function = get_function(_function->name->value_string);
                 res = run_function(this, res, _function, _context);
             } catch(out_of_range e_0) {
-                RuntimeError e(res.start, res.end, "Function callback doesn't exist");
+                RuntimeError e(res.start, res.end, "Function callback doesn't exist", generate_traceback(_context));
                 return res.failure(e);
             }
             if(res.should_return()) { return res; }
@@ -50,7 +50,7 @@ class BuiltInRunner {
         InterpreterResult run_print(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             SymbolContainer value = context->symbol_table->get("value");
             if(value.type != SYMBOL_STRING) {
-                RuntimeError e(res.start, res.end, "Invalid argument");
+                RuntimeError e(res.start, res.end, "Invalid argument", generate_traceback(context));
                 return res.failure(e);
             }
             printf("%s", value.value_string.c_str());
@@ -79,7 +79,7 @@ class BuiltInRunner {
             try {
                 res.set_from(stoi(value.value_string));
             } catch(invalid_argument e_0) {
-                RuntimeError e(res.start, res.end, "Invalid argument");
+                RuntimeError e(res.start, res.end, "Invalid argument", generate_traceback(context));
                 return res.failure(e);
             }
             
@@ -91,7 +91,7 @@ class BuiltInRunner {
             try {
                 res.set_from(stof(value.value_string));
             } catch(invalid_argument e_0) {
-                RuntimeError e(res.start, res.end, "Invalid argument");
+                RuntimeError e(res.start, res.end, "Invalid argument", generate_traceback(context));
                 return res.failure(e);
             }
 
@@ -105,7 +105,7 @@ class BuiltInRunner {
                 InterpreterResult result = run(non_root_function, context);
                 return result;
             } catch(out_of_range e_0) {
-                RuntimeError e(res.start, res.end, "Function doesn't exist");
+                RuntimeError e(res.start, res.end, "Function doesn't exist", generate_traceback(context));
                 return res.failure(e);
             }
         }
@@ -129,7 +129,7 @@ class BuiltInRunner {
                     res.set_from(static_cast<int>(err));
                 }
             } catch(invalid_argument e_0) {
-                RuntimeError e(res.start, res.end, "Something went wrong");
+                RuntimeError e(res.start, res.end, "Something went wrong", generate_traceback(context));
                 return res.failure(e);
             }
 
@@ -142,7 +142,7 @@ class BuiltInRunner {
             try {
                 res.set_from(string(1, value.at(pos)));
             } catch(out_of_range e_0) {
-                RuntimeError e(res.start, res.end, "The index is out of range");
+                RuntimeError e(res.start, res.end, "The index is out of range", generate_traceback(context));
                 return res.failure(e);
             }
 
@@ -155,7 +155,7 @@ class BuiltInRunner {
             try {
                 res.set_from(value.at(pos));
             } catch(out_of_range e_0) {
-                RuntimeError e(res.start, res.end, "The index is out of range");
+                RuntimeError e(res.start, res.end, "The index is out of range", generate_traceback(context));
                 return res.failure(e);
             }
 

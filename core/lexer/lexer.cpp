@@ -7,8 +7,9 @@ using namespace std;
 
 class Lexer {
     public:
-        string fileName = "";
-        string text = "";
+        string file_name = "";
+        string file_contents = "";
+
         Position pos;
         char current_c;
         vector<string> object_keywords;
@@ -17,26 +18,26 @@ class Lexer {
             
         }
 
-        Lexer(vector<string> _object_keywords, string _fileName, string _text) {
+        Lexer(vector<string> _object_keywords, string _file_name, string _file_contents) {
             object_keywords = _object_keywords;
-            fileName = _fileName;
-            text = _text;
+            file_name = _file_name;
+            file_contents = _file_contents;
 
-            pos.set_location(-1, 0, -1, fileName, text);
+            pos.set_location(-1, 0, -1);
             advance();
         }
 
         void advance() {
             pos.advance(current_c);
-            if(pos.index < text.length()) {
-                current_c = text.at(pos.index);
+            if(pos.index < file_contents.length()) {
+                current_c = file_contents.at(pos.index);
             }
         }
 
         MakeTokensResult make_tokens() {
             MakeTokensResult result;
 
-            while(pos.index < text.length()) {
+            while(pos.index < file_contents.length()) {
                 switch(current_c) {
                     case ' ':
                     case '\t':
@@ -164,7 +165,7 @@ class Lexer {
                             Position start = pos.copy();
                             advance();
 
-                            IllegalCharacterError e(start, pos, ("'" + string(1, c) + "'").c_str());
+                            IllegalCharacterError e(file_name, start, pos, ("'" + string(1, c) + "'").c_str());
                             result.e = e;
                             result.state = -1;
                             return result;
@@ -193,7 +194,7 @@ class Lexer {
             string str;
             int dot = 0;
             bool is_dot_last = false;
-            while(pos.index < text.length() && (DIGITS + ".").find(current_c) != string::npos) {
+            while(pos.index < file_contents.length() && (DIGITS + ".").find(current_c) != string::npos) {
                 is_dot_last = false;
                 if(current_c == '.') {
                     if(dot == 1) { break; }
@@ -235,7 +236,7 @@ class Lexer {
 
         MakeTokensResult make_identifier(MakeTokensResult result) {
             string str;
-            while(pos.index < text.length() && (LETTERS_DIGITS + '_').find(current_c) != string::npos) {
+            while(pos.index < file_contents.length() && (LETTERS_DIGITS + '_').find(current_c) != string::npos) {
                 str += current_c;
                 advance();
             }
@@ -265,7 +266,7 @@ class Lexer {
             bool escaped = false;
             advance();
 
-            while(pos.index < text.length() && (current_c != '"' || escaped == true)) {
+            while(pos.index < file_contents.length() && (current_c != '"' || escaped == true)) {
                 if(escaped == true) {
                     if(current_c == 'n') {
                         str += '\n';
@@ -307,7 +308,7 @@ class Lexer {
                 advance();
                 result.tokens.push_back(t);
             } else {
-                ExpectedCharacterError e(pos.copy(), pos.copy(), "'=' (after '!')");
+                ExpectedCharacterError e(file_name, pos.copy(), pos.copy(), "'=' (after '!')");
                 result.e = e;
                 result.state = -1;
             }
@@ -429,7 +430,7 @@ class Lexer {
             if(current_c == '/') {
                 advance();
             } else {
-                ExpectedCharacterError e(pos.copy(), pos.copy(), "'/'");
+                ExpectedCharacterError e(file_name, pos.copy(), pos.copy(), "'/'");
                 result.e = e;
                 result.state = -1;
             }

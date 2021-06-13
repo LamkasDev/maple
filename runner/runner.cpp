@@ -43,10 +43,11 @@ class Runner {
             return result;
         }
 
-        RunResult run(string _fileName, string _text) {
+        RunResult run(string _file_name, string _file_contents) {
             RunResult result;
+            result.set_file_contents(_file_contents);
 
-            Lexer lexer(object_keywords, _fileName, _text);
+            Lexer lexer(object_keywords, _file_name, _file_contents);
             result.set_lexer(lexer);
             MakeTokensResult makeTokensResult = lexer.make_tokens();
             result.set_make_tokens_result(makeTokensResult);
@@ -57,13 +58,15 @@ class Runner {
 
             object_keywords = lexer.object_keywords;
 
-            Parser parser(object_keywords, makeTokensResult.tokens);
+            Parser parser(object_keywords, _file_name, makeTokensResult.tokens);
             ParserResult parserResult = parser.parse();
             result.set_parser_result(parserResult);
             if(parserResult.state == -1) {
                 result.state = -1;
                 return result;
             }
+
+            interpreter->context->file_name = _file_name;
 
             InterpreterResult interpreterResult;
             interpreterResult = interpreter->visit_node(parserResult.node, interpreter->context);

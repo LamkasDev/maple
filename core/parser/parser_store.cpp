@@ -3,6 +3,8 @@ using namespace std;
 
 class ParserStore {
     public:
+        string file_name = "";
+
         list<shared_ptr<Token>> tokens;
         shared_ptr<Token> current_t = nullptr;
         vector<string> object_keywords;
@@ -12,8 +14,9 @@ class ParserStore {
 
         }
 
-        ParserStore(vector<string> _object_keywords, list<shared_ptr<Token>> _tokens) {
+        ParserStore(vector<string> _object_keywords, string _file_name, list<shared_ptr<Token>> _tokens) {
             object_keywords = _object_keywords;
+            file_name = _file_name;
             tokens = _tokens;
             index = 1;
         }
