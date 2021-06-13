@@ -162,7 +162,7 @@ class Lexer {
                             if(result.state == -1) { return result; }
                         } else {
                             char c = current_c;
-                            Position start = pos.copy();
+                            Position start = pos;
                             advance();
 
                             IllegalCharacterError e(file_name, start, pos, ("'" + string(1, c) + "'").c_str());
@@ -212,21 +212,21 @@ class Lexer {
             
             if(dot == 0) {
                 shared_ptr<TokenInt> t = make_shared<TokenInt>(stoi(str));
-                t->set_start(pos.copy());
-                t->set_end(pos.copy());
+                t->set_start(pos);
+                t->set_end(pos);
 
                 result.tokens.push_back(t);
             } else {
                 shared_ptr<TokenFloat> t = make_shared<TokenFloat>(atof(str.c_str()));
-                t->set_start(pos.copy());
-                t->set_end(pos.copy());
+                t->set_start(pos);
+                t->set_end(pos);
 
                 result.tokens.push_back(t);
             }
             if(is_dot_last == true) {
                 shared_ptr<Token> t_1 = make_shared<Token>(TT_DOT);
-                t_1->set_start(pos.copy());
-                t_1->set_end(pos.copy());
+                t_1->set_start(pos);
+                t_1->set_end(pos);
 
                 result.tokens.push_back(t_1);
             }
@@ -246,14 +246,14 @@ class Lexer {
             }
             if(in_array(str, KEYWORDS) || in_array(str, object_keywords)) {
                 shared_ptr<TokenKeyword> t = make_shared<TokenKeyword>(str);
-                t->set_start(pos.copy());
-                t->set_end(pos.copy());
+                t->set_start(pos);
+                t->set_end(pos);
 
                 result.tokens.push_back(t);
             } else {
                 shared_ptr<TokenIdentifier> t = make_shared<TokenIdentifier>(str);
-                t->set_start(pos.copy());
-                t->set_end(pos.copy());
+                t->set_start(pos);
+                t->set_end(pos);
 
                 result.tokens.push_back(t);
             }
@@ -291,8 +291,8 @@ class Lexer {
             advance();
 
             shared_ptr<TokenString> t = make_shared<TokenString>(str);
-            t->set_start(pos.copy());
-            t->set_end(pos.copy());
+            t->set_start(pos);
+            t->set_end(pos);
 
             result.tokens.push_back(t);
             return result;
@@ -300,15 +300,15 @@ class Lexer {
 
         MakeTokensResult make_not_equals(MakeTokensResult result) {
             shared_ptr<Token> t = make_shared<Token>(TT_NEQ);
-            t->set_start(pos.copy());
-            t->set_end(pos.copy());
+            t->set_start(pos);
+            t->set_end(pos);
 
             advance();
             if(current_c == '=') {
                 advance();
                 result.tokens.push_back(t);
             } else {
-                ExpectedCharacterError e(file_name, pos.copy(), pos.copy(), "'=' (after '!')");
+                ExpectedCharacterError e(file_name, pos, pos, "'=' (after '!')");
                 result.e = e;
                 result.state = -1;
             }
@@ -318,8 +318,8 @@ class Lexer {
 
         MakeTokensResult make_equals(MakeTokensResult result) {
             shared_ptr<Token> t = make_shared<Token>(TT_EQ);
-            t->set_start(pos.copy());
-            t->set_end(pos.copy());
+            t->set_start(pos);
+            t->set_end(pos);
 
             advance();
             if(current_c == '=') {
@@ -336,8 +336,8 @@ class Lexer {
 
         MakeTokensResult make_less_than(MakeTokensResult result) {
             shared_ptr<Token> t = make_shared<Token>(TT_LTHAN);
-            t->set_start(pos.copy());
-            t->set_end(pos.copy());
+            t->set_start(pos);
+            t->set_end(pos);
 
             advance();
             if(current_c == '=') {
@@ -351,8 +351,8 @@ class Lexer {
 
         MakeTokensResult make_greater_than(MakeTokensResult result) {
             shared_ptr<Token> t = make_shared<Token>(TT_GTHAN);
-            t->set_start(pos.copy());
-            t->set_end(pos.copy());
+            t->set_start(pos);
+            t->set_end(pos);
 
             advance();
             if(current_c == '=') {
@@ -366,8 +366,8 @@ class Lexer {
 
         MakeTokensResult make_minus(MakeTokensResult result) {
             shared_ptr<Token> t = make_shared<Token>(TT_MINUS);
-            t->set_start(pos.copy());
-            t->set_end(pos.copy());
+            t->set_start(pos);
+            t->set_end(pos);
 
             advance();
             if(current_c == '=') {
@@ -381,8 +381,8 @@ class Lexer {
 
         MakeTokensResult make_plus(MakeTokensResult result) {
             shared_ptr<Token> t = make_shared<Token>(TT_PLUS);
-            t->set_start(pos.copy());
-            t->set_end(pos.copy());
+            t->set_start(pos);
+            t->set_end(pos);
 
             advance();
             if(current_c == '=') {
@@ -396,8 +396,8 @@ class Lexer {
 
         MakeTokensResult process_slash(MakeTokensResult result) {
             shared_ptr<Token> t = make_shared<Token>(TT_DIV);
-            t->set_start(pos.copy());
-            t->set_end(pos.copy());
+            t->set_start(pos);
+            t->set_end(pos);
 
             advance();
             if(current_c == '/') {
@@ -430,7 +430,7 @@ class Lexer {
             if(current_c == '/') {
                 advance();
             } else {
-                ExpectedCharacterError e(file_name, pos.copy(), pos.copy(), "'/'");
+                ExpectedCharacterError e(file_name, pos, pos, "'/'");
                 result.e = e;
                 result.state = -1;
             }

@@ -200,7 +200,7 @@ class Node {
             shared_ptr<Node> copy = make_shared<Node>();
 
             copy->set_type(type);
-            copy->set_value(value.copy());
+            copy->set_value(value);
             if(left != nullptr) {
                 copy->set_to_left(left->copy());
             }
@@ -208,7 +208,7 @@ class Node {
                 copy->set_to_right(right->copy());
             }
             if(token != nullptr) {
-                copy->set_token(token->copy());
+                copy->set_token(token);
             }
 
             return copy;

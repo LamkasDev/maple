@@ -87,8 +87,8 @@ class Token {
         }
 
         void set_start(Position _start) {
-            start = _start.copy();
-            end = _start.copy();
+            start = _start;
+            end = _start;
             end.advance();
         }
 
