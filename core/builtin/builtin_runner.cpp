@@ -48,13 +48,21 @@ class BuiltInRunner {
         }
 
         InterpreterResult run_print(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string string_value = "";
+
             SymbolContainer value = context->symbol_table->get("value");
-            if(value.type != SYMBOL_STRING) {
+            if(value.type == SYMBOL_STRING) {
+                string_value = value.value_string;
+            } else if(value.type == SYMBOL_INT) {
+                string_value = to_string(value.value_int);
+            } else if(value.type == SYMBOL_FLOAT) {
+                string_value = to_string(value.value_float).substr(0, to_string(value.value_float).find(".")+4);
+            } else {
                 RuntimeError e(res.start, res.end, "Invalid argument", generate_traceback(context));
                 return res.failure(e);
             }
-            printf("%s", value.value_string.c_str());
-            res.set_from(value.value_string.c_str());
+            printf("%s", string_value.c_str());
+            res.set_from(string_value.c_str());
 
             return res.success();
         }
