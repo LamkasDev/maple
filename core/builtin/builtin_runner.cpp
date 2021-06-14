@@ -372,4 +372,38 @@ class BuiltInRunner {
 
             return res.success();
         }
+        
+        InterpreterResult run_list_concat(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            shared_ptr<List> list = make_shared<List>();
+            shared_ptr<ListStore> list_store = interpreter_store->attach_list_store(list);
+            for(shared_ptr<List> _list : non_root_arguments->list_lists) {
+                shared_ptr<ListStore> _list_store = interpreter_store->get_list_store(_list->list_id);
+                for(SymbolContainer _symbol : _list_store->list_symbols) {
+                    list_store->add_value(_symbol);
+                }
+                for(SymbolContainer _symbol : _list_store->list_lists) {
+                    list_store->add_value(_symbol);
+                }
+                for(SymbolContainer _symbol : _list_store->list_objects) {
+                    list_store->add_value(_symbol);
+                }
+            }
+
+            res.set_from(list);
+            return res.success();
+        }
+        
+        /*InterpreterResult run_list_includes(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            shared_ptr<List> list = non_root_arguments->list_lists[0];
+            shared_ptr<ListStore> list_store = interpreter_store->get_list_store(list->list_id);
+            SymbolContainer symbol = non_root_arguments->list_symbols[0];
+            bool result = false;
+            for(SymbolContainer _symbol : list_store->list_symbols) {
+                result = symbol == _symbol;
+                if(result == true) { break; }
+            }
+
+            res.set_from(result);
+            return res.success();
+        }*/
 };

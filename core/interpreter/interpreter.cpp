@@ -84,6 +84,11 @@ class Interpreter {
             run_func = &BuiltInRunner::run_string_trim_end; arguments.clear(); arguments.push_back("arguments");
             add_non_root_builtin_function("STRING_trim_end", arguments, run_func);
 
+            run_func = &BuiltInRunner::run_list_concat; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("LIST_concat", arguments, run_func);
+            /*run_func = &BuiltInRunner::run_list_includes; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("LIST_includes", arguments, run_func);*/
+
             run_func = &BuiltInRunner::run_http_fetch; arguments.clear(); arguments.push_back("arguments");
             add_non_root_builtin_function("http_fetch", arguments, run_func);
 
