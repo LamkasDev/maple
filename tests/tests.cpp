@@ -99,16 +99,13 @@ bool run_tests(Runner runner) {
     total_tests += 6;
 
     printf("----------\n");
-    passed += run_integer_test(runner, "Loops 1 (VAR l_1 = 1)", "VAR l_1 = 1", 1);
-    passed += run_integer_test(runner, "Loops 2 (VAR l_2 = 1)", "VAR l_2 = 1", 1);
-    passed += run_integer_test(runner, "Loops 3 (VAR l_3 = 1)", "VAR l_3 = 1", 1);
-    passed += run_integer_test(runner, "Loops 4 (FOR (VAR i = 1) TO 6 { VAR l_1 = l_1 * i })", "FOR (VAR i = 1) TO 6 { VAR l_1 = l_1 * i }", 0);
-    passed += run_integer_test(runner, "Loops 5 (FOR (VAR i = -1) TO -6 STEP -1 { VAR l_2 = l_2 * i })", "FOR (VAR i = -1) TO -6 STEP -1 { VAR l_2 = l_2 * i }", 0);
-    passed += run_integer_test(runner, "Loops 6 (l_1)", "l_1", 120);
-    passed += run_integer_test(runner, "Loops 7 (l_2)", "l_2", -120);
-    passed += run_integer_test(runner, "Loops 8 (WHILE l_3 < 100 { VAR l_3 = l_3 + 1 })", "WHILE l_3 < 100 { VAR l_3 = l_3 + 1 }", 0);
-    passed += run_integer_test(runner, "Loops 9 (l_3)", "l_3", 100);
-    total_tests += 9;
+    passed += run_integer_test(runner, "Loops 1 (VAR l_1 = 1; FOR (VAR i = 1) TO 6 { VAR l_1 = l_1 * i };)", "VAR l_1 = 1; FOR (VAR i = 1) TO 6 { VAR l_1 = l_1 * i };", 1);
+    passed += run_integer_test(runner, "Loops 2 (VAR l_2 = 1; FOR (VAR i = -1) TO -6 STEP -1 { VAR l_2 = l_2 * i })", "VAR l_2 = 1; FOR (VAR i = -1) TO -6 STEP -1 { VAR l_2 = l_2 * i };", 1);
+    passed += run_integer_test(runner, "Loops 3 (l_1)", "l_1", 120);
+    passed += run_integer_test(runner, "Loops 4 (l_2)", "l_2", -120);
+    passed += run_integer_test(runner, "Loops 5 (VAR l_3 = 1; WHILE l_3 < 100 { VAR l_3 = l_3 + 1 };)", "VAR l_3 = 1; WHILE l_3 < 100 { VAR l_3 = l_3 + 1 };", 1);
+    passed += run_integer_test(runner, "Loops 6 (l_3)", "l_3", 100);
+    total_tests += 6;
 
     printf("----------\n");
     passed += run_integer_test(runner, "Functions 1 (FUNC f_a() => 1)", "FUNC f_a() => 1", 0);
@@ -147,39 +144,45 @@ bool run_tests(Runner runner) {
     total_tests += 5;
 
     printf("----------\n");
-    passed += run_integer_test(runner, "List Functions 1 (VAR a = 0)", "VAR a = 0", 0);
-    passed += run_integer_test(runner, "List Functions 2 (VAR b = 0)", "VAR b = 0", 0);
-    passed += run_string_test(runner, "List Functions 3 (VAR c = \"a\")", "VAR c = \"a\"", "a");
-    passed += run_integer_test(runner, "List Functions 4 (FOREACH(el IN list_a) { VAR a = a + el })", "FOREACH(el IN list_a) { VAR a = a + el }", 0);
-    passed += run_integer_test(runner, "List Functions 5 (FOREACH(el IN list_a) { VAR b = b + el })", "FOREACH(el IN list_b) { VAR b = b + el }", 0);
-    passed += run_integer_test(runner, "List Functions 6 (FOREACH(el IN list_a) { VAR c = c + el })", "FOREACH(el IN list_c) { VAR c = c + el }", 0);
-    passed += run_integer_test(runner, "List Functions 7 (a)", "a", 6);
-    passed += run_float_test(runner, "List Functions 8 (b)", "b", 6.75);
-    passed += run_string_test(runner, "List Functions 9 (c)", "c", "abcd");
-    total_tests += 9;
+    passed += run_integer_test(runner, "List Functions 1 (VAR a = 0; FOREACH(el IN list_a) { VAR a = a + el };)", "VAR a = 0; FOREACH(el IN list_a) { VAR a = a + el };", 0);
+    passed += run_integer_test(runner, "List Functions 2 (VAR b = 0; FOREACH(el IN list_a) { VAR b = b + el };)", "VAR b = 0; FOREACH(el IN list_b) { VAR b = b + el };", 0);
+    passed += run_integer_test(runner, "List Functions 3 (VAR c = \"a\"; FOREACH(el IN list_a) { VAR c = c + el };)", "VAR c = \"a\"; FOREACH(el IN list_c) { VAR c = c + el };", 0);
+    passed += run_integer_test(runner, "List Functions 4 (a)", "a", 6);
+    passed += run_float_test(runner, "List Functions 5 (b)", "b", 6.75);
+    passed += run_string_test(runner, "List Functions 6 (c)", "c", "abcd");
+    total_tests += 6;
 
     printf("----------\n");
     passed += run_integer_test(runner, "Built-in Functions 1 (parse_int(\"100\"))", "parse_int(\"100\")", 100);
     passed += run_float_test(runner, "Built-in Functions 2 (parse_float(\"100.55\"))", "parse_float(\"100.55\")", 100.55);
-    passed += run_string_test(runner, "Built-in Functions 3 (\"abcd\".char_at(1))", "\"abcd\".char_at(1)", "b");
-    passed += run_string_test(runner, "Built-in Functions 4 (\"ab\".concat(\"cd\"))", "\"ab\".concat(\"cd\")", "abcd");
-    passed += run_integer_test(runner, "Built-in Functions 5 (\"abcd\".starts_with(\"ab\"))", "\"abcd\".starts_with(\"ab\")", 1);
-    passed += run_integer_test(runner, "Built-in Functions 6 (\"abcd\".ends_with(\"cd\"))", "\"abcd\".ends_with(\"cd\")", 1);
-    passed += run_integer_test(runner, "Built-in Functions 7 (\"abcd\".includes(\"c\"))", "\"abcd\".includes(\"c\")", 1);
-    passed += run_integer_test(runner, "Built-in Functions 8 (\"abcd\".index_of(\"c\"))", "\"abcd\".index_of(\"c\")", 2);
-    passed += run_integer_test(runner, "Built-in Functions 9 (\"abcdcd\".last_index_of(\"c\"))", "\"abcdcd\".last_index_of(\"c\")", 4);
-    passed += run_string_test(runner, "Built-in Functions 10 (\"abcd\".replace(\"cd\", \"11\"))", "\"abcd\".replace(\"cd\", \"11\")", "ab11");
-    passed += run_string_test(runner, "Built-in Functions 11 (\"1111\".replace_all(\"1\", \"2\"))", "\"1111\".replace_all(\"1\", \"2\")", "2222");
-    /*passed += run_string_test(runner, "Built-in Functions 12 (VAR a = \"-\")", "VAR a = \"-\"", "-");
-    passed += run_integer_test(runner, "Built-in Functions 13 (VAR list_a = \"ab.cd\".split(\".\"))", "VAR list_a = \"ab.cd\".split(\".\")", 0);
-    passed += run_string_test(runner, "Built-in Functions 14 (FOREACH(el IN list_a) { VAR a = a + el })", "FOREACH(el IN list_a) { VAR a = a + el }", "-abcd");*/
-    passed += run_string_test(runner, "Built-in Functions 15 (\"abcd\".substring(1,3))", "\"abcd\".substring(1,3)", "bc");
-    passed += run_string_test(runner, "Built-in Functions 16 (\"aBCd\".to_lower_case())", "\"aBCd\".to_lower_case()", "abcd");
-    passed += run_string_test(runner, "Built-in Functions 17 (\"aBCd\".to_upper_case())", "\"aBCd\".to_upper_case()", "ABCD");
-    passed += run_string_test(runner, "Built-in Functions 18 (\" ababa \".trim())", "\" ababa \".trim()", "ababa");
-    passed += run_string_test(runner, "Built-in Functions 19 (\" ababa \".trim_start())", "\" ababa \".trim_start()", "ababa ");
-    passed += run_string_test(runner, "Built-in Functions 20 (\" ababa \".trim_end())", "\" ababa \".trim_end()", " ababa");
-    total_tests += 17;
+    total_tests += 2;
+
+    printf("----------\n");
+    passed += run_string_test(runner, "Built-in String Functions 1 (\"abcd\".char_at(1))", "\"abcd\".char_at(1)", "b");
+    passed += run_string_test(runner, "Built-in String Functions 2 (\"ab\".concat(\"cd\"))", "\"ab\".concat(\"cd\")", "abcd");
+    passed += run_integer_test(runner, "Built-in String Functions 3 (\"abcd\".starts_with(\"ab\"))", "\"abcd\".starts_with(\"ab\")", 1);
+    passed += run_integer_test(runner, "Built-in String Functions 4 (\"abcd\".ends_with(\"cd\"))", "\"abcd\".ends_with(\"cd\")", 1);
+    passed += run_integer_test(runner, "Built-in String Functions 5 (\"abcd\".includes(\"c\"))", "\"abcd\".includes(\"c\")", 1);
+    passed += run_integer_test(runner, "Built-in String Functions 6 (\"abcd\".index_of(\"c\"))", "\"abcd\".index_of(\"c\")", 2);
+    passed += run_integer_test(runner, "Built-in String Functions 7 (\"abcdcd\".last_index_of(\"c\"))", "\"abcdcd\".last_index_of(\"c\")", 4);
+    passed += run_string_test(runner, "Built-in String Functions 8 (\"abcd\".replace(\"cd\", \"11\"))", "\"abcd\".replace(\"cd\", \"11\")", "ab11");
+    passed += run_string_test(runner, "Built-in String Functions 9 (\"1111\".replace_all(\"1\", \"2\"))", "\"1111\".replace_all(\"1\", \"2\")", "2222");
+    /*passed += run_string_test(runner, "Built-in String Functions 10 (VAR a = \"-\")", "VAR a = \"-\"", "-");
+    passed += run_integer_test(runner, "Built-in String Functions 11 (VAR list_a = \"ab.cd\".split(\".\"))", "VAR list_a = \"ab.cd\".split(\".\")", 0);
+    passed += run_string_test(runner, "Built-in String Functions 12 (FOREACH(el IN list_a) { VAR a = a + el })", "FOREACH(el IN list_a) { VAR a = a + el }", "-abcd");*/
+    passed += run_string_test(runner, "Built-in String Functions 13 (\"abcd\".substring(1,3))", "\"abcd\".substring(1,3)", "bc");
+    passed += run_string_test(runner, "Built-in String Functions 14 (\"aBCd\".to_lower_case())", "\"aBCd\".to_lower_case()", "abcd");
+    passed += run_string_test(runner, "Built-in String Functions 15 (\"aBCd\".to_upper_case())", "\"aBCd\".to_upper_case()", "ABCD");
+    passed += run_string_test(runner, "Built-in String Functions 16 (\" ababa \".trim())", "\" ababa \".trim()", "ababa");
+    passed += run_string_test(runner, "Built-in String Functions 17 (\" ababa \".trim_start())", "\" ababa \".trim_start()", "ababa ");
+    passed += run_string_test(runner, "Built-in String Functions 18 (\" ababa \".trim_end())", "\" ababa \".trim_end()", " ababa");
+    total_tests += 15;
+
+    printf("----------\n");
+    passed += run_integer_test(runner, "Built-in List Functions 1 (VAR list_a = [1,2,3]; VAR list_b = [4,5,6]; VAR list_c = list_a.concat(list_b);)", "VAR list_a = [1,2,3]; VAR list_b = [4,5,6]; VAR list_c = list_a.concat(list_b);", 0);
+    passed += run_integer_test(runner, "Built-in List Functions 2 (VAR a = 0; FOREACH(el IN list_c) { VAR a = a + el };)", "VAR a = 0; FOREACH(el IN list_c) { VAR a = a + el };", 0);
+    passed += run_integer_test(runner, "Built-in List Functions 3 (a)", "a", 21);
+    total_tests += 3;
 
     printf("----------\n");
     passed += run_integer_test(runner, "Objects 1 (VAR obj = NEW OBJECT())", "VAR obj = NEW OBJECT()", 0);
