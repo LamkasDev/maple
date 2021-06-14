@@ -5,7 +5,13 @@ class BuiltInRunner {
     public:
         map<string, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)>> builtin_functions;
         map<string, shared_ptr<Function>> non_root_functions;
-        shared_ptr<ListStore> non_root_arguments;
+
+        shared_ptr<ListStore> non_root_arguments = nullptr;
+        shared_ptr<InterpreterStore> interpreter_store = nullptr;
+
+        BuiltInRunner(shared_ptr<InterpreterStore> _interpreter_store) {
+            interpreter_store = _interpreter_store;
+        }
 
         shared_ptr<Function> create_builtin_function(string name, list<string> arguments, function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> function) {
             shared_ptr<Function> f = make_shared<Function>();

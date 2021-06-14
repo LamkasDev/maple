@@ -6,6 +6,7 @@
 #include "../../structures/object_prototype.cpp"
 #include "../../structures/list_store.cpp"
 #include "../../structures/object_store.cpp"
+#include "interpreter_store.cpp"
 #include "interpreter_result.cpp"
 #include "../builtin/builtin_runner.cpp"
 using namespace std;
@@ -17,13 +18,11 @@ class Interpreter {
 
         shared_ptr<Context> context = nullptr;
         map<string, shared_ptr<ObjectPrototype>> object_prototypes;
-        
-        map<int, shared_ptr<ListStore>> lists;
-        int list_uuid = 0;
-        map<int, shared_ptr<ObjectStore>> objects;
-        int object_uuid = 0;
+        shared_ptr<InterpreterStore> interpreter_store = nullptr;
 
         Interpreter() {
+            interpreter_store = make_shared<InterpreterStore>();
+
             SymbolContainer sc_null(0);
             SymbolContainer sc_true(1);
             SymbolContainer sc_false(0);
@@ -33,7 +32,7 @@ class Interpreter {
             save_to_context("TRUE", sc_true, context);
             save_to_context("FALSE", sc_false, context);
 
-            builtin_runner = make_shared<BuiltInRunner>();
+            builtin_runner = make_shared<BuiltInRunner>(interpreter_store);
 
             function<InterpreterResult(BuiltInRunner*, InterpreterResult, shared_ptr<Function>, shared_ptr<Context>)> run_func;
             list<string> arguments;
@@ -209,13 +208,7 @@ class Interpreter {
         InterpreterResult visit_list_node(shared_ptr<Node> node, shared_ptr<Context> _context) {
             shared_ptr<List> n = make_shared<List>();
             n->set_pos(node->start, node->end);
-
-            int current_uuid = list_uuid;
-            list_uuid++;
-
-            shared_ptr<ListStore> n_1 = make_shared<ListStore>();
-            n->set_list_id(current_uuid);
-            lists.insert_or_assign(current_uuid, n_1);
+            shared_ptr<ListStore> n_1 = interpreter_store->attach_list_store(n);
 
             InterpreterResult res;
             res.set_pos(n->start, n->end);
@@ -261,15 +254,7 @@ class Interpreter {
             shared_ptr<Context> new_context = generate_new_context("obj_context", context);
             shared_ptr<Object> n = make_shared<Object>();
             n->set_pos(node->start, node->end);
-
-            int current_uuid = object_uuid;
-            object_uuid++;
-
-            shared_ptr<ObjectStore> n_1 = make_shared<ObjectStore>();
-            n_1->set_context(new_context);
-            n_1->set_prototype(object_prototypes.at(node->token->value_string));
-            n->set_object_id(current_uuid);
-            objects.insert_or_assign(current_uuid, n_1);
+            shared_ptr<ObjectStore> n_1 = interpreter_store->attach_object_store(n, new_context, object_prototypes.at(node->token->value_string));
             
             for(shared_ptr<Node> _node : n_1->prototype->body->statements_nodes_result) {
                 if(_node->type != NODE_CONSTRUCTOR_DEF) {
@@ -517,7 +502,7 @@ class Interpreter {
                 return res.failure(e);
             }
 
-            shared_ptr<ListStore> list_store = get_list_store(list.res_list->list_id);
+            shared_ptr<ListStore> list_store = interpreter_store->get_list_store(list.res_list->list_id);
             if(list_store->type == SYMBOL_LIST_SYMBOLS) {
                 for(SymbolContainer e : list_store->list_symbols) {
                     save_to_context(node->token->value_string, e, _context);
@@ -653,7 +638,7 @@ class Interpreter {
             if(function.value_function->built_in == false) {
                 expr = res.register_result(visit_node(function.value_function->expression, new_context));
             } else if(function.value_function->name->value_string == "run_builtin_function") {
-                shared_ptr<ListStore> arguments = get_list_store(new_context->get_variable("arguments").value_list->list_id);
+                shared_ptr<ListStore> arguments = interpreter_store->get_list_store(new_context->get_variable("arguments").value_list->list_id);
                 builtin_runner->non_root_arguments = arguments;
 
                 expr = res.register_result(builtin_runner->run(function.value_function, new_context));
@@ -805,7 +790,7 @@ class Interpreter {
                 return res.failure(e);
             }
 
-            shared_ptr<ObjectStore> object_store = get_object_store(left.res_obj->object_id);
+            shared_ptr<ObjectStore> object_store = interpreter_store->get_object_store(left.res_obj->object_id);
             InterpreterResult right = res.register_result(visit_node(node->right, object_store->context));
             if(res.should_return()) { return res; }
 
@@ -827,28 +812,10 @@ class Interpreter {
             InterpreterResult expr = res.register_result(visit_node(node->chained_assigment_result, _context));
             if(res.should_return()) { return res; }
 
-            shared_ptr<ObjectStore> object_store = get_object_store(left.res_obj->object_id);
+            shared_ptr<ObjectStore> object_store = interpreter_store->get_object_store(left.res_obj->object_id);
             save_to_context(node->right->token->value_string, expr, object_store->context);
             
             return res.success();
-        }
-
-        shared_ptr<ObjectStore> get_object_store(int id) {
-            try {
-                shared_ptr<ObjectStore> value = objects.at(id);
-                return value;
-            } catch(out_of_range e) {
-                return nullptr;
-            }
-        }
-
-        shared_ptr<ListStore> get_list_store(int id) {
-            try {
-                shared_ptr<ListStore> value = lists.at(id);
-                return value;
-            } catch(out_of_range e) {
-                return nullptr;
-            }
         }
 
         void no_visit_method(string type) {
