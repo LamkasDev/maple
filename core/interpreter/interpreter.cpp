@@ -5,6 +5,7 @@
 #include "../../structures/string.cpp"
 #include "../../structures/object_prototype.cpp"
 #include "../../structures/list_store.cpp"
+#include "../../structures/map_store.cpp"
 #include "../../structures/object_store.cpp"
 #include "interpreter_store.cpp"
 #include "interpreter_result.cpp"
@@ -121,6 +122,8 @@ class Interpreter {
             visit_functions.insert_or_assign(NODE_STRING, visit_func);
             visit_func = &Interpreter::visit_list_node;
             visit_functions.insert_or_assign(NODE_LIST, visit_func);
+            visit_func = &Interpreter::visit_map_node;
+            visit_functions.insert_or_assign(NODE_MAP, visit_func);
             visit_func = &Interpreter::visit_statements_node;
             visit_functions.insert_or_assign(NODE_STATEMENTS, visit_func);
             visit_func = &Interpreter::visit_return_node;
@@ -246,6 +249,19 @@ class Interpreter {
                     break;
                 }
             }
+            if(res.should_return()) { return res; }
+
+            res.set_from(n);
+            return res.success();
+        }
+
+        InterpreterResult visit_map_node(shared_ptr<Node> node, shared_ptr<Context> _context) {
+            shared_ptr<Map> n = make_shared<Map>();
+            n->set_pos(node->start, node->end);
+            shared_ptr<MapStore> n_1 = interpreter_store->attach_map_store(n);
+
+            InterpreterResult res;
+            res.set_pos(n->start, n->end);
             if(res.should_return()) { return res; }
 
             res.set_from(n);

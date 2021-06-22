@@ -5,6 +5,8 @@ class InterpreterStore {
     public:
         map<int, shared_ptr<ListStore>> lists;
         int list_uuid = 0;
+        map<int, shared_ptr<MapStore>> maps;
+        int map_uuid = 0;
         map<int, shared_ptr<ObjectStore>> objects;
         int object_uuid = 0;
 
@@ -56,5 +58,29 @@ class InterpreterStore {
 
             _list->set_list_id(id);
             return list_store;
+        }
+
+        shared_ptr<MapStore> get_map_store(int id) {
+            try {
+                shared_ptr<MapStore> value = maps.at(id);
+                return value;
+            } catch(out_of_range e) {
+                return nullptr;
+            }
+        }
+
+        int get_map_uuid() {
+            int current_uuid = map_uuid;
+            map_uuid++;
+            return current_uuid;
+        }
+
+        shared_ptr<MapStore> attach_map_store(shared_ptr<Map> _map) {
+            shared_ptr<MapStore> map_store = make_shared<MapStore>();
+            int id = get_map_uuid();
+            maps.insert_or_assign(id, map_store);
+
+            _map->set_map_id(id);
+            return map_store;
         }
 };

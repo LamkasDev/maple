@@ -7,6 +7,7 @@ const string NODE_INT = "INT";
 const string NODE_FLOAT = "FLOAT";
 const string NODE_STRING = "STRING";
 const string NODE_LIST = "LIST";
+const string NODE_MAP = "MAP";
 
 const string NODE_BINARY = "BINARY";
 const string NODE_UNARY = "UNARY";

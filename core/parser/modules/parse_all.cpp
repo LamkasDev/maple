@@ -93,6 +93,12 @@ class ParseAll {
                 } else {
                     return result.failure(create_syntax_error(parser_store, "')'"));
                 }
+            } else if(t->type == TT_LCBRACKET) {
+                ParserResult expr = map_expr(parser_store);
+                if(expr.state == -1) { return result.failure(expr.e); }
+
+                result.set_node(expr.node);
+                return result.success();
             } else if(t->type == TT_LSBRACKET) {
                 ParserResult expr = list_expr(parser_store);
                 if(expr.state == -1) { return result.failure(expr.e); }
@@ -420,6 +426,28 @@ class ParseAll {
             node->set_end(parser_store->current_t->start);
             node->set_list_nodes_result(elements);
             
+            result.set_node(node);
+            return result.success();
+        }
+
+        ParserResult map_expr(shared_ptr<ParserStore> parser_store) {
+            ParserResult result;
+            shared_ptr<Node> node = make_shared<Node>();
+            node->set_pos(parser_store->current_t->start, parser_store->current_t->end);
+            node->set_type(NODE_MAP);
+
+            if(parser_store->current_t->type != TT_LCBRACKET) {
+                return result.failure(create_syntax_error(parser_store, "'{'", 1));
+            }
+            result.register_advance(parser_store->advance());
+
+            if(parser_store->current_t->type != TT_RCBRACKET) {
+                return result.failure(create_syntax_error(parser_store, "'}'", 1));
+            }
+            result.register_advance(parser_store->advance());
+
+            node->set_end(parser_store->current_t->start);
+
             result.set_node(node);
             return result.success();
         }

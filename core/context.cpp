@@ -1,5 +1,6 @@
 #pragma once
 #include "../structures/list.cpp"
+#include "../structures/map.cpp"
 #include "../structures/object.cpp"
 #include "../structures/function.cpp"
 #include "symbols/symbol_container.cpp"

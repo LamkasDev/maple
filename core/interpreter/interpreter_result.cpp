@@ -13,6 +13,7 @@ class InterpreterResult {
         FloatNumber res_float;
         String res_string;
         shared_ptr<List> res_list;
+        shared_ptr<Map> res_map;
         shared_ptr<Function> res_func;
         shared_ptr<Object> res_obj;
 
@@ -128,6 +129,11 @@ class InterpreterResult {
             type = NODE_LIST;
         }
 
+        void set_from(shared_ptr<Map> _res_map) {
+            res_map = _res_map;
+            type = NODE_MAP;
+        }
+
         void set_from(InterpreterResult _result) {
             if(_result.type == NODE_INT) {
                 res_int = _result.res_int;
@@ -144,6 +150,9 @@ class InterpreterResult {
             } else if(_result.type == NODE_LIST) {
                 res_list = _result.res_list;
                 type = NODE_LIST;
+            } else if(_result.type == NODE_MAP) {
+                res_map = _result.res_map;
+                type = NODE_MAP;
             } else if(_result.type == NODE_OBJECT_NEW) {
                 res_obj = _result.res_obj;
                 type = NODE_OBJECT_NEW;
@@ -368,6 +377,8 @@ class InterpreterResult {
                 return res_string.repr();
             } else if(type == NODE_LIST) {
                 return res_list->repr();
+            } else if(type == NODE_MAP) {
+                return res_map->repr();
             } else if(type == NODE_OBJECT_NEW) {
                 return res_obj->repr();
             } else {
