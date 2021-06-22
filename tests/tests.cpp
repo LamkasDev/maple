@@ -176,7 +176,8 @@ bool run_tests(Runner runner) {
     passed += run_string_test(runner, "Built-in String Functions 16 (\" ababa \".trim())", "\" ababa \".trim()", "ababa");
     passed += run_string_test(runner, "Built-in String Functions 17 (\" ababa \".trim_start())", "\" ababa \".trim_start()", "ababa ");
     passed += run_string_test(runner, "Built-in String Functions 18 (\" ababa \".trim_end())", "\" ababa \".trim_end()", " ababa");
-    total_tests += 15;
+    passed += run_integer_test(runner, "Built-in String Functions 19 (\"ababa\".length())", "\"ababa\".length()", 5);
+    total_tests += 16;
 
     printf("----------\n");
     passed += run_integer_test(runner, "Built-in List Functions 1 (VAR list_a = [1,2,3]; VAR list_b = [4,5,6]; VAR list_c = list_a.concat(list_b);)", "VAR list_a = [1,2,3]; VAR list_b = [4,5,6]; VAR list_c = list_a.concat(list_b);", 0);

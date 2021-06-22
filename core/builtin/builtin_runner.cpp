@@ -373,6 +373,14 @@ class BuiltInRunner {
             return res.success();
         }
         
+        InterpreterResult run_string_length(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            string value = non_root_arguments->list_symbols[0].value_string;
+            int l = value.length();
+            res.set_from(l);
+
+            return res.success();
+        }
+        
         InterpreterResult run_list_concat(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             shared_ptr<List> list = make_shared<List>();
             shared_ptr<ListStore> list_store = interpreter_store->attach_list_store(list);
