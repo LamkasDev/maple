@@ -405,6 +405,15 @@ class BuiltInRunner {
             return res.success();
         }
         
+        InterpreterResult run_list_pop(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            SymbolContainer list = non_root_arguments->list_symbols[0];
+            shared_ptr<ListStore> list_store = interpreter_store->get_list_store(list.value_list->list_id);
+            SymbolContainer value = list_store->pop_value();
+
+            res.set_from(value);
+            return res.success();
+        }
+        
         /*InterpreterResult run_list_includes(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             shared_ptr<List> list = non_root_arguments->list_lists[0];
             shared_ptr<ListStore> list_store = interpreter_store->get_list_store(list->list_id);
