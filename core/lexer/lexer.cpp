@@ -386,7 +386,10 @@ class Lexer {
             t->set_end(pos);
 
             advance();
-            if(current_c == '=') {
+            if (current_c == '-') {
+                advance();
+                t->set_type(TT_MINUSMINUS);                
+            } else if(current_c == '=') {
                 advance();
                 t->set_type(TT_MINUSEQ);
             }

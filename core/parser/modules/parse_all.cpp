@@ -1029,15 +1029,24 @@ class ParseAll {
                 result.register_advance(parser_store->advance());
 
                 shared_ptr<Token> assignment_token = parser_store->current_t;
+                shared_ptr<Node> n = make_shared<Node>();
+                n->set_type(NODE_ASSIGNMENT);
+                n->set_token(identifier);
+                n->set_assignment_token(assignment_token);
+                if(assignment_token->type == TT_PLUSPLUS || assignment_token->type == TT_MINUSMINUS) {
+                    result.register_advance(parser_store->advance());
 
-                if(assignment_token->type != TT_EQ && assignment_token->type != TT_PLUSEQ && assignment_token->type != TT_MINUSEQ && assignment_token->type != TT_MULEQ && assignment_token->type != TT_DIVEQ && assignment_token->type != TT_PLUSPLUS) {
-                    return result.failure(create_syntax_error(parser_store, "'=', '+=', '*=', '/=', '++' or '-='"));
+                    n->set_pos(identifier->start, identifier->end); 
+                } else if(assignment_token->type == TT_EQ || assignment_token->type == TT_PLUSEQ || assignment_token->type == TT_MINUSEQ || assignment_token->type == TT_MULEQ || assignment_token->type == TT_DIVEQ) {
+                    result.register_advance(parser_store->advance());
+                    ParserResult expr = result.register_result(expression(parser_store));
+                    if(result.state == -1) { return result; }
+
+                    n->set_pos(identifier->start, expr.node->end); 
+                    n->set_to_right(expr.node);
+                } else {
+                    return result.failure(create_syntax_error(parser_store, "'=', '+=', '-=', '*=', '/=', '++' or '--'"));
                 }
-                result.register_advance(parser_store->advance());
-
-                ParserResult expr = result.register_result(expression(parser_store));
-                if(result.state == -1) { return result; }
-                shared_ptr<Node> n = make_shared<Node>(); n->set_pos(identifier->start, expr.node->end); n->set_type(NODE_ASSIGNMENT); n->set_token(identifier); n->set_assignment_token(assignment_token); n->set_to_right(expr.node);
                 
                 result.set_node(n);
                 return result.success();

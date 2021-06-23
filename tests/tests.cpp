@@ -218,8 +218,13 @@ bool run_tests(Runner runner) {
 
     printf("----------\n");
     passed += run_string_test(runner, "Equals math 1 (VAR a = \"a\"; VAR a += \"b\";)", "VAR a = \"a\"; VAR a += \"b\";", "ab");
-    passed += run_integer_test(runner, "Equals math 2 (VAR a = 2; VAR a -= 1;)", "VAR a = 2; VAR a -= 1;", 1);
-    total_tests += 2;
+    passed += run_integer_test(runner, "Equals math 2 (VAR a = 2; VAR a += 1;)", "VAR a = 2; VAR a += 1;", 3);
+    passed += run_integer_test(runner, "Equals math 3 (VAR a = 2; VAR a -= 1;)", "VAR a = 2; VAR a -= 1;", 1);
+    passed += run_integer_test(runner, "Equals math 4 (VAR a = 2; VAR a *= 2;)", "VAR a = 2; VAR a *= 2;", 4);
+    passed += run_float_test(runner, "Equals math 5 (VAR a = 2; VAR a /= 2;)", "VAR a = 2; VAR a /= 2;", 1);
+    passed += run_integer_test(runner, "Equals math 6 (VAR a = 2; VAR a++;)", "VAR a = 2; VAR a++;", 3);
+    passed += run_integer_test(runner, "Equals math 7 (VAR a = 2; VAR a--;)", "VAR a = 2; VAR a--;", 1);
+    total_tests += 7;
 
     printf("----------\n");
     printf("%i PASSED, %i FAILED", passed, (total_tests - passed));
