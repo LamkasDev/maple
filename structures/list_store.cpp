@@ -14,4 +14,10 @@ class ListStore {
             list_symbols.pop_back();
             return value;
         }
+
+        SymbolContainer shift_value() {
+            SymbolContainer value = list_symbols.front();
+            list_symbols.erase(list_symbols.begin());
+            return value;
+        }
 };

@@ -93,6 +93,8 @@ class Interpreter {
             add_non_root_builtin_function("LIST_push", arguments, run_func);
             run_func = &BuiltInRunner::run_list_pop; arguments.clear(); arguments.push_back("arguments");
             add_non_root_builtin_function("LIST_pop", arguments, run_func);
+            run_func = &BuiltInRunner::run_list_shift; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("LIST_shift", arguments, run_func);
             /*run_func = &BuiltInRunner::run_list_includes; arguments.clear(); arguments.push_back("arguments");
             add_non_root_builtin_function("LIST_includes", arguments, run_func);*/
 
