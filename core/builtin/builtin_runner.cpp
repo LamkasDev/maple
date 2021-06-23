@@ -525,6 +525,15 @@ class BuiltInRunner {
             return res.success();
         }
         
+        InterpreterResult run_list_length(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            SymbolContainer list = non_root_arguments->list_symbols[0];
+            shared_ptr<ListStore> list_store = interpreter_store->get_list_store(list.value_list->list_id);
+            int length = list_store->length_values();
+
+            res.set_from(length);
+            return res.success();
+        }
+        
         /*InterpreterResult run_list_includes(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             shared_ptr<List> list = non_root_arguments->list_lists[0];
             shared_ptr<ListStore> list_store = interpreter_store->get_list_store(list->list_id);

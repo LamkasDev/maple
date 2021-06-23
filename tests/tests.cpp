@@ -194,7 +194,9 @@ bool run_tests(Runner runner) {
     passed += run_integer_test(runner, "Built-in List Functions 12 (list_a.get(0)", "list_a.get(0)", 4);
     passed += run_integer_test(runner, "Built-in List Functions 13 (VAR list_a = [1,2,3]; list_a.reverse();)", "VAR list_a = [1,2,3]; list_a.reverse();", 0);
     passed += run_integer_test(runner, "Built-in List Functions 14 (list_a.get(0))", "list_a.get(0)", 3);
-    total_tests += 14;
+    passed += run_integer_test(runner, "Built-in List Functions 15 (VAR list_a = [1,2,3])", "VAR list_a = [1,2,3]", 0);
+    passed += run_integer_test(runner, "Built-in List Functions 16 (list_a.length())", "list_a.length()", 3);
+    total_tests += 16;
 
     printf("----------\n");
     passed += run_integer_test(runner, "Objects 1 (VAR obj = NEW OBJECT())", "VAR obj = NEW OBJECT()", 0);

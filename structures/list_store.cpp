@@ -32,4 +32,8 @@ class ListStore {
         SymbolContainer get_value(int index) {
             return list_symbols[index];
         }
+
+        int length_values() {
+            return list_symbols.size();
+        }
 };
