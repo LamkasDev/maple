@@ -58,7 +58,8 @@ class Lexer {
                     }
 
                     case '*': {
-                        result = add_generic_token(result, TT_MUL);
+                        result = make_mul(result);
+                        if(result.state == -1) { return result; }
                         break;
                     }
 
@@ -364,6 +365,21 @@ class Lexer {
             return result;
         }
 
+        MakeTokensResult make_mul(MakeTokensResult result) {
+            shared_ptr<Token> t = make_shared<Token>(TT_MUL);
+            t->set_start(pos.copy());
+            t->set_end(pos.copy());
+
+            advance();
+            if(current_c == '=') {
+                advance();
+                t->set_type(TT_MULEQ);
+            }
+
+            result.tokens.push_back(t);
+            return result;
+        }
+
         MakeTokensResult make_minus(MakeTokensResult result) {
             shared_ptr<Token> t = make_shared<Token>(TT_MINUS);
             t->set_start(pos);
@@ -385,7 +401,10 @@ class Lexer {
             t->set_end(pos);
 
             advance();
-            if(current_c == '=') {
+            if (current_c == '+') {
+                advance();
+                t->set_type(TT_PLUSPLUS);                
+            } else if(current_c == '=') {
                 advance();
                 t->set_type(TT_PLUSEQ);
             }
@@ -400,7 +419,10 @@ class Lexer {
             t->set_end(pos);
 
             advance();
-            if(current_c == '/') {
+            if(current_c == '=') {
+                advance();
+                t->set_type(TT_DIVEQ);  
+            } else if(current_c == '/') {
                 advance();
                 skip_comment();
                 return result;

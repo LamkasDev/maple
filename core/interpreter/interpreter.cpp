@@ -425,6 +425,26 @@ class Interpreter {
             return res;    
         }
 
+        InterpreterResult process_double_op(string token, shared_ptr<Node> node, InterpreterResult res, shared_ptr<Context> _context) {
+            shared_ptr<Node> previous_node = make_shared<Node>();
+            previous_node->set_type(NODE_ACCESS);
+            previous_node->set_token(node->token);
+
+            InterpreterResult previous_value;
+            
+            previous_value = res.register_result(visit_node(previous_node, _context));
+            if(res.should_return()) { return res; }
+            
+            shared_ptr<Token> _token = make_shared<Token>(token);
+            InterpreterResult new_value;
+            new_value = res.register_result(res.process_binary(previous_value, _token, visit_unary_node(node, _context)));
+
+            if(res.should_return()) { return res; }
+
+            res.set_from(res.register_result(new_value));
+            return res;    
+        }
+
         InterpreterResult visit_variable_assignment_node(shared_ptr<Node> node, shared_ptr<Context> _context) {
             InterpreterResult res;
             res.set_pos(node->start, node->end);
@@ -432,7 +452,7 @@ class Interpreter {
             InterpreterResult value_res;
             value_res = res.register_result(visit_node(node->right, _context));
             if(res.should_return()) { return res; }
-
+        
             if (node->assignment_token->type == TT_EQ) {
                 res.set_from(value_res);
             } else if (node->assignment_token->type == TT_PLUSEQ) {
@@ -441,6 +461,15 @@ class Interpreter {
             } else if (node->assignment_token->type == TT_MINUSEQ) {
                 res = process_equals_op(TT_MINUS,node,res,_context,value_res);
                 if(res.should_return()) { return res; }
+            } else if (node->assignment_token->type == TT_MULEQ) {
+                res = process_equals_op(TT_MUL,node,res,_context,value_res);
+                if(res.should_return()) { return res; }                
+            } else if (node->assignment_token->type == TT_DIVEQ) {
+                res = process_equals_op(TT_DIV,node,res,_context,value_res);
+                if(res.should_return()) { return res; }                
+            } else if (node->assignment_token->type == TT_PLUSPLUS) {
+                res = process_double_op(TT_PLUS,node,res,_context);
+                if(res.should_return()) { return res; }                
             }
             
             save_to_context(node->token->value_string, res, _context);
