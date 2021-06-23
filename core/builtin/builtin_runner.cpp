@@ -180,10 +180,15 @@ class BuiltInRunner {
         }
         
         InterpreterResult run_string_char_at(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            if(non_root_arguments->list_symbols[1].type != NODE_INT) {
+                RuntimeError e(res.start, res.end, "Invalid value for 'index'", generate_traceback(context));
+                return res.failure(e);
+            }
+
             string value = non_root_arguments->list_symbols[0].value_string;
-            int pos = non_root_arguments->list_symbols[1].value_int;
+            int index = non_root_arguments->list_symbols[1].value_int;
             try {
-                res.set_from(string(1, value.at(pos)));
+                res.set_from(string(1, value.at(index)));
             } catch(out_of_range e_0) {
                 RuntimeError e(res.start, res.end, "The index is out of range", generate_traceback(context));
                 return res.failure(e);
@@ -193,10 +198,15 @@ class BuiltInRunner {
         }
         
         InterpreterResult run_string_char_code_at(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            if(non_root_arguments->list_symbols[1].type != NODE_INT) {
+                RuntimeError e(res.start, res.end, "Invalid value for 'index'", generate_traceback(context));
+                return res.failure(e);
+            }
+
             string value = non_root_arguments->list_symbols[0].value_string;
-            int pos = non_root_arguments->list_symbols[1].value_int;
+            int index = non_root_arguments->list_symbols[1].value_int;
             try {
-                res.set_from(value.at(pos));
+                res.set_from(value.at(index));
             } catch(out_of_range e_0) {
                 RuntimeError e(res.start, res.end, "The index is out of range", generate_traceback(context));
                 return res.failure(e);
@@ -216,40 +226,60 @@ class BuiltInRunner {
         }
         
         InterpreterResult run_string_ends_with(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            if(non_root_arguments->list_symbols[1].type != NODE_STRING) {
+                RuntimeError e(res.start, res.end, "Invalid value for 'searchString'", generate_traceback(context));
+                return res.failure(e);
+            }
+
             string value = non_root_arguments->list_symbols[0].value_string;
-            string value_c = non_root_arguments->list_symbols[1].value_string;
+            string search_string = non_root_arguments->list_symbols[1].value_string;
             bool result = false; res.set_from(result);
-            if (value_c.size() > value.size()) { return res.success(); }
-            result = equal(value_c.rbegin(), value_c.rend(), value.rbegin());
+            if (search_string.size() > value.size()) { return res.success(); }
+            result = equal(search_string.rbegin(), search_string.rend(), value.rbegin());
 
             res.set_from(result);
             return res.success();
         }
         
         InterpreterResult run_string_starts_with(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            if(non_root_arguments->list_symbols[1].type != NODE_STRING) {
+                RuntimeError e(res.start, res.end, "Invalid value for 'searchString'", generate_traceback(context));
+                return res.failure(e);
+            }
+
             string value = non_root_arguments->list_symbols[0].value_string;
-            string value_c = non_root_arguments->list_symbols[1].value_string;
+            string search_string = non_root_arguments->list_symbols[1].value_string;
             bool result = false; res.set_from(result);
-            if (value_c.size() > value.size()) { return res.success(); }
-            result = equal(value_c.begin(), value_c.end(), value.begin());
+            if (search_string.size() > value.size()) { return res.success(); }
+            result = equal(search_string.begin(), search_string.end(), value.begin());
 
             res.set_from(result);
             return res.success();
         }
         
         InterpreterResult run_string_includes(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            if(non_root_arguments->list_symbols[1].type != NODE_STRING) {
+                RuntimeError e(res.start, res.end, "Invalid value for 'searchString'", generate_traceback(context));
+                return res.failure(e);
+            }
+
             string value = non_root_arguments->list_symbols[0].value_string;
-            string value_c = non_root_arguments->list_symbols[1].value_string;
-            bool result = value.find(value_c) != string::npos;
+            string search_string = non_root_arguments->list_symbols[1].value_string;
+            bool result = value.find(search_string) != string::npos;
 
             res.set_from(result);
             return res.success();
         }
         
         InterpreterResult run_string_index_of(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            if(non_root_arguments->list_symbols[1].type != NODE_STRING) {
+                RuntimeError e(res.start, res.end, "Invalid value for 'searchString'", generate_traceback(context));
+                return res.failure(e);
+            }
+
             string value = non_root_arguments->list_symbols[0].value_string;
-            string value_c = non_root_arguments->list_symbols[1].value_string;
-            size_t result = value.find(value_c);
+            string search_string = non_root_arguments->list_symbols[1].value_string;
+            size_t result = value.find(search_string);
             if(result == string::npos) {
                 res.set_from(-1);
             } else {
@@ -260,9 +290,14 @@ class BuiltInRunner {
         }
         
         InterpreterResult run_string_last_index_of(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            if(non_root_arguments->list_symbols[1].type != NODE_STRING) {
+                RuntimeError e(res.start, res.end, "Invalid value for 'searchString'", generate_traceback(context));
+                return res.failure(e);
+            }
+
             string value = non_root_arguments->list_symbols[0].value_string;
-            string value_c = non_root_arguments->list_symbols[1].value_string;
-            size_t result = value.rfind(value_c);
+            string search_string = non_root_arguments->list_symbols[1].value_string;
+            size_t result = value.rfind(search_string);
             if(result == string::npos) {
                 res.set_from(-1);
             } else {
@@ -273,28 +308,52 @@ class BuiltInRunner {
         }
         
         InterpreterResult run_string_repeat(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            if(non_root_arguments->list_symbols[1].type != NODE_INT) {
+                RuntimeError e(res.start, res.end, "Invalid value for 'count'", generate_traceback(context));
+                return res.failure(e);
+            }
+
             string value = non_root_arguments->list_symbols[0].value_string;
-            int n = non_root_arguments->list_symbols[1].value_int;
-            res.set_from(repeat_string(value, n));
+            int count = non_root_arguments->list_symbols[1].value_int;
+            value = repeat_string(value, count);
+            res.set_from(value);
 
             return res.success();
         }
         
         InterpreterResult run_string_replace(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            if(non_root_arguments->list_symbols[1].type != NODE_STRING) {
+                RuntimeError e(res.start, res.end, "Invalid value for 'fromString'", generate_traceback(context));
+                return res.failure(e);
+            }
+            if(non_root_arguments->list_symbols[2].type != NODE_STRING) {
+                RuntimeError e(res.start, res.end, "Invalid value for 'toString'", generate_traceback(context));
+                return res.failure(e);
+            }
+
             string value = non_root_arguments->list_symbols[0].value_string;
-            string from_value = non_root_arguments->list_symbols[1].value_string;
-            string to_value = non_root_arguments->list_symbols[2].value_string;
-            replace_string(value, from_value, to_value);
+            string from_string = non_root_arguments->list_symbols[1].value_string;
+            string to_string = non_root_arguments->list_symbols[2].value_string;
+            replace_string(value, from_string, to_string);
             res.set_from(value);
 
             return res.success();
         }
         
         InterpreterResult run_string_replace_all(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            if(non_root_arguments->list_symbols[1].type != NODE_STRING) {
+                RuntimeError e(res.start, res.end, "Invalid value for 'fromString'", generate_traceback(context));
+                return res.failure(e);
+            }
+            if(non_root_arguments->list_symbols[2].type != NODE_STRING) {
+                RuntimeError e(res.start, res.end, "Invalid value for 'toString'", generate_traceback(context));
+                return res.failure(e);
+            }
+
             string value = non_root_arguments->list_symbols[0].value_string;
-            string from_value = non_root_arguments->list_symbols[1].value_string;
-            string to_value = non_root_arguments->list_symbols[2].value_string;
-            replace_string_all(value, from_value, to_value);
+            string from_string = non_root_arguments->list_symbols[1].value_string;
+            string to_string = non_root_arguments->list_symbols[2].value_string;
+            replace_string_all(value, from_string, to_string);
             res.set_from(value);
 
             return res.success();
@@ -321,6 +380,15 @@ class BuiltInRunner {
         }*/
         
         InterpreterResult run_string_substring(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            if(non_root_arguments->list_symbols[1].type != NODE_INT) {
+                RuntimeError e(res.start, res.end, "Invalid value for 'start'", generate_traceback(context));
+                return res.failure(e);
+            }
+            if(non_root_arguments->list_symbols.size() > 2 && non_root_arguments->list_symbols[2].type != NODE_INT) {
+                RuntimeError e(res.start, res.end, "Invalid value for 'end'", generate_traceback(context));
+                return res.failure(e);
+            }
+
             string value = non_root_arguments->list_symbols[0].value_string;
             int start = non_root_arguments->list_symbols[1].value_int;
             if(non_root_arguments->list_symbols.size() >= 2) {
@@ -335,7 +403,7 @@ class BuiltInRunner {
         
         InterpreterResult run_string_to_lower_case(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             string value = non_root_arguments->list_symbols[0].value_string;
-            value = to_lower_case_string(value);
+            to_lower_case_string(value);
             res.set_from(value);
 
             return res.success();
@@ -343,7 +411,7 @@ class BuiltInRunner {
         
         InterpreterResult run_string_to_upper_case(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             string value = non_root_arguments->list_symbols[0].value_string;
-            value = to_upper_case_string(value);
+            to_upper_case_string(value);
             res.set_from(value);
 
             return res.success();
@@ -375,8 +443,8 @@ class BuiltInRunner {
         
         InterpreterResult run_string_length(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             string value = non_root_arguments->list_symbols[0].value_string;
-            int l = value.length();
-            res.set_from(l);
+            int length = value.length();
+            res.set_from(length);
 
             return res.success();
         }

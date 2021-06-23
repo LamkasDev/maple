@@ -6,13 +6,13 @@ bool in_array(const string &value, const vector<string> &array){
 }
 
 string repeat_string(const string& input, unsigned num) {
-    string ret;
-    ret.reserve(input.size() * num);
+    string value;
+    value.reserve(input.size() * num);
     while (num--) {
-        ret += input;
+        value += input;
     }
 
-    return ret;
+    return value;
 }
 
 void replace_string(string& str, const string& from, const string& to) {
@@ -50,14 +50,12 @@ vector<string> split_string(const string& str, const string& delim) {
     return tokens;
 }
 
-string to_lower_case_string(string& str) {
+void to_lower_case_string(string& str) {
     transform(str.begin(), str.end(), str.begin(), ::tolower);
-    return str;
 }
 
-string to_upper_case_string(string& str) {
+void to_upper_case_string(string& str) {
     transform(str.begin(), str.end(), str.begin(), ::toupper);
-    return str;
 }
 
 void ltrim_string(string &s) {
