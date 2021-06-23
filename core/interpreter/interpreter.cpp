@@ -226,12 +226,6 @@ class Interpreter {
                 InterpreterResult value_res = res.register_result(visit_node(_node, _context));
                 if(res.should_return()) { break; }
 
-                bool is_mixed = n_1->type != SYMBOL_LIST_UNKNOWN && ((n_1->type == SYMBOL_LIST_SYMBOLS && (value_res.type != NODE_INT && value_res.type != NODE_FLOAT && value_res.type != NODE_STRING)) || (n_1->type != SYMBOL_LIST_SYMBOLS && n_1->type != value_res.type));
-                if(is_mixed == true) {
-                    RuntimeError e(_node->start, _node->end, "Mixed types in an array are not allowed", generate_traceback(_context));
-                    res.failure(e);
-                    break;
-                }
                 if(value_res.type == NODE_INT) {
                     SymbolContainer container(value_res.res_int.value);
                     n_1->add_value(container);
@@ -242,9 +236,11 @@ class Interpreter {
                     SymbolContainer container(value_res.res_string.value);
                     n_1->add_value(container);
                 } else if(value_res.type == NODE_LIST) {
-                    n_1->add_value(value_res.res_list);
+                    SymbolContainer container(value_res.res_list);
+                    n_1->add_value(container);
                 } else if(value_res.type == NODE_OBJECT_NEW) {
-                    n_1->add_value(value_res.res_obj);
+                    SymbolContainer container(value_res.res_obj);
+                    n_1->add_value(container);
                 } else {
                     RuntimeError e(_node->start, _node->end, "Unsupported type in list", generate_traceback(_context));
                     res.failure(e);
@@ -526,42 +522,15 @@ class Interpreter {
             }
 
             shared_ptr<ListStore> list_store = interpreter_store->get_list_store(list.res_list->list_id);
-            if(list_store->type == SYMBOL_LIST_SYMBOLS) {
-                for(SymbolContainer e : list_store->list_symbols) {
-                    save_to_context(node->token->value_string, e, _context);
+            for(SymbolContainer e : list_store->list_symbols) {
+                save_to_context(node->token->value_string, e, _context);
 
-                    InterpreterResult expr = res.register_result(visit_node(node->for_expr_result, _context));
+                InterpreterResult expr = res.register_result(visit_node(node->for_expr_result, _context));
 
-                    if(res.state == -1) { break; }
-                    if(res.loop_should_continue == true) { res.reset(); continue; }
-                    if(res.loop_should_break == true) { res.reset(); break; }
-                    if(res.has_return_value == true) { res.set_from(expr); res.reset(); break; }
-                }
-            } else if(list_store->type == SYMBOL_LIST_LIST) {
-                for(shared_ptr<List> e : list_store->list_lists) {
-                    save_to_context(node->token->value_string, e, _context);
-
-                    InterpreterResult expr = res.register_result(visit_node(node->for_expr_result, _context));
-
-                    if(res.state == -1) { break; }
-                    if(res.loop_should_continue == true) { res.reset(); continue; }
-                    if(res.loop_should_break == true) { res.reset(); break; }
-                    if(res.has_return_value == true) { res.set_from(expr); res.reset(); break; }
-                }
-            } else if(list_store->type == SYMBOL_LIST_OBJECT) {
-                for(shared_ptr<Object> e : list_store->list_objects) {
-                    save_to_context(node->token->value_string, e, _context);
-
-                    InterpreterResult expr = res.register_result(visit_node(node->for_expr_result, _context));
-
-                    if(res.state == -1) { break; }
-                    if(res.loop_should_continue == true) { res.reset(); continue; }
-                    if(res.loop_should_break == true) { res.reset(); break; }
-                    if(res.has_return_value == true) { res.set_from(expr); res.reset(); break; }
-                }
-            } else {
-                RuntimeError e(node->start, node->end, "Invalid type to iterate over", generate_traceback(_context));
-                return res.failure(e);
+                if(res.state == -1) { break; }
+                if(res.loop_should_continue == true) { res.reset(); continue; }
+                if(res.loop_should_break == true) { res.reset(); break; }
+                if(res.has_return_value == true) { res.set_from(expr); res.reset(); break; }
             }
             if(res.should_return()) { return res; }
 

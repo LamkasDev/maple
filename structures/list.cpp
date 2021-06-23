@@ -1,11 +1,6 @@
 #pragma once
 using namespace std;
 
-const string SYMBOL_LIST_UNKNOWN = "UNKNOWN";
-const string SYMBOL_LIST_SYMBOLS = "SYMBOL";
-const string SYMBOL_LIST_LIST = "LIST";
-const string SYMBOL_LIST_OBJECT = "OBJECT";
-
 class List {
     public:
         Position start;
