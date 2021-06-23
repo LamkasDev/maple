@@ -89,6 +89,8 @@ class Interpreter {
 
             run_func = &BuiltInRunner::run_list_concat; arguments.clear(); arguments.push_back("arguments");
             add_non_root_builtin_function("LIST_concat", arguments, run_func);
+            run_func = &BuiltInRunner::run_list_push; arguments.clear(); arguments.push_back("arguments");
+            add_non_root_builtin_function("LIST_push", arguments, run_func);
             /*run_func = &BuiltInRunner::run_list_includes; arguments.clear(); arguments.push_back("arguments");
             add_non_root_builtin_function("LIST_includes", arguments, run_func);*/
 
