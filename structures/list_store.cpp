@@ -24,4 +24,8 @@ class ListStore {
         void unshift_value(SymbolContainer _value) {
             list_symbols.insert(list_symbols.begin(), _value);
         }
+
+        void reverse_values() {
+            reverse(list_symbols.begin(), list_symbols.end());
+        }
 };
