@@ -180,23 +180,21 @@ bool run_tests(Runner runner) {
     total_tests += 16;
 
     printf("----------\n");
-    passed += run_integer_test(runner, "Built-in List Functions 1 (VAR list_a = [1,2,3]; VAR list_b = [4,5,6]; VAR list_c = list_a.concat(list_b);)", "VAR list_a = [1,2,3]; VAR list_b = [4,5,6]; VAR list_c = list_a.concat(list_b);", 0);
-    passed += run_integer_test(runner, "Built-in List Functions 2 (VAR a = 0; FOREACH(el IN list_c) { VAR a = a + el };)", "VAR a = 0; FOREACH(el IN list_c) { VAR a = a + el };", 0);
-    passed += run_integer_test(runner, "Built-in List Functions 3 (a)", "a", 21);
-    passed += run_integer_test(runner, "Built-in List Functions 4 (VAR list_a = [1,2,3]; list_a.push(4);)", "VAR list_a = [1,2,3]; list_a.push(4);", 0);
-    passed += run_integer_test(runner, "Built-in List Functions 5 (VAR a = 0; FOREACH(el IN list_a) { VAR a = a + el };)", "VAR a = 0; FOREACH(el IN list_a) { VAR a = a + el };", 0);
-    passed += run_integer_test(runner, "Built-in List Functions 6 (a)", "a", 10);
+    passed += run_integer_test(runner, "Built-in List Functions 1 (VAR list_a = [1,2,3])", "VAR list_a = [1,2,3]", 0);
+    passed += run_integer_test(runner, "Built-in List Functions 2 (list_a.get(0))", "list_a.get(0)", 1);
+    passed += run_integer_test(runner, "Built-in List Functions 3 (VAR list_a = [1,2,3]; VAR list_b = [4,5,6]; VAR list_c = list_a.concat(list_b);)", "VAR list_a = [1,2,3]; VAR list_b = [4,5,6]; VAR list_c = list_a.concat(list_b);", 0);
+    passed += run_integer_test(runner, "Built-in List Functions 4 (list_c.get(5))", "(list_c.get(5))", 6);
+    passed += run_integer_test(runner, "Built-in List Functions 5 (VAR list_a = [1,2,3]; list_a.push(4);)", "VAR list_a = [1,2,3]; list_a.push(4);", 0);
+    passed += run_integer_test(runner, "Built-in List Functions 6 (list_a.get(3))", "list_a.get(3)", 4);
     passed += run_integer_test(runner, "Built-in List Functions 7 (VAR list_a = [1,2,3])", "VAR list_a = [1,2,3]", 0);
     passed += run_integer_test(runner, "Built-in List Functions 8 (list_a.pop())", "list_a.pop()", 3);
     passed += run_integer_test(runner, "Built-in List Functions 9 (VAR list_a = [1,2,3])", "VAR list_a = [1,2,3]", 0);
     passed += run_integer_test(runner, "Built-in List Functions 10 (list_a.shift())", "list_a.shift()", 1);
     passed += run_integer_test(runner, "Built-in List Functions 11 (VAR list_a = [1,2,3]; list_a.unshift(4);)", "VAR list_a = [1,2,3]; list_a.unshift(4);", 0);
-    passed += run_integer_test(runner, "Built-in List Functions 12 (VAR a = 0; FOREACH(el IN list_a) { VAR a = a + el };)", "VAR a = 0; FOREACH(el IN list_a) { VAR a = a + el };", 0);
-    passed += run_integer_test(runner, "Built-in List Functions 13 (a)", "a", 10);
-    passed += run_integer_test(runner, "Built-in List Functions 14 (VAR list_a = [1,2,3]; list_a.reverse();)", "VAR list_a = [1,2,3]; list_a.reverse();", 0);
-    passed += run_integer_test(runner, "Built-in List Functions 15 (VAR a = 0; FOREACH(el IN list_a) { VAR a = a + el };)", "VAR a = 0; FOREACH(el IN list_a) { VAR a = a + el };", 0);
-    passed += run_integer_test(runner, "Built-in List Functions 16 (a)", "a", 6);
-    total_tests += 16;
+    passed += run_integer_test(runner, "Built-in List Functions 12 (list_a.get(0)", "list_a.get(0)", 4);
+    passed += run_integer_test(runner, "Built-in List Functions 13 (VAR list_a = [1,2,3]; list_a.reverse();)", "VAR list_a = [1,2,3]; list_a.reverse();", 0);
+    passed += run_integer_test(runner, "Built-in List Functions 14 (list_a.get(0))", "list_a.get(0)", 3);
+    total_tests += 14;
 
     printf("----------\n");
     passed += run_integer_test(runner, "Objects 1 (VAR obj = NEW OBJECT())", "VAR obj = NEW OBJECT()", 0);

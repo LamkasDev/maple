@@ -28,4 +28,8 @@ class ListStore {
         void reverse_values() {
             reverse(list_symbols.begin(), list_symbols.end());
         }
+
+        SymbolContainer get_value(int index) {
+            return list_symbols[index];
+        }
 };
