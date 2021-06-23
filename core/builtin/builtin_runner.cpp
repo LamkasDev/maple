@@ -450,6 +450,11 @@ class BuiltInRunner {
         }
         
         InterpreterResult run_list_get(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            if(non_root_arguments->list_symbols[1].type != NODE_INT) {
+                RuntimeError e(res.start, res.end, "Invalid value for 'index'", generate_traceback(context));
+                return res.failure(e);
+            }
+
             SymbolContainer list = non_root_arguments->list_symbols[0];
             shared_ptr<ListStore> list_store = interpreter_store->get_list_store(list.value_list->list_id);
             SymbolContainer index = non_root_arguments->list_symbols[1];
@@ -476,8 +481,8 @@ class BuiltInRunner {
         InterpreterResult run_list_push(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             SymbolContainer list = non_root_arguments->list_symbols[0];
             shared_ptr<ListStore> list_store = interpreter_store->get_list_store(list.value_list->list_id);
-            SymbolContainer symbol = non_root_arguments->list_symbols[1];
-            list_store->add_value(symbol);
+            SymbolContainer new_value = non_root_arguments->list_symbols[1];
+            list_store->add_value(new_value);
 
             res.set_from(list.value_list);
             return res.success();
@@ -486,26 +491,26 @@ class BuiltInRunner {
         InterpreterResult run_list_pop(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             SymbolContainer list = non_root_arguments->list_symbols[0];
             shared_ptr<ListStore> list_store = interpreter_store->get_list_store(list.value_list->list_id);
-            SymbolContainer value = list_store->pop_value();
+            SymbolContainer ret_value = list_store->pop_value();
 
-            res.set_from(value);
+            res.set_from(ret_value);
             return res.success();
         }
         
         InterpreterResult run_list_shift(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             SymbolContainer list = non_root_arguments->list_symbols[0];
             shared_ptr<ListStore> list_store = interpreter_store->get_list_store(list.value_list->list_id);
-            SymbolContainer value = list_store->shift_value();
+            SymbolContainer ret_value = list_store->shift_value();
 
-            res.set_from(value);
+            res.set_from(ret_value);
             return res.success();
         }
         
         InterpreterResult run_list_unshift(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             SymbolContainer list = non_root_arguments->list_symbols[0];
             shared_ptr<ListStore> list_store = interpreter_store->get_list_store(list.value_list->list_id);
-            SymbolContainer symbol = non_root_arguments->list_symbols[1];
-            list_store->unshift_value(symbol);
+            SymbolContainer new_value = non_root_arguments->list_symbols[1];
+            list_store->unshift_value(new_value);
 
             res.set_from(list.value_list);
             return res.success();
