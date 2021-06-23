@@ -20,4 +20,8 @@ class ListStore {
             list_symbols.erase(list_symbols.begin());
             return value;
         }
+
+        void unshift_value(SymbolContainer _value) {
+            list_symbols.insert(list_symbols.begin(), _value);
+        }
 };

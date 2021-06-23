@@ -190,7 +190,10 @@ bool run_tests(Runner runner) {
     passed += run_integer_test(runner, "Built-in List Functions 8 (list_a.pop())", "list_a.pop()", 3);
     passed += run_integer_test(runner, "Built-in List Functions 9 (VAR list_a = [1,2,3])", "VAR list_a = [1,2,3]", 0);
     passed += run_integer_test(runner, "Built-in List Functions 10 (list_a.shift())", "list_a.shift()", 1);
-    total_tests += 10;
+    passed += run_integer_test(runner, "Built-in List Functions 11 (VAR list_a = [1,2,3]; list_a.unshift(4);)", "VAR list_a = [1,2,3]; list_a.unshift(4);", 0);
+    passed += run_integer_test(runner, "Built-in List Functions 12 (VAR a = 0; FOREACH(el IN list_a) { VAR a = a + el };)", "VAR a = 0; FOREACH(el IN list_a) { VAR a = a + el };", 0);
+    passed += run_integer_test(runner, "Built-in List Functions 13 (a)", "a", 10);
+    total_tests += 13;
 
     printf("----------\n");
     passed += run_integer_test(runner, "Objects 1 (VAR obj = NEW OBJECT())", "VAR obj = NEW OBJECT()", 0);

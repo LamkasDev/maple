@@ -423,6 +423,16 @@ class BuiltInRunner {
             return res.success();
         }
         
+        InterpreterResult run_list_unshift(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
+            SymbolContainer list = non_root_arguments->list_symbols[0];
+            shared_ptr<ListStore> list_store = interpreter_store->get_list_store(list.value_list->list_id);
+            SymbolContainer symbol = non_root_arguments->list_symbols[1];
+            list_store->unshift_value(symbol);
+
+            res.set_from(list.value_list);
+            return res.success();
+        }
+        
         /*InterpreterResult run_list_includes(InterpreterResult res, shared_ptr<Function> function, shared_ptr<Context> context) {
             shared_ptr<List> list = non_root_arguments->list_lists[0];
             shared_ptr<ListStore> list_store = interpreter_store->get_list_store(list->list_id);
