@@ -134,29 +134,48 @@ class InterpreterResult {
             type = NODE_MAP;
         }
 
+        void set_from(SymbolContainer _result) {
+            if(_result.type == NODE_INT) {
+                res_int = _result.value_int;
+            } else if(_result.type == NODE_FLOAT) {
+                res_float = _result.value_float;
+            } else if(_result.type == NODE_FUNC_DEF) {
+                res_func = _result.value_function;
+            } else if(_result.type == NODE_STRING) {
+                res_string = _result.value_string;
+            } else if(_result.type == NODE_LIST) {
+                res_list = _result.value_list;
+            } else if(_result.type == NODE_MAP) {
+                res_map = _result.value_map;
+            } else if(_result.type == NODE_OBJECT_NEW) {
+                res_obj = _result.value_object;
+            } else {
+                return;
+            }
+            
+            type = _result.type;
+        }
+
         void set_from(InterpreterResult _result) {
             if(_result.type == NODE_INT) {
                 res_int = _result.res_int;
-                type = NODE_INT;
             } else if(_result.type == NODE_FLOAT) {
                 res_float = _result.res_float;
-                type = NODE_FLOAT;
             } else if(_result.type == NODE_FUNC_DEF) {
                 res_func = _result.res_func;
-                type = NODE_FUNC_DEF;
             } else if(_result.type == NODE_STRING) {
                 res_string = _result.res_string;
-                type = NODE_STRING;
             } else if(_result.type == NODE_LIST) {
                 res_list = _result.res_list;
-                type = NODE_LIST;
             } else if(_result.type == NODE_MAP) {
                 res_map = _result.res_map;
-                type = NODE_MAP;
             } else if(_result.type == NODE_OBJECT_NEW) {
                 res_obj = _result.res_obj;
-                type = NODE_OBJECT_NEW;
+            } else {
+                return;
             }
+            
+            type = _result.type;
         }
 
         InterpreterResult process_binary(InterpreterResult _left, shared_ptr<Token> _op, InterpreterResult _right, shared_ptr<Context> _context) {
